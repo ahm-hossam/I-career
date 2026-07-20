@@ -1,11 +1,21 @@
-import { Button } from "@i-career/ui";
+import { Hero } from '@/components/hero';
+import { LogoTicker } from '@/components/logo-ticker';
+import { ServiceTabs } from '@/components/service-tabs';
+import { ProgramsTeaser } from '@/components/programs-teaser';
+import { EventsTeaser } from '@/components/events-teaser';
+import { TestimonialCarousel } from '@/components/testimonial-carousel';
+import { CtaBand } from '@/components/cta-band';
 
 export default function Home() {
   return (
-    <div className="flex min-h-screen flex-col items-center justify-center gap-4">
-      <h1 className="text-3xl font-semibold">I-career</h1>
-      <p className="text-zinc-600 dark:text-zinc-400">Public site — under construction.</p>
-      <Button>Get started</Button>
-    </div>
+    <>
+      <Hero />
+      <LogoTicker />
+      <ServiceTabs />
+      <ProgramsTeaser />
+      <EventsTeaser />
+      <TestimonialCarousel />
+      <CtaBand />
+    </>
   );
 }
