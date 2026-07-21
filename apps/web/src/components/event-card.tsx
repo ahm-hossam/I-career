@@ -29,10 +29,12 @@ export function EventCard({
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin: '-60px' }}
       transition={{ duration: 0.45, delay: index * 0.08 }}
-      whileHover={{ y: -4 }}
+      whileHover={{ y: -8, transition: { type: 'spring', stiffness: 300, damping: 22 } }}
       className={cn(
-        'flex flex-col justify-between rounded-2xl p-6 shadow-sm transition-shadow duration-300 hover:shadow-lg',
-        dark ? 'border border-white/10 bg-white/[0.06] backdrop-blur' : 'border border-ink/[0.07] bg-white',
+        'flex flex-col justify-between rounded-2xl p-6 shadow-sm transition-shadow duration-300',
+        dark
+          ? 'border border-white/10 bg-white/[0.06] backdrop-blur hover:border-white/25 hover:shadow-[0_0_0_1px_rgba(255,255,255,0.12),0_20px_40px_-15px_rgba(0,0,0,0.5)]'
+          : 'border border-ink/[0.07] bg-white hover:border-brand-500/30 hover:shadow-[0_0_0_1px_rgba(79,186,116,0.15),0_20px_40px_-15px_rgba(21,26,30,0.25)]',
       )}
     >
       <div>

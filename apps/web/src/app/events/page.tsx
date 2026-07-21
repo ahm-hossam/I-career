@@ -2,8 +2,9 @@
 
 import { useMemo, useState } from 'react';
 import { motion } from 'motion/react';
-import { ChevronDown, ChevronRight } from 'lucide-react';
+import { CalendarDays, ChevronDown, ChevronRight, PartyPopper } from 'lucide-react';
 import { EventCard } from '@/components/event-card';
+import { NetworkField } from '@/components/network-field';
 import { SORT_OPTIONS } from '@/lib/content-types';
 import {
   EVENTS_PAGE,
@@ -26,18 +27,43 @@ export default function EventsPage() {
   }, [sort]);
 
   return (
-    <div className="mx-auto max-w-7xl px-4 py-14 sm:px-6 sm:py-20 lg:px-8">
-      <motion.div
-        initial={{ opacity: 0, y: 16 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5 }}
-        className="max-w-2xl"
-      >
-        <p className="text-sm font-bold uppercase tracking-wide text-brand-600">{EVENTS_PAGE.eyebrow}</p>
-        <h1 className="mt-2 text-3xl font-extrabold text-balance text-ink sm:text-4xl">{EVENTS_PAGE.title}</h1>
-      </motion.div>
+    <div>
+      <section className="relative -mt-[80px] overflow-hidden bg-white pt-[144px] pb-10 sm:pt-[160px]">
+        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_80%_55%_at_50%_-10%,rgba(79,186,116,0.1),transparent)]" />
+        <NetworkField variant="brand" />
 
-      <div className="mt-10 flex items-center justify-between">
+        <motion.div
+          initial={{ opacity: 0, y: -14 }}
+          animate={{ opacity: 1, y: [0, -10, 0], rotate: [-6, -2, -6] }}
+          transition={{
+            opacity: { duration: 0.6, delay: 0.4 },
+            y: { duration: 4, repeat: Infinity, ease: 'easeInOut', delay: 0.4 },
+            rotate: { duration: 4, repeat: Infinity, ease: 'easeInOut', delay: 0.4 },
+          }}
+          className="pointer-events-none absolute right-[8%] top-16 hidden items-center gap-1.5 rounded-full border border-brand-500/20 bg-white/90 px-3.5 py-1.5 text-xs font-bold text-brand-700 shadow-lg backdrop-blur-sm lg:flex"
+        >
+          <PartyPopper size={13} />
+          {UPCOMING_EVENTS.length} {UPCOMING_EVENTS_HEADING}
+        </motion.div>
+
+        <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <motion.div
+            initial={{ opacity: 0, y: 16 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5 }}
+            className="max-w-2xl"
+          >
+            <span className="inline-flex items-center gap-1.5 rounded-full border border-brand-500/20 bg-white/80 px-3.5 py-1 text-xs font-bold uppercase tracking-wide text-brand-700 shadow-sm backdrop-blur-sm">
+              <CalendarDays size={12} />
+              {EVENTS_PAGE.eyebrow}
+            </span>
+            <h1 className="mt-4 text-3xl font-extrabold text-balance text-ink sm:text-4xl">{EVENTS_PAGE.title}</h1>
+          </motion.div>
+        </div>
+      </section>
+
+      <div className="mx-auto max-w-7xl px-4 pb-14 sm:px-6 sm:pb-20 lg:px-8">
+      <div className="flex items-center justify-between">
         <div>
           <h2 className="text-xl font-bold text-ink">{UPCOMING_EVENTS_HEADING}</h2>
           <p className="mt-1 text-sm text-ink-soft">{UPCOMING_EVENTS_SUBHEAD}</p>
@@ -102,6 +128,7 @@ export default function EventsPage() {
             </motion.div>
           ))}
         </div>
+      </div>
       </div>
     </div>
   );

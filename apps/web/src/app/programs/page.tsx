@@ -2,8 +2,9 @@
 
 import { useMemo, useState } from 'react';
 import { motion } from 'motion/react';
-import { ChevronDown, ChevronRight } from 'lucide-react';
+import { ChevronDown, ChevronRight, GraduationCap, Sparkles } from 'lucide-react';
 import { cn } from '@i-career/utils';
+import { NetworkField } from '@/components/network-field';
 import { ProgramCard } from '@/components/program-card';
 import { PROGRAMS, PROGRAMS_PAGE, PROGRAM_TYPE_FILTERS, SORT_OPTIONS } from '@/data/programs';
 
@@ -23,19 +24,44 @@ export default function ProgramsPage() {
   }, [sort, typeFilter]);
 
   return (
-    <div className="mx-auto max-w-7xl px-4 py-14 sm:px-6 sm:py-20 lg:px-8">
-      <motion.div
-        initial={{ opacity: 0, y: 16 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5 }}
-        className="max-w-2xl"
-      >
-        <p className="text-sm font-bold uppercase tracking-wide text-brand-600">{PROGRAMS_PAGE.heading}</p>
-        <h1 className="mt-2 text-3xl font-extrabold text-balance text-ink sm:text-4xl">{PROGRAMS_PAGE.title}</h1>
-        <p className="mt-4 text-ink-soft">{PROGRAMS_PAGE.subhead}</p>
-      </motion.div>
+    <div>
+      <section className="relative -mt-[80px] overflow-hidden bg-white pt-[144px] pb-10 sm:pt-[160px]">
+        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_80%_55%_at_50%_-10%,rgba(79,186,116,0.1),transparent)]" />
+        <NetworkField variant="brand" />
 
-      <div className="mt-10 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+        <motion.div
+          initial={{ opacity: 0, y: -14 }}
+          animate={{ opacity: 1, y: [0, -10, 0], rotate: [-6, -2, -6] }}
+          transition={{
+            opacity: { duration: 0.6, delay: 0.4 },
+            y: { duration: 4, repeat: Infinity, ease: 'easeInOut', delay: 0.4 },
+            rotate: { duration: 4, repeat: Infinity, ease: 'easeInOut', delay: 0.4 },
+          }}
+          className="pointer-events-none absolute right-[8%] top-16 hidden items-center gap-1.5 rounded-full border border-brand-500/20 bg-white/90 px-3.5 py-1.5 text-xs font-bold text-brand-700 shadow-lg backdrop-blur-sm lg:flex"
+        >
+          <GraduationCap size={13} />
+          {PROGRAMS.length} Programs
+        </motion.div>
+
+        <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <motion.div
+            initial={{ opacity: 0, y: 16 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5 }}
+            className="max-w-2xl"
+          >
+            <span className="inline-flex items-center gap-1.5 rounded-full border border-brand-500/20 bg-white/80 px-3.5 py-1 text-xs font-bold uppercase tracking-wide text-brand-700 shadow-sm backdrop-blur-sm">
+              <Sparkles size={12} />
+              {PROGRAMS_PAGE.heading}
+            </span>
+            <h1 className="mt-4 text-3xl font-extrabold text-balance text-ink sm:text-4xl">{PROGRAMS_PAGE.title}</h1>
+            <p className="mt-4 text-ink-soft">{PROGRAMS_PAGE.subhead}</p>
+          </motion.div>
+        </div>
+      </section>
+
+      <div className="mx-auto max-w-7xl px-4 pb-14 sm:px-6 sm:pb-20 lg:px-8">
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div className="flex flex-wrap items-center gap-2">
           <button
             type="button"
@@ -105,6 +131,7 @@ export default function ProgramsPage() {
           Next
           <ChevronRight size={16} />
         </button>
+      </div>
       </div>
     </div>
   );

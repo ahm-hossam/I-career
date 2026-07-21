@@ -1,7 +1,8 @@
 'use client';
 
 import { motion } from 'motion/react';
-import { Sparkles } from 'lucide-react';
+import { Sparkles, Target } from 'lucide-react';
+import { NetworkField } from '@/components/network-field';
 import { StatCounter } from '@/components/stat-counter';
 import { VideoModal } from '@/components/video-modal';
 import { STATS } from '@/data/home';
@@ -19,8 +20,27 @@ function initialsOf(name: string) {
 export default function AboutPage() {
   return (
     <div>
-      <section className="bg-gradient-to-br from-brand-hero via-brand-500 to-brand-600 py-16 sm:py-24">
-        <div className="mx-auto max-w-4xl px-4 text-center sm:px-6 lg:px-8">
+      <section
+        data-nav-theme="dark"
+        className="relative -mt-[80px] overflow-hidden bg-gradient-to-br from-brand-hero via-brand-500 to-brand-600 pt-[144px] pb-16 sm:pt-[176px] sm:pb-24"
+      >
+        <NetworkField variant="inverted" />
+
+        <motion.div
+          initial={{ opacity: 0, y: -14 }}
+          animate={{ opacity: 1, y: [0, -10, 0], rotate: [-6, -2, -6] }}
+          transition={{
+            opacity: { duration: 0.6, delay: 0.4 },
+            y: { duration: 4, repeat: Infinity, ease: 'easeInOut', delay: 0.4 },
+            rotate: { duration: 4, repeat: Infinity, ease: 'easeInOut', delay: 0.4 },
+          }}
+          className="pointer-events-none absolute left-[7%] top-20 hidden items-center gap-1.5 rounded-full border border-white/25 bg-white/10 px-3.5 py-1.5 text-xs font-bold text-white backdrop-blur-sm lg:flex"
+        >
+          <Target size={13} />
+          {STATS[0].value} {STATS[0].label}
+        </motion.div>
+
+        <div className="relative mx-auto max-w-4xl px-4 text-center sm:px-6 lg:px-8">
           <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}>
             <p className="text-sm font-bold uppercase tracking-widest text-white/80">{VISION.eyebrow}</p>
             <h1 className="mt-3 text-balance text-3xl font-extrabold text-white sm:text-4xl">{VISION.text}</h1>

@@ -2,8 +2,9 @@
 
 import { useState } from 'react';
 import { motion } from 'motion/react';
-import { Facebook, Instagram, Linkedin, Mail, Send } from 'lucide-react';
+import { Facebook, Instagram, Linkedin, Mail, MessageCircle, Send } from 'lucide-react';
 import { cn } from '@i-career/utils';
+import { NetworkField } from '@/components/network-field';
 import { CONTACT_FORM, CONTACT_PAGE, CONTACT_SIDE } from '@/data/contact';
 
 export default function ContactPage() {
@@ -12,19 +13,29 @@ export default function ContactPage() {
   const [submitted, setSubmitted] = useState(false);
 
   return (
-    <div className="mx-auto max-w-6xl px-4 py-14 sm:px-6 sm:py-20 lg:px-8">
-      <motion.div
-        initial={{ opacity: 0, y: 16 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5 }}
-        className="max-w-2xl"
-      >
-        <p className="text-sm font-bold uppercase tracking-wide text-brand-600">{CONTACT_PAGE.eyebrow}</p>
-        <h1 className="mt-2 text-3xl font-extrabold text-balance text-ink sm:text-4xl">{CONTACT_PAGE.title}</h1>
-        <p className="mt-4 text-ink-soft">{CONTACT_PAGE.subhead}</p>
-      </motion.div>
+    <div>
+      <section className="relative -mt-[80px] overflow-hidden bg-white pt-[144px] pb-10 sm:pt-[160px]">
+        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_80%_55%_at_50%_-10%,rgba(79,186,116,0.1),transparent)]" />
+        <NetworkField variant="brand" />
+        <div className="relative mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
+          <motion.div
+            initial={{ opacity: 0, y: 16 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5 }}
+            className="max-w-2xl"
+          >
+            <span className="inline-flex items-center gap-1.5 rounded-full border border-brand-500/20 bg-white/80 px-3.5 py-1 text-xs font-bold uppercase tracking-wide text-brand-700 shadow-sm backdrop-blur-sm">
+              <MessageCircle size={12} />
+              {CONTACT_PAGE.eyebrow}
+            </span>
+            <h1 className="mt-4 text-3xl font-extrabold text-balance text-ink sm:text-4xl">{CONTACT_PAGE.title}</h1>
+            <p className="mt-4 text-ink-soft">{CONTACT_PAGE.subhead}</p>
+          </motion.div>
+        </div>
+      </section>
 
-      <div className="mt-12 grid gap-10 lg:grid-cols-[1.3fr_1fr]">
+      <div className="mx-auto max-w-6xl px-4 pt-6 pb-14 sm:px-6 sm:pb-20 lg:px-8">
+      <div className="grid gap-10 lg:grid-cols-[1.3fr_1fr]">
         <motion.form
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -164,6 +175,7 @@ export default function ContactPage() {
             </a>
           </div>
         </motion.div>
+      </div>
       </div>
     </div>
   );

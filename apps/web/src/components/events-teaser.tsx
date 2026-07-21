@@ -8,7 +8,7 @@ export function EventsTeaser() {
   const { featured } = EVENTS_TEASER;
 
   return (
-    <section className="relative overflow-hidden bg-ink py-16 sm:py-24">
+    <section data-nav-theme="dark" className="relative overflow-hidden bg-ink py-16 sm:py-24">
       <span className="pointer-events-none absolute -bottom-10 right-[-4%] select-none font-sans text-[16rem] font-extrabold leading-none text-white/[0.04]">
         car
       </span>

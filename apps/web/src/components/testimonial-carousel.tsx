@@ -26,8 +26,12 @@ export function TestimonialCarousel() {
   }, [index, paused, goTo]);
 
   return (
-    <section className="bg-brand-500 py-16 sm:py-24">
-      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+    <section data-nav-theme="dark" className="relative overflow-hidden bg-gradient-to-br from-brand-700 via-brand-600 to-ink py-16 sm:py-24">
+      <div className="pointer-events-none absolute inset-0 opacity-[0.06] [background-image:url('data:image/svg+xml;utf8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22120%22%20height%3D%22120%22%3E%3Cfilter%20id%3D%22n%22%3E%3CfeTurbulence%20type%3D%22fractalNoise%22%20baseFrequency%3D%220.9%22%20numOctaves%3D%222%22%20stitchTiles%3D%22stitch%22%2F%3E%3C%2Ffilter%3E%3Crect%20width%3D%22100%25%22%20height%3D%22100%25%22%20filter%3D%22url(%23n)%22%2F%3E%3C%2Fsvg%3E')]" />
+      <div className="pointer-events-none absolute -top-20 left-[10%] h-80 w-80 rounded-full bg-brand-300/20 blur-3xl" />
+      <div className="pointer-events-none absolute -bottom-24 right-[8%] h-96 w-96 rounded-full bg-accent-300/15 blur-3xl" />
+
+      <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <motion.div
           initial={{ opacity: 0, y: 16 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -53,9 +57,11 @@ export function TestimonialCarousel() {
               {Array.from({ length: pages }).map((_, pageIdx) => (
                 <div key={pageIdx} className="grid w-full shrink-0 gap-5 sm:grid-cols-2 lg:grid-cols-3">
                   {TESTIMONIALS.slice(pageIdx * PER_VIEW_LG, pageIdx * PER_VIEW_LG + PER_VIEW_LG).map((t) => (
-                    <div
+                    <motion.div
                       key={t.name}
-                      className="flex flex-col rounded-2xl border border-white/15 bg-white/10 p-6 shadow-lg backdrop-blur"
+                      whileHover={{ y: -8 }}
+                      transition={{ type: 'spring', stiffness: 300, damping: 22 }}
+                      className="group flex flex-col rounded-2xl border border-white/15 bg-white/10 p-6 shadow-lg backdrop-blur transition-shadow duration-300 hover:border-white/30 hover:shadow-[0_0_0_1px_rgba(255,255,255,0.15),0_20px_40px_-10px_rgba(0,0,0,0.4)]"
                     >
                       <Quote size={28} className="text-white/40" />
                       <p className="mt-4 flex-1 text-[15px] leading-relaxed text-white">{t.quote}</p>
@@ -72,7 +78,7 @@ export function TestimonialCarousel() {
                           <p className="text-xs text-white/70">{t.title}</p>
                         </div>
                       </div>
-                    </div>
+                    </motion.div>
                   ))}
                 </div>
               ))}

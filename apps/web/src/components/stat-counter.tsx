@@ -10,9 +10,13 @@ interface StatCounterProps {
   label: string;
   theme?: 'dark' | 'light';
   className?: string;
+  /** Seconds to wait before counting starts — sync this with any parent entrance delay,
+   * since `useInView` fires as soon as the element is geometrically visible, regardless
+   * of an opacity/transform delay animating it in. */
+  delay?: number;
 }
 
-export function StatCounter({ value, suffix = '', label, theme = 'dark', className }: StatCounterProps) {
+export function StatCounter({ value, suffix = '', label, theme = 'dark', className, delay = 0 }: StatCounterProps) {
   const ref = useRef<HTMLDivElement>(null);
   const inView = useInView(ref, { once: true, margin: '-10% 0px -10% 0px' });
   const [display, setDisplay] = useState(0);
@@ -21,11 +25,12 @@ export function StatCounter({ value, suffix = '', label, theme = 'dark', classNa
     if (!inView) return;
     const controls = animate(0, value, {
       duration: 1.4,
+      delay,
       ease: [0.16, 1, 0.3, 1],
       onUpdate: (v) => setDisplay(Math.round(v)),
     });
     return () => controls.stop();
-  }, [inView, value]);
+  }, [inView, value, delay]);
 
   return (
     <div ref={ref} className={className}>
