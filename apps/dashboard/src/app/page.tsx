@@ -1,11 +1,13 @@
-import { Button } from "@i-career/ui";
+import { OverviewView } from '@/components/overview-view';
+import { fetchResetRequests, fetchUsers } from '@/lib/api';
+import { buildActivityItems, buildApplicantsKpi, buildSignupChart, emptyKpi } from '@/lib/overview-data';
 
-export default function DashboardHome() {
-  return (
-    <div className="flex min-h-screen flex-col items-center justify-center gap-4">
-      <h1 className="text-3xl font-semibold">I-career Admin</h1>
-      <p className="text-zinc-600 dark:text-zinc-400">Dashboard — under construction.</p>
-      <Button variant="secondary">Sign in</Button>
-    </div>
-  );
+export default async function DashboardOverviewPage() {
+  const [users, requests] = await Promise.all([fetchUsers(), fetchResetRequests()]);
+
+  const kpis = [buildApplicantsKpi(users), emptyKpi('kpiPrograms'), emptyKpi('kpiEmployers'), emptyKpi('kpiEvents')];
+  const chartData = buildSignupChart(users);
+  const activityItems = buildActivityItems(users, requests);
+
+  return <OverviewView kpis={kpis} chartData={chartData} recentUsers={users} activityItems={activityItems} />;
 }

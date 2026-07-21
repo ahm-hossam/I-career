@@ -3,11 +3,13 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { AnimatePresence, motion, useAnimation } from 'motion/react';
-import { Menu, X } from 'lucide-react';
+import { LogOut, Menu, X } from 'lucide-react';
 import { cn } from '@i-career/utils';
-import { NAV_ITEMS, LOGIN_LABEL } from '@/data/site';
+import { NAV_ITEMS } from '@/data/site';
+import { useAuth } from '@/lib/auth/auth-context';
+import { useAuthModal } from '@/lib/auth/auth-modal-context';
 
 const TRIGGER_Y = 90;
 
@@ -15,8 +17,21 @@ export function SiteHeader() {
   const [scrolled, setScrolled] = useState(false);
   const [sectionDark, setSectionDark] = useState(false);
   const [open, setOpen] = useState(false);
+  const [profileOpen, setProfileOpen] = useState(false);
   const pathname = usePathname();
   const controls = useAnimation();
+  const { user, logout } = useAuth();
+  const { open: openAuthModal } = useAuthModal();
+  const profileRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!profileOpen) return;
+    const onClick = (e: MouseEvent) => {
+      if (profileRef.current && !profileRef.current.contains(e.target as Node)) setProfileOpen(false);
+    };
+    document.addEventListener('mousedown', onClick);
+    return () => document.removeEventListener('mousedown', onClick);
+  }, [profileOpen]);
 
   // At the very top the bar is full-width & see-through everywhere (not just home).
   // Once scrolled, it shrinks into a floating pill whose fill is the INVERSE of
@@ -84,7 +99,7 @@ export function SiteHeader() {
         transition={{ layout: { type: 'spring', stiffness: 320, damping: 32 } }}
         className={cn(
           'mx-auto flex items-center justify-between transition-[max-width,border-radius,background-color,border-color,box-shadow,backdrop-filter] duration-300 ease-out',
-          atTop ? 'max-w-7xl px-4 py-4 sm:px-6 lg:px-8' : 'max-w-4xl px-5 py-2.5 sm:px-6',
+          atTop ? 'max-w-7xl px-4 py-4 sm:px-6 lg:px-8' : 'max-w-5xl px-5 py-2.5 sm:px-6',
           atTop && 'rounded-none border border-transparent bg-transparent shadow-none',
           showDarkPill &&
             'rounded-[2rem] border border-white/10 bg-ink/90 shadow-[0_10px_40px_-8px_rgba(0,0,0,0.55)] backdrop-blur-md',
@@ -132,12 +147,67 @@ export function SiteHeader() {
         </nav>
 
         <div className="flex items-center gap-2">
-          <Link
-            href="/login"
-            className="hidden rounded-full bg-accent-300 px-5 py-2.5 text-[15px] font-semibold text-ink shadow-sm transition-all hover:-translate-y-0.5 hover:shadow-md active:translate-y-0 sm:inline-flex"
-          >
-            {LOGIN_LABEL}
-          </Link>
+          {user ? (
+            <div ref={profileRef} className="relative hidden sm:block">
+              <button
+                type="button"
+                onClick={() => setProfileOpen((v) => !v)}
+                className={cn(
+                  'hidden items-center gap-2 whitespace-nowrap rounded-full py-1 pl-1 pr-3 text-[15px] font-semibold transition-colors sm:inline-flex',
+                  useWhiteText ? 'text-white hover:bg-white/10' : 'text-ink hover:bg-ink/[0.05]',
+                )}
+              >
+                <span className="flex h-8 w-8 items-center justify-center rounded-full bg-gradient-to-br from-brand-500 to-brand-700 text-xs font-bold text-white">
+                  {user.firstName[0]}
+                  {user.lastName[0]}
+                </span>
+                {user.firstName}
+              </button>
+              <AnimatePresence>
+                {profileOpen && (
+                  <motion.div
+                    initial={{ opacity: 0, y: 8, scale: 0.97 }}
+                    animate={{ opacity: 1, y: 0, scale: 1 }}
+                    exit={{ opacity: 0, y: 8, scale: 0.97 }}
+                    transition={{ duration: 0.15 }}
+                    className="absolute right-0 top-[calc(100%+8px)] w-48 overflow-hidden rounded-2xl border border-ink/[0.06] bg-white shadow-xl"
+                  >
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setProfileOpen(false);
+                        void logout();
+                      }}
+                      className="flex w-full items-center gap-2.5 px-4 py-3 text-sm font-medium text-status-coral transition-colors hover:bg-status-coral/[0.08]"
+                    >
+                      <LogOut size={16} />
+                      Log out
+                    </button>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>
+          ) : (
+            <>
+              <button
+                type="button"
+                onClick={() => openAuthModal('login')}
+                className={cn(
+                  'hidden whitespace-nowrap rounded-full px-4 py-2.5 text-[15px] font-semibold transition-colors sm:inline-flex',
+                  useWhiteText ? 'text-white hover:bg-white/10' : 'text-ink hover:bg-ink/[0.05]',
+                )}
+              >
+                Login
+              </button>
+              <button
+                type="button"
+                onClick={() => openAuthModal('signup')}
+                className="hidden whitespace-nowrap rounded-full bg-accent-300 px-5 py-2.5 text-[15px] font-semibold text-ink shadow-sm transition-all hover:-translate-y-0.5 hover:shadow-md active:translate-y-0 sm:inline-flex"
+              >
+                Sign Up
+              </button>
+            </>
+          )}
           <button
             type="button"
             onClick={() => setOpen((v) => !v)}
@@ -190,13 +260,42 @@ export function SiteHeader() {
                   {item.label}
                 </Link>
               ))}
-              <Link
-                href="/login"
-                onClick={() => setOpen(false)}
-                className="mt-2 rounded-full bg-accent-300 px-5 py-3 text-center text-base font-semibold text-ink shadow-sm"
-              >
-                {LOGIN_LABEL}
-              </Link>
+              {user ? (
+                <button
+                  type="button"
+                  onClick={() => {
+                    setOpen(false);
+                    void logout();
+                  }}
+                  className="mt-2 flex items-center justify-center gap-2 rounded-full border border-status-coral/20 px-5 py-3 text-center text-base font-semibold text-status-coral"
+                >
+                  <LogOut size={18} />
+                  Log out ({user.firstName})
+                </button>
+              ) : (
+                <div className="mt-2 flex flex-col gap-2">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setOpen(false);
+                      openAuthModal('login');
+                    }}
+                    className="rounded-full border border-ink/10 px-5 py-3 text-center text-base font-semibold text-ink"
+                  >
+                    Login
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setOpen(false);
+                      openAuthModal('signup');
+                    }}
+                    className="rounded-full bg-accent-300 px-5 py-3 text-center text-base font-semibold text-ink shadow-sm"
+                  >
+                    Sign Up
+                  </button>
+                </div>
+              )}
             </div>
           </motion.nav>
         )}

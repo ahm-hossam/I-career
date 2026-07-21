@@ -8,15 +8,53 @@ generator client {
 }
 
 model User {
-  id        String   @id @default(cuid())
-  email     String   @unique
-  name      String?
-  role      Role     @default(USER)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id             String        @id @default(cuid())
+  email          String        @unique
+  passwordHash   String
+  firstName      String
+  lastName       String
+  phone          String
+  nationality    String
+  birthday       DateTime      @db.Date
+  gender         Gender
+  studentStatus  StudentStatus
+  university     String
+  graduationYear Int
+  faculty        String
+  role           Role          @default(USER)
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
+
+  resetRequests PasswordResetRequest[]
+}
+
+model PasswordResetRequest {
+  id         String             @id @default(cuid())
+  userId     String
+  user       User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+  status     ResetRequestStatus @default(PENDING)
+  createdAt  DateTime           @default(now())
+  resolvedAt DateTime?
+
+  @@index([status])
 }
 
 enum Role {
   ADMIN
   USER
+}
+
+enum Gender {
+  MALE
+  FEMALE
+}
+
+enum StudentStatus {
+  STUDENT
+  GRADUATE
+}
+
+enum ResetRequestStatus {
+  PENDING
+  RESOLVED
 }

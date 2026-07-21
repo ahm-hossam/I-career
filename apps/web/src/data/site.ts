@@ -9,8 +9,6 @@ export const NAV_ITEMS: NavItem[] = [
   { label: 'Contact us', href: '/contact' },
 ];
 
-export const LOGIN_LABEL = 'Login';
-
 export const FOOTER_TAGLINE = 'Be Career Ready!';
 
 export const FOOTER_COLUMNS = [

@@ -1,7 +1,11 @@
 import type { Metadata } from 'next';
 import { Almarai } from 'next/font/google';
+import { AuthModal } from '@/components/auth/auth-modal';
 import { SiteHeader } from '@/components/site-header';
 import { SiteFooter } from '@/components/site-footer';
+import { AuthProvider } from '@/lib/auth/auth-context';
+import { AuthModalProvider } from '@/lib/auth/auth-modal-context';
+import { getSessionUser } from '@/lib/auth/session';
 import './globals.css';
 
 const almarai = Almarai({
@@ -32,17 +36,24 @@ export const metadata: Metadata = {
   },
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const user = await getSessionUser();
+
   return (
     <html lang="en" className={`${almarai.variable} h-full antialiased`}>
       <body className="flex min-h-full flex-col font-sans">
-        <SiteHeader />
-        <main className="flex-1">{children}</main>
-        <SiteFooter />
+        <AuthProvider initialUser={user}>
+          <AuthModalProvider>
+            <SiteHeader />
+            <main className="flex-1">{children}</main>
+            <SiteFooter />
+            <AuthModal />
+          </AuthModalProvider>
+        </AuthProvider>
       </body>
     </html>
   );
