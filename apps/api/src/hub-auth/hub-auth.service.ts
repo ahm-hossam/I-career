@@ -31,6 +31,16 @@ export class HubAuthService {
       throw new ConflictException('An account with this email already exists');
     }
 
+    let referredByCodeId: string | undefined;
+    if (dto.referralCode) {
+      const referralCode = await prisma.referralCode.findUnique({
+        where: { code: dto.referralCode },
+      });
+      if (referralCode) {
+        referredByCodeId = referralCode.id;
+      }
+    }
+
     const passwordHash = await bcrypt.hash(dto.password, 10);
     const user = await prisma.hubUser.create({
       data: {
@@ -45,8 +55,15 @@ export class HubAuthService {
         studentStatus: dto.studentStatus,
         university: dto.university,
         faculty: dto.faculty,
+        referredByCodeId,
       },
     });
+
+    if (referredByCodeId) {
+      await prisma.referralEvent.create({
+        data: { referralCodeId: referredByCodeId, type: 'SIGNUP', hubUserId: user.id },
+      });
+    }
 
     const token = await this.signToken(user);
     return { user: toPublicHubUser(user), token };

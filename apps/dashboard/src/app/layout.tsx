@@ -4,6 +4,8 @@ import { cookies } from 'next/headers';
 import { DashboardShell } from '@/components/dashboard-shell';
 import { ThemeLocaleScript } from '@/components/theme-locale-script';
 import { fetchResetRequests, fetchUsers } from '@/lib/api';
+import { DashboardAuthProvider } from '@/lib/auth/auth-context';
+import { getDashboardSessionUser } from '@/lib/auth/session';
 import { LocaleProvider } from '@/lib/i18n/locale-context';
 import { dirOf, LOCALES, DEFAULT_LOCALE, type Locale } from '@/lib/i18n/types';
 import { buildActivityItems } from '@/lib/overview-data';
@@ -32,7 +34,11 @@ export default async function RootLayout({ children }: Readonly<{ children: Reac
   const cookieTheme = cookieStore.get('icareer-theme')?.value;
   const theme: Theme = cookieTheme === 'dark' ? 'dark' : 'light';
 
-  const [users, requests] = await Promise.all([fetchUsers(), fetchResetRequests()]);
+  const [users, requests, sessionUser] = await Promise.all([
+    fetchUsers(),
+    fetchResetRequests(),
+    getDashboardSessionUser(),
+  ]);
   const activityItems = buildActivityItems(users, requests, 8);
 
   return (
@@ -48,7 +54,9 @@ export default async function RootLayout({ children }: Readonly<{ children: Reac
       <body className="min-h-full font-sans">
         <ThemeProvider initialTheme={theme}>
           <LocaleProvider initialLocale={locale}>
-            <DashboardShell activity={activityItems}>{children}</DashboardShell>
+            <DashboardAuthProvider initialUser={sessionUser}>
+              <DashboardShell activity={activityItems}>{children}</DashboardShell>
+            </DashboardAuthProvider>
           </LocaleProvider>
         </ThemeProvider>
       </body>

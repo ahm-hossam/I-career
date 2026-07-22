@@ -3,8 +3,9 @@
 import { useRef, useState, useSyncExternalStore } from 'react';
 import { useRouter } from 'next/navigation';
 import { AnimatePresence, motion } from 'motion/react';
-import { Bell, Moon, Search, Sun } from 'lucide-react';
+import { Bell, ChevronDown, LogOut, Moon, Search, Sun } from 'lucide-react';
 import { cn } from '@i-career/utils';
+import { useDashboardAuth } from '@/lib/auth/auth-context';
 import { useLocale } from '@/lib/i18n/locale-context';
 import type { Locale } from '@/lib/i18n/types';
 import type { ActivityItem } from '@/lib/overview-data';
@@ -63,11 +64,15 @@ function targetForActivity(item: ActivityItem): string {
 export function TopHeader({ onOpenSearch, activity }: { onOpenSearch: () => void; activity: ActivityItem[] }) {
   const { t, locale, setLocale } = useLocale();
   const { theme, toggleTheme } = useTheme();
+  const { user, logout } = useDashboardAuth();
   const router = useRouter();
   const [notifOpen, setNotifOpen] = useState(false);
+  const [userMenuOpen, setUserMenuOpen] = useState(false);
   const readIds = useSyncExternalStore(subscribeReadIds, getReadIdsSnapshot, getReadIdsServerSnapshot);
   const notifRef = useRef<HTMLDivElement>(null);
+  const userMenuRef = useRef<HTMLDivElement>(null);
   useClickOutside(notifRef, () => setNotifOpen(false), notifOpen);
+  useClickOutside(userMenuRef, () => setUserMenuOpen(false), userMenuOpen);
 
   const unreadCount = activity.filter((item) => !readIds.has(item.id)).length;
 
@@ -215,6 +220,50 @@ export function TopHeader({ onOpenSearch, activity }: { onOpenSearch: () => void
             )}
           </AnimatePresence>
         </div>
+
+        {user && (
+          <div ref={userMenuRef} className="relative">
+            <button
+              type="button"
+              onClick={() => setUserMenuOpen((v) => !v)}
+              className="flex items-center gap-2 rounded-full border border-border-subtle bg-surface/60 py-1 pl-1 pr-2.5 text-sm font-semibold text-ink transition-colors hover:bg-ink/[0.04] dark:text-white/90"
+            >
+              <span className="flex h-7 w-7 items-center justify-center rounded-full bg-gradient-to-br from-brand-500 to-brand-700 text-xs font-bold text-white">
+                {user.name.slice(0, 1).toUpperCase()}
+              </span>
+              <span className="hidden max-w-[120px] truncate sm:inline">{user.name}</span>
+              <ChevronDown size={14} className="text-ink-faint" />
+            </button>
+
+            <AnimatePresence>
+              {userMenuOpen && (
+                <motion.div
+                  initial={{ opacity: 0, y: 8, scale: 0.97 }}
+                  animate={{ opacity: 1, y: 0, scale: 1 }}
+                  exit={{ opacity: 0, y: 8, scale: 0.97 }}
+                  transition={{ duration: 0.15 }}
+                  className="absolute end-0 top-[calc(100%+10px)] z-40 w-48 overflow-hidden rounded-2xl border border-border-subtle bg-surface shadow-xl"
+                >
+                  <div className="border-b border-border-subtle px-4 py-3">
+                    <p className="truncate text-sm font-semibold text-ink dark:text-white">{user.name}</p>
+                    <p className="truncate text-xs text-ink-faint">{user.email}</p>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setUserMenuOpen(false);
+                      void logout();
+                    }}
+                    className="flex w-full items-center gap-2.5 px-4 py-3 text-sm font-medium text-status-coral transition-colors hover:bg-status-coral/[0.08]"
+                  >
+                    <LogOut size={16} />
+                    {t('header.signOut')}
+                  </button>
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </div>
+        )}
       </div>
     </header>
   );

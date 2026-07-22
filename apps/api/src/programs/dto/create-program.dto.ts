@@ -1,6 +1,7 @@
 import { Type } from 'class-transformer';
 import { IsArray, IsIn, IsNotEmpty, IsOptional, IsString, ValidateNested } from 'class-validator';
 import { ProgramPhaseDto } from './program-phase.dto';
+import { ProgramSponsorDto } from './program-sponsor.dto';
 
 const ASPECT_RATIOS = ['16:6', '16:9', '1:1'];
 
@@ -54,4 +55,13 @@ export class CreateProgramDto {
   @IsOptional()
   @IsString()
   partnerLogoUrl?: string | null;
+
+  @IsArray()
+  @ValidateNested({ each: true })
+  @Type(() => ProgramSponsorDto)
+  sponsors!: ProgramSponsorDto[];
+
+  @IsOptional()
+  @IsString()
+  formId?: string | null;
 }

@@ -73,7 +73,55 @@ export interface ProgramPhase {
   description: string;
 }
 
+export interface ProgramSponsor {
+  name: string;
+  description: string;
+  logoUrl: string;
+}
+
 export type ImageAspect = '16:6' | '16:9' | '1:1';
+
+export type FormFieldType =
+  | 'SHORT_TEXT'
+  | 'LONG_TEXT'
+  | 'EMAIL'
+  | 'PHONE'
+  | 'NUMBER'
+  | 'DROPDOWN'
+  | 'CHECKBOXES'
+  | 'YES_NO'
+  | 'DATE'
+  | 'FILE';
+
+export interface ProgramFormField {
+  id: string;
+  label: string;
+  type: FormFieldType;
+  required: boolean;
+  options: string[];
+  order: number;
+}
+
+export interface PublicProgramForm {
+  id: string;
+  name: string;
+  fields: ProgramFormField[];
+  programCount: number;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface ProgramFormFieldInput {
+  label: string;
+  type: FormFieldType;
+  required: boolean;
+  options: string[];
+}
+
+export interface ProgramFormInput {
+  name: string;
+  fields: ProgramFormFieldInput[];
+}
 
 export interface PublicProgram {
   id: string;
@@ -90,6 +138,8 @@ export interface PublicProgram {
   partnerName: string;
   partnerBio: string;
   partnerLogoUrl: string | null;
+  sponsors: ProgramSponsor[];
+  form: PublicProgramForm | null;
   createdAt: string;
   updatedAt: string;
 }
@@ -108,6 +158,61 @@ export interface ProgramInput {
   partnerName: string;
   partnerBio: string;
   partnerLogoUrl: string | null;
+  sponsors: ProgramSponsor[];
+  formId: string | null;
+}
+
+export type ApplicationStatus = 'PENDING' | 'ACCEPTED' | 'REJECTED';
+
+export interface PublicProgramApplication {
+  id: string;
+  status: ApplicationStatus;
+  attendedAt: string | null;
+  answers: Record<string, string | string[]> | null;
+  createdAt: string;
+  applicant: {
+    id: string;
+    firstName: string;
+    lastName: string;
+    email: string;
+    phone: string;
+    university: string;
+    faculty: string;
+  };
+  referral: {
+    code: string;
+    label: string | null;
+    type: ReferralCodeType;
+  } | null;
+}
+
+export type ReferralCodeType = 'PERSONAL' | 'CUSTOM';
+
+export interface PublicReferralCode {
+  id: string;
+  code: string;
+  type: ReferralCodeType;
+  label: string | null;
+  ownerName: string | null;
+  clicks: number;
+  signups: number;
+  applications: number;
+  createdAt: string;
+}
+
+export interface ProgramFunnelSummary {
+  clicks: number;
+  signups: number;
+  applications: number;
+  organicApplications: number;
+  accepted: number;
+  rejected: number;
+  attended: number;
+}
+
+export interface ProgramReferralOverview {
+  summary: ProgramFunnelSummary;
+  codes: PublicReferralCode[];
 }
 
 export type ArticleCategory = 'CAREER_HACKS' | 'JOB_SEARCH' | 'DAY_IN_THE_LIFE' | 'GUIDE';
@@ -168,4 +273,29 @@ export interface PublicCompany {
   facebookUrl: string | null;
   websiteUrl: string | null;
   createdAt: string;
+}
+
+export type DashboardUserRole = 'ADMIN';
+
+export interface DashboardAuthUser {
+  id: string;
+  email: string;
+  name: string;
+  role: DashboardUserRole;
+  kind: 'dashboard';
+}
+
+export interface PublicDashboardUser {
+  id: string;
+  name: string;
+  email: string;
+  role: DashboardUserRole;
+  active: boolean;
+  createdAt: string;
+}
+
+export interface DashboardUserInput {
+  name: string;
+  email: string;
+  role: DashboardUserRole;
 }

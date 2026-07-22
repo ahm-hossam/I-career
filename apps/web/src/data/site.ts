@@ -5,6 +5,7 @@ export const NAV_ITEMS: NavItem[] = [
   { label: 'Services', href: '/#services' },
   { label: 'Programs', href: '/programs' },
   { label: 'Events', href: '/events' },
+  { label: 'Articles', href: '/articles' },
   { label: 'About us', href: '/about' },
   { label: 'Contact us', href: '/contact' },
 ];
@@ -25,6 +26,7 @@ export const FOOTER_COLUMNS = [
     links: [
       { label: 'Contact us', href: '/contact' },
       { label: 'Follow us', href: '#social' },
+      { label: 'For Employers', href: '/employer/register' },
     ],
   },
 ];

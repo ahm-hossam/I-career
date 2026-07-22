@@ -3,6 +3,7 @@ import {
   IsEmail,
   IsEnum,
   IsNotEmpty,
+  IsOptional,
   IsString,
   MaxLength,
   MinLength,
@@ -51,4 +52,8 @@ export class HubRegisterDto {
   @IsString()
   @IsNotEmpty()
   faculty!: string;
+
+  @IsOptional()
+  @IsString()
+  referralCode?: string;
 }

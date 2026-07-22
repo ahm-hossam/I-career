@@ -1,4 +1,13 @@
-import type { PasswordResetRequestSummary, PublicProgram, PublicUser } from '@i-career/types';
+import type {
+  PasswordResetRequestSummary,
+  ProgramFunnelSummary,
+  PublicDashboardUser,
+  PublicProgram,
+  PublicProgramApplication,
+  PublicProgramForm,
+  PublicReferralCode,
+  PublicUser,
+} from '@i-career/types';
 
 function internalHeaders() {
   return { 'x-internal-token': process.env.INTERNAL_API_TOKEN! };
@@ -30,4 +39,50 @@ export async function fetchProgram(slug: string): Promise<PublicProgram | null> 
   if (!res.ok) return null;
   const data = await res.json();
   return data.program;
+}
+
+export async function fetchProgramForms(): Promise<PublicProgramForm[]> {
+  const res = await fetch(`${process.env.API_URL}/program-forms`, { cache: 'no-store' });
+  if (!res.ok) return [];
+  const data = await res.json();
+  return data.items;
+}
+
+export async function fetchProgramForm(id: string): Promise<PublicProgramForm | null> {
+  const res = await fetch(`${process.env.API_URL}/program-forms/${id}`, { cache: 'no-store' });
+  if (!res.ok) return null;
+  return res.json();
+}
+
+export async function fetchApplicants(slug: string): Promise<PublicProgramApplication[]> {
+  const res = await fetch(`${process.env.API_URL}/programs/${slug}/applicants`, {
+    headers: internalHeaders(),
+    cache: 'no-store',
+  });
+  if (!res.ok) return [];
+  const data = await res.json();
+  return data.items;
+}
+
+export async function fetchDashboardUsers(): Promise<PublicDashboardUser[]> {
+  const res = await fetch(`${process.env.API_URL}/dashboard-users`, { headers: internalHeaders(), cache: 'no-store' });
+  if (!res.ok) return [];
+  const data = await res.json();
+  return data.items;
+}
+
+export async function fetchReferralOverview(
+  slug: string,
+): Promise<{ summary: ProgramFunnelSummary; codes: PublicReferralCode[] }> {
+  const res = await fetch(`${process.env.API_URL}/programs/${slug}/referral-codes`, {
+    headers: internalHeaders(),
+    cache: 'no-store',
+  });
+  if (!res.ok) {
+    return {
+      summary: { clicks: 0, signups: 0, applications: 0, organicApplications: 0, accepted: 0, rejected: 0, attended: 0 },
+      codes: [],
+    };
+  }
+  return res.json();
 }

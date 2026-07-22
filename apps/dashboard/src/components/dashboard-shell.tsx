@@ -1,12 +1,14 @@
 'use client';
 
 import { useEffect, useState, type ReactNode } from 'react';
+import { usePathname } from 'next/navigation';
 import { CommandPalette } from '@/components/command-palette';
 import { Sidebar } from '@/components/sidebar';
 import { TopHeader } from '@/components/top-header';
 import type { ActivityItem } from '@/lib/overview-data';
 
 export function DashboardShell({ children, activity }: { children: ReactNode; activity: ActivityItem[] }) {
+  const pathname = usePathname();
   const [commandOpen, setCommandOpen] = useState(false);
 
   useEffect(() => {
@@ -19,6 +21,10 @@ export function DashboardShell({ children, activity }: { children: ReactNode; ac
     document.addEventListener('keydown', handleKey);
     return () => document.removeEventListener('keydown', handleKey);
   }, []);
+
+  if (pathname === '/login') {
+    return <>{children}</>;
+  }
 
   return (
     <div className="flex h-screen overflow-hidden">

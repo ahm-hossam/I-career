@@ -1,8 +1,23 @@
-import { Body, Controller, Delete, Get, Param, Post, Put, Req, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  Patch,
+  Post,
+  Put,
+  Req,
+  UseGuards,
+} from '@nestjs/common';
 import type { Request } from 'express';
 import { HubSessionGuard, type HubSessionPayload } from '../common/guards/hub-session.guard';
 import { InternalTokenGuard } from '../common/guards/internal-token.guard';
+import { ApplyProgramDto } from './dto/apply-program.dto';
 import { CreateProgramDto } from './dto/create-program.dto';
+import { CreateReferralCodeDto } from './dto/create-referral-code.dto';
+import { TrackClickDto } from './dto/track-click.dto';
+import { UpdateApplicantDto } from './dto/update-applicant.dto';
 import { UpdateProgramDto } from './dto/update-program.dto';
 import { ProgramsService } from './programs.service';
 
@@ -23,8 +38,55 @@ export class ProgramsController {
 
   @Post(':slug/apply')
   @UseGuards(HubSessionGuard)
-  apply(@Param('slug') slug: string, @Req() req: Request & { hubSession?: HubSessionPayload }) {
-    return this.programsService.apply(slug, req.hubSession!.sub);
+  apply(
+    @Param('slug') slug: string,
+    @Body() dto: ApplyProgramDto,
+    @Req() req: Request & { hubSession?: HubSessionPayload },
+  ) {
+    return this.programsService.apply(slug, req.hubSession!.sub, dto);
+  }
+
+  @Post(':slug/track-click')
+  trackClick(@Param('slug') slug: string, @Body() dto: TrackClickDto) {
+    return this.programsService.trackClick(slug, dto.code);
+  }
+
+  @Post(':slug/referral-code')
+  @UseGuards(HubSessionGuard)
+  getOrCreateReferralCode(
+    @Param('slug') slug: string,
+    @Req() req: Request & { hubSession?: HubSessionPayload },
+  ) {
+    return this.programsService.getOrCreateReferralCode(slug, req.hubSession!.sub);
+  }
+
+  @Get(':slug/applicants')
+  @UseGuards(InternalTokenGuard)
+  async getApplicants(@Param('slug') slug: string) {
+    const items = await this.programsService.getApplicants(slug);
+    return { items };
+  }
+
+  @Patch(':slug/applicants/:applicationId')
+  @UseGuards(InternalTokenGuard)
+  updateApplicant(
+    @Param('slug') slug: string,
+    @Param('applicationId') applicationId: string,
+    @Body() dto: UpdateApplicantDto,
+  ) {
+    return this.programsService.updateApplicant(slug, applicationId, dto);
+  }
+
+  @Get(':slug/referral-codes')
+  @UseGuards(InternalTokenGuard)
+  getReferralOverview(@Param('slug') slug: string) {
+    return this.programsService.getReferralOverview(slug);
+  }
+
+  @Post(':slug/referral-codes')
+  @UseGuards(InternalTokenGuard)
+  createReferralCode(@Param('slug') slug: string, @Body() dto: CreateReferralCodeDto) {
+    return this.programsService.createReferralCode(slug, dto);
   }
 
   @Post()

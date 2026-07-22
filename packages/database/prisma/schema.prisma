@@ -77,7 +77,11 @@ model HubUser {
   createdAt     DateTime      @default(now())
   updatedAt     DateTime      @updatedAt
 
-  applications ProgramApplication[]
+  referredByCodeId String?
+  referredByCode   ReferralCode? @relation("HubUserReferredBy", fields: [referredByCodeId], references: [id])
+
+  applications       ProgramApplication[]
+  ownedReferralCodes ReferralCode[]       @relation("HubUserOwnsCode")
 }
 
 model Program {
@@ -95,21 +99,111 @@ model Program {
   partnerName    String
   partnerBio     String
   partnerLogoUrl String?
+  sponsors       Json     @default("[]")
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
-  applications ProgramApplication[]
+  formId String?
+  form   ProgramForm? @relation(fields: [formId], references: [id])
+
+  applications  ProgramApplication[]
+  referralCodes ReferralCode[]
+}
+
+enum ApplicationStatus {
+  PENDING
+  ACCEPTED
+  REJECTED
 }
 
 model ProgramApplication {
-  id        String   @id @default(cuid())
+  id        String            @id @default(cuid())
   hubUserId String
-  hubUser   HubUser  @relation(fields: [hubUserId], references: [id], onDelete: Cascade)
+  hubUser   HubUser           @relation(fields: [hubUserId], references: [id], onDelete: Cascade)
   programId String
-  program   Program  @relation(fields: [programId], references: [id], onDelete: Cascade)
-  createdAt DateTime @default(now())
+  program   Program           @relation(fields: [programId], references: [id], onDelete: Cascade)
+  status    ApplicationStatus @default(PENDING)
+  attendedAt DateTime?
+  answers   Json?
+  createdAt DateTime          @default(now())
+
+  referralCodeId String?
+  referralCode   ReferralCode? @relation(fields: [referralCodeId], references: [id])
 
   @@unique([hubUserId, programId])
+}
+
+enum FormFieldType {
+  SHORT_TEXT
+  LONG_TEXT
+  EMAIL
+  PHONE
+  NUMBER
+  DROPDOWN
+  CHECKBOXES
+  YES_NO
+  DATE
+  FILE
+}
+
+model ProgramForm {
+  id        String             @id @default(cuid())
+  name      String
+  createdAt DateTime           @default(now())
+  updatedAt DateTime           @updatedAt
+
+  fields   ProgramFormField[]
+  programs Program[]
+}
+
+model ProgramFormField {
+  id       String        @id @default(cuid())
+  formId   String
+  form     ProgramForm   @relation(fields: [formId], references: [id], onDelete: Cascade)
+  label    String
+  type     FormFieldType
+  required Boolean       @default(false)
+  options  String[]
+  order    Int
+}
+
+enum ReferralCodeType {
+  PERSONAL
+  CUSTOM
+}
+
+model ReferralCode {
+  id             String           @id @default(cuid())
+  code           String           @unique
+  type           ReferralCodeType
+  label          String?
+  programId      String
+  program        Program          @relation(fields: [programId], references: [id], onDelete: Cascade)
+  ownerHubUserId String?
+  ownerHubUser   HubUser?         @relation("HubUserOwnsCode", fields: [ownerHubUserId], references: [id], onDelete: Cascade)
+  createdAt      DateTime         @default(now())
+
+  referredHubUsers    HubUser[]            @relation("HubUserReferredBy")
+  events              ReferralEvent[]
+  programApplications ProgramApplication[]
+
+  @@unique([ownerHubUserId, programId])
+}
+
+enum ReferralEventType {
+  CLICK
+  SIGNUP
+  APPLICATION
+}
+
+model ReferralEvent {
+  id                   String            @id @default(cuid())
+  referralCodeId       String
+  referralCode         ReferralCode      @relation(fields: [referralCodeId], references: [id], onDelete: Cascade)
+  type                 ReferralEventType
+  hubUserId            String?
+  programApplicationId String?
+  createdAt            DateTime          @default(now())
 }
 
 enum ArticleCategory {
@@ -184,4 +278,19 @@ model EmployerUser {
   companyId    String
   company      Company  @relation(fields: [companyId], references: [id], onDelete: Cascade)
   createdAt    DateTime @default(now())
+}
+
+enum DashboardUserRole {
+  ADMIN
+}
+
+model DashboardUser {
+  id           String            @id @default(cuid())
+  name         String
+  email        String            @unique
+  passwordHash String
+  role         DashboardUserRole @default(ADMIN)
+  active       Boolean           @default(true)
+  createdAt    DateTime          @default(now())
+  updatedAt    DateTime          @updatedAt
 }

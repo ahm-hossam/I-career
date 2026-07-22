@@ -1,6 +1,7 @@
 import {
   Building2,
   CalendarDays,
+  ClipboardList,
   GraduationCap,
   HeartHandshake,
   LayoutDashboard,
@@ -29,6 +30,7 @@ export const NAV_SECTIONS: NavSection[] = [
       { key: 'overview', href: '/', icon: LayoutDashboard },
       { key: 'applicants', href: '/applicants', icon: Users },
       { key: 'programs', href: '/programs', icon: GraduationCap },
+      { key: 'forms', href: '/forms', icon: ClipboardList },
       { key: 'events', href: '/events', icon: CalendarDays },
     ],
   },

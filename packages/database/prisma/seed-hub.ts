@@ -21,7 +21,7 @@ async function seedPrograms() {
       title: 'Ready For Tomorrow (Digitera) - 2026',
       subtitleEn: 'Ready for Tomorrow — A Youth Inclusion and Employment Project.',
       subtitleAr: 'جاهزون للغد — مشروع دمج وتوظيف الشباب',
-      logoUrl: 'http://localhost:3003/programs/digitera-logo.png',
+      logoUrl: 'http://localhost:3000/programs/digitera-logo.png',
       imageAspect: '16:6',
       aboutBody: toHtml(
         'Ready for Tomorrow is a fully free employment pathway for ambitious young graduates in Greater Cairo. Built in partnership with Plan International and the Danish-Arab Partnership Program, the program is designed to help you secure your first job through:\n\n' +
@@ -86,7 +86,7 @@ async function seedPrograms() {
       title: 'Talentex Academy: From Talent to Career',
       subtitleEn: 'Talentex Academy — A Youth Skills & Employment Pathway',
       subtitleAr: 'أكاديمية تالانتكس — مسار لمهارات وتوظيف الشباب',
-      logoUrl: 'http://localhost:3003/programs/talentex-banner.jpg',
+      logoUrl: 'http://localhost:3000/programs/talentex-banner.jpg',
       imageAspect: '16:6',
       aboutBody: toHtml(
         'Talentex Academy is a comprehensive employability and career development program designed to support youth in Egypt in transitioning successfully into the job market. The academy bridges the gap between academic learning and employer expectations by equipping ambitious young people, aged 20–25, with the technical, professional, and career readiness skills needed for sustainable employment.\n\n' +
@@ -149,7 +149,7 @@ async function seedPrograms() {
       title: 'Next Path',
       subtitleEn: 'A fully free career launchpad for recent graduates and senior students in Greater Cairo.',
       subtitleAr: null,
-      logoUrl: 'http://localhost:3003/programs/nextpath-banner.png',
+      logoUrl: 'http://localhost:3000/programs/nextpath-banner.png',
       imageAspect: '16:6',
       aboutBody: toHtml(
         'You worked hard to get that degree. Now comes the part no one really prepares you for — the job search. Next Path is here for exactly that moment.\n\n' +

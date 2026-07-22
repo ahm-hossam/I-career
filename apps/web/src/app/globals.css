@@ -1,5 +1,6 @@
 @import "tailwindcss";
 @import "@i-career/config/tailwind/theme.css";
+@plugin "@tailwindcss/typography";
 @source "../../../../packages/ui/src";
 
 :root {

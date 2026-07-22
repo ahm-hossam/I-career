@@ -5,14 +5,17 @@ import { ProgramsTeaser } from '@/components/programs-teaser';
 import { EventsTeaser } from '@/components/events-teaser';
 import { TestimonialCarousel } from '@/components/testimonial-carousel';
 import { CtaBand } from '@/components/cta-band';
+import { fetchPrograms } from '@/lib/api';
 
-export default function Home() {
+export default async function Home() {
+  const programs = await fetchPrograms();
+
   return (
     <>
       <Hero />
       <LogoTicker />
       <ServiceTabs />
-      <ProgramsTeaser />
+      <ProgramsTeaser programs={programs} />
       <EventsTeaser />
       <TestimonialCarousel />
       <CtaBand />
