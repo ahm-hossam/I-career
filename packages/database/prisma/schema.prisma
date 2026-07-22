@@ -58,3 +58,127 @@ enum ResetRequestStatus {
   PENDING
   RESOLVED
 }
+
+// --- iCareer Hub -------------------------------------------------------
+
+model HubUser {
+  id            String        @id @default(cuid())
+  email         String        @unique
+  passwordHash  String
+  firstName     String
+  lastName      String
+  phone         String
+  governorate   String
+  birthday      DateTime      @db.Date
+  gender        Gender
+  studentStatus StudentStatus
+  university    String
+  faculty       String
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+
+  applications ProgramApplication[]
+}
+
+model Program {
+  id          String   @id @default(cuid())
+  slug        String   @unique
+  title       String
+  subtitleEn  String
+  subtitleAr  String?
+  logoUrl     String
+  aboutBody   String
+  phases      Json
+  benefits    String[]
+  criteria    String[]
+  partnerName String
+  partnerBio  String
+  createdAt   DateTime @default(now())
+
+  applications ProgramApplication[]
+}
+
+model ProgramApplication {
+  id        String   @id @default(cuid())
+  hubUserId String
+  hubUser   HubUser  @relation(fields: [hubUserId], references: [id], onDelete: Cascade)
+  programId String
+  program   Program  @relation(fields: [programId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+
+  @@unique([hubUserId, programId])
+}
+
+enum ArticleCategory {
+  CAREER_HACKS
+  JOB_SEARCH
+  DAY_IN_THE_LIFE
+  GUIDE
+}
+
+model Article {
+  id          String          @id @default(cuid())
+  slug        String          @unique
+  title       String
+  category    ArticleCategory
+  body        String
+  publishedAt DateTime
+  createdAt   DateTime        @default(now())
+}
+
+enum EventType {
+  INFO_SESSION
+  TRAINING
+  WORKSHOP
+  CAREER_DAY
+  RECRUITMENT_DAY
+  EMPLOYER_CIRCLE
+  CAREER_ADVISING
+  CAREER_TALK
+  EMPLOYMENT_FAIR
+  MENTORSHIP_CIRCLE
+  CAREER_WEEK
+  OTHER
+}
+
+model Event {
+  id        String    @id @default(cuid())
+  slug      String    @unique
+  title     String
+  type      EventType
+  startsAt  DateTime
+  location  String
+  body      String
+  createdAt DateTime  @default(now())
+}
+
+model Company {
+  id                String   @id @default(cuid())
+  name              String
+  numberOfEmployees String
+  industry          String
+  type              String
+  description       String
+  address           String
+  benefits          String[]
+  logoUrl           String?
+  linkedinUrl       String?
+  facebookUrl       String?
+  websiteUrl        String?
+  documentUrls      String[]
+  createdAt         DateTime @default(now())
+
+  employerUsers EmployerUser[]
+}
+
+model EmployerUser {
+  id           String   @id @default(cuid())
+  email        String   @unique
+  passwordHash String
+  fullName     String
+  phone        String
+  jobTitle     String
+  companyId    String
+  company      Company  @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  createdAt    DateTime @default(now())
+}

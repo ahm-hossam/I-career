@@ -10,6 +10,7 @@
     "db:studio": "prisma studio",
     "db:push": "prisma db push",
     "db:seed": "tsx prisma/seed.ts",
+    "db:seed:hub": "tsx prisma/seed-hub.ts",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {

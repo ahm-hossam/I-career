@@ -13,4 +13,13 @@ export type {
   Gender,
   StudentStatus,
   ResetRequestStatus,
+  HubUser,
+  Program,
+  ProgramApplication,
+  Article,
+  ArticleCategory,
+  Event,
+  EventType,
+  Company,
+  EmployerUser,
 } from './generated/prisma/index.js';
