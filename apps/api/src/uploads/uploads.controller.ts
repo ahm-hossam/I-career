@@ -5,15 +5,18 @@ import {
   Controller,
   Post,
   UploadedFile,
+  UseGuards,
   UseInterceptors,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
+import { InternalTokenGuard } from '../common/guards/internal-token.guard';
 
 const ALLOWED_EXTENSIONS = new Set(['.pdf', '.jpg', '.jpeg', '.png']);
 const MAX_SIZE_BYTES = 10 * 1024 * 1024;
 
 @Controller('uploads')
+@UseGuards(InternalTokenGuard)
 export class UploadsController {
   @Post()
   @UseInterceptors(
@@ -43,6 +46,6 @@ export class UploadsController {
     if (!file) {
       throw new BadRequestException('No file provided');
     }
-    return { url: `/uploads/${file.filename}` };
+    return { url: `${process.env.PUBLIC_API_URL}/uploads/${file.filename}` };
   }
 }

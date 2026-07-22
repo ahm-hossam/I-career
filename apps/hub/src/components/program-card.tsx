@@ -4,6 +4,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { motion } from 'motion/react';
 import type { PublicProgram } from '@i-career/types';
+import { aspectRatioClass, stripHtml } from '@/lib/rich-text';
 
 export function ProgramCard({ program, index = 0 }: { program: PublicProgram; index?: number }) {
   return (
@@ -15,7 +16,10 @@ export function ProgramCard({ program, index = 0 }: { program: PublicProgram; in
       whileHover={{ y: -6 }}
       className="flex flex-col overflow-hidden rounded-3xl border border-ink/[0.06] bg-white shadow-sm transition-shadow hover:shadow-xl"
     >
-      <Link href={`/programs/${program.slug}`} className="relative block aspect-[15/9] w-full overflow-hidden bg-brand-50">
+      <Link
+        href={`/programs/${program.slug}`}
+        className={`relative block w-full overflow-hidden bg-brand-50 ${aspectRatioClass(program.imageAspect)}`}
+      >
         <Image src={program.logoUrl} alt={program.title} fill className="object-cover" />
       </Link>
       <div className="flex flex-1 flex-col gap-3 p-5">
@@ -31,7 +35,7 @@ export function ProgramCard({ program, index = 0 }: { program: PublicProgram; in
           </Link>
         </div>
         <p className="line-clamp-1 text-sm font-semibold text-ink">{program.subtitleEn}</p>
-        <p className="line-clamp-3 text-sm text-ink-soft">{program.aboutBody}</p>
+        <p className="line-clamp-3 text-sm text-ink-soft">{stripHtml(program.aboutBody)}</p>
       </div>
     </motion.div>
   );

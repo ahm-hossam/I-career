@@ -13,6 +13,9 @@
     "@i-career/types": "workspace:*",
     "@i-career/ui": "workspace:*",
     "@i-career/utils": "workspace:*",
+    "@tiptap/pm": "^3.28.0",
+    "@tiptap/react": "^3.28.0",
+    "@tiptap/starter-kit": "^3.28.0",
     "lucide-react": "^0.545.0",
     "motion": "^12.42.2",
     "next": "16.2.10",
@@ -21,6 +24,7 @@
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",
+    "@tailwindcss/typography": "^0.5.20",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",

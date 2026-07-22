@@ -87,13 +87,16 @@ model Program {
   subtitleEn  String
   subtitleAr  String?
   logoUrl     String
+  imageAspect String   @default("16:6")
   aboutBody   String
   phases      Json
   benefits    String[]
   criteria    String[]
-  partnerName String
-  partnerBio  String
+  partnerName    String
+  partnerBio     String
+  partnerLogoUrl String?
   createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 
   applications ProgramApplication[]
 }

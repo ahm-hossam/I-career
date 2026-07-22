@@ -4,6 +4,7 @@ import { Check } from 'lucide-react';
 import { ProgramCard } from '@/components/program-card';
 import { ProgramRegisterButton } from '@/components/program-register-button';
 import { fetchProgramBySlug } from '@/lib/api';
+import { aspectRatioClass } from '@/lib/rich-text';
 
 export default async function ProgramDetailPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
@@ -14,7 +15,7 @@ export default async function ProgramDetailPage({ params }: { params: Promise<{ 
 
   return (
     <article className="relative -mt-[80px] mx-auto max-w-4xl px-4 pb-12 pt-[124px] sm:px-6 sm:pb-16 sm:pt-[140px] lg:px-8">
-      <div className="relative aspect-[16/6] w-full overflow-hidden rounded-3xl bg-brand-50">
+      <div className={`relative w-full overflow-hidden rounded-3xl bg-brand-50 ${aspectRatioClass(program.imageAspect)}`}>
         <Image src={program.logoUrl} alt={program.title} fill className="object-cover" priority />
       </div>
 
@@ -27,7 +28,10 @@ export default async function ProgramDetailPage({ params }: { params: Promise<{ 
         <h2 className="text-xl font-bold text-ink">About Program</h2>
         <p className="mt-2 font-semibold text-ink">{program.subtitleEn}</p>
         {program.subtitleAr && <p className="text-ink-soft" dir="rtl">{program.subtitleAr}</p>}
-        <p className="mt-4 whitespace-pre-line text-ink-soft">{program.aboutBody}</p>
+        <div
+          className="prose prose-sm mt-4 max-w-none text-ink-soft prose-headings:text-ink prose-strong:text-ink"
+          dangerouslySetInnerHTML={{ __html: program.aboutBody }}
+        />
       </section>
 
       {program.phases.length > 0 && (
@@ -38,7 +42,10 @@ export default async function ProgramDetailPage({ params }: { params: Promise<{ 
             {program.phases.map((phase) => (
               <div key={phase.title} className="rounded-2xl border border-ink/[0.06] bg-white p-5 shadow-sm">
                 <h3 className="font-bold text-ink">{phase.title}</h3>
-                <p className="mt-1.5 whitespace-pre-line text-sm text-ink-soft">{phase.description}</p>
+                <div
+                  className="prose prose-sm mt-1.5 max-w-none text-sm text-ink-soft prose-headings:text-ink prose-strong:text-ink"
+                  dangerouslySetInnerHTML={{ __html: phase.description }}
+                />
               </div>
             ))}
           </div>
@@ -78,8 +85,18 @@ export default async function ProgramDetailPage({ params }: { params: Promise<{ 
       )}
 
       <section className="mt-10 rounded-3xl border border-ink/[0.06] bg-brand-50/40 p-6">
-        <h2 className="font-bold text-ink">{program.partnerName}</h2>
-        <p className="mt-2 whitespace-pre-line text-sm text-ink-soft">{program.partnerBio}</p>
+        <div className="flex items-center gap-4">
+          {program.partnerLogoUrl && (
+            <div className="relative h-12 w-12 shrink-0 overflow-hidden rounded-full bg-white">
+              <Image src={program.partnerLogoUrl} alt={program.partnerName} fill className="object-cover" />
+            </div>
+          )}
+          <h2 className="font-bold text-ink">{program.partnerName}</h2>
+        </div>
+        <div
+          className="prose prose-sm mt-2 max-w-none text-sm text-ink-soft prose-headings:text-ink prose-strong:text-ink"
+          dangerouslySetInnerHTML={{ __html: program.partnerBio }}
+        />
       </section>
 
       {otherPrograms.length > 0 && (

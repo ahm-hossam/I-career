@@ -73,6 +73,8 @@ export interface ProgramPhase {
   description: string;
 }
 
+export type ImageAspect = '16:6' | '16:9' | '1:1';
+
 export interface PublicProgram {
   id: string;
   slug: string;
@@ -80,13 +82,32 @@ export interface PublicProgram {
   subtitleEn: string;
   subtitleAr: string | null;
   logoUrl: string;
+  imageAspect: ImageAspect;
   aboutBody: string;
   phases: ProgramPhase[];
   benefits: string[];
   criteria: string[];
   partnerName: string;
   partnerBio: string;
+  partnerLogoUrl: string | null;
   createdAt: string;
+  updatedAt: string;
+}
+
+export interface ProgramInput {
+  slug: string;
+  title: string;
+  subtitleEn: string;
+  subtitleAr: string | null;
+  logoUrl: string;
+  imageAspect: ImageAspect;
+  aboutBody: string;
+  phases: ProgramPhase[];
+  benefits: string[];
+  criteria: string[];
+  partnerName: string;
+  partnerBio: string;
+  partnerLogoUrl: string | null;
 }
 
 export type ArticleCategory = 'CAREER_HACKS' | 'JOB_SEARCH' | 'DAY_IN_THE_LIFE' | 'GUIDE';

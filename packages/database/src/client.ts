@@ -22,4 +22,5 @@ export type {
   EventType,
   Company,
   EmployerUser,
+  Prisma,
 } from './generated/prisma/index.js';

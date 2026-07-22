@@ -1,6 +1,17 @@
 import 'dotenv/config';
 import { prisma } from '../src/client';
 
+// Converts the plain-text copy captured from the live site into basic HTML
+// (paragraphs + line breaks) so it renders correctly through the dashboard's
+// rich-text editor and the Hub's HTML-rendering — kept as plain text above
+// for readability, transformed only at write time.
+function toHtml(text: string): string {
+  return text
+    .split('\n\n')
+    .map((paragraph) => `<p>${paragraph.replace(/\n/g, '<br>')}</p>`)
+    .join('');
+}
+
 async function seedPrograms() {
   await prisma.program.upsert({
     where: { slug: 'ready-for-tomorrow' },
@@ -10,32 +21,38 @@ async function seedPrograms() {
       title: 'Ready For Tomorrow (Digitera) - 2026',
       subtitleEn: 'Ready for Tomorrow — A Youth Inclusion and Employment Project.',
       subtitleAr: 'جاهزون للغد — مشروع دمج وتوظيف الشباب',
-      logoUrl: '/programs/digitera-logo.png',
-      aboutBody:
+      logoUrl: 'http://localhost:3003/programs/digitera-logo.png',
+      imageAspect: '16:6',
+      aboutBody: toHtml(
         'Ready for Tomorrow is a fully free employment pathway for ambitious young graduates in Greater Cairo. Built in partnership with Plan International and the Danish-Arab Partnership Program, the program is designed to help you secure your first job through:\n\n' +
-        'Life skills training to build career awareness and job readiness\n' +
-        'Technical upskilling aligned with market demand\n' +
-        'Personalized career coaching and interview preparation\n' +
-        'Direct access to employers who are actively hiring\n\n' +
-        'Every stage of the program is designed around one goal: helping you land your first real job offer.',
+          'Life skills training to build career awareness and job readiness\n' +
+          'Technical upskilling aligned with market demand\n' +
+          'Personalized career coaching and interview preparation\n' +
+          'Direct access to employers who are actively hiring\n\n' +
+          'Every stage of the program is designed around one goal: helping you land your first real job offer.',
+      ),
       phases: [
         {
           title: 'Life Skills Bootcamp (2 days)',
-          description:
+          description: toHtml(
             'Build career awareness, understand the job market, and learn how to write a strong CV and perform confidently in interviews',
+          ),
         },
         {
           title: 'Technical Training (6 days)',
-          description: 'Choose between a technical or business track based on your background and interests',
+          description: toHtml('Choose between a technical or business track based on your background and interests'),
         },
         {
           title: 'Personalized Coaching',
-          description: 'One-on-one sessions with a career coach to support your job applications and interview preparation',
+          description: toHtml(
+            'One-on-one sessions with a career coach to support your job applications and interview preparation',
+          ),
         },
         {
           title: 'Career Exposure',
-          description:
+          description: toHtml(
             'Attend career days and mentorship events, with direct access to hiring managers and industry professionals',
+          ),
         },
       ],
       benefits: [
@@ -55,8 +72,9 @@ async function seedPrograms() {
         'Able to commit to the full program duration',
       ],
       partnerName: 'Plan International Egypt',
-      partnerBio:
+      partnerBio: toHtml(
         'Plan International is an independent development and humanitarian organisation that advances children’s rights and equality for girls. Plan International has been working in Egypt since 1981 following an agreement with the Ministry of Foreign Affairs and under the supervision of the Ministry of Social Solidarity.',
+      ),
     },
   });
 
@@ -68,30 +86,36 @@ async function seedPrograms() {
       title: 'Talentex Academy: From Talent to Career',
       subtitleEn: 'Talentex Academy — A Youth Skills & Employment Pathway',
       subtitleAr: 'أكاديمية تالانتكس — مسار لمهارات وتوظيف الشباب',
-      logoUrl: '/programs/talentex-banner.jpg',
-      aboutBody:
+      logoUrl: 'http://localhost:3003/programs/talentex-banner.jpg',
+      imageAspect: '16:6',
+      aboutBody: toHtml(
         'Talentex Academy is a comprehensive employability and career development program designed to support youth in Egypt in transitioning successfully into the job market. The academy bridges the gap between academic learning and employer expectations by equipping ambitious young people, aged 20–25, with the technical, professional, and career readiness skills needed for sustainable employment.\n\n' +
-        'The academy combines employability skills training, field-based career learning, personalized coaching, and direct employer connections to help participants build successful career pathways and access real job opportunities.',
+          'The academy combines employability skills training, field-based career learning, personalized coaching, and direct employer connections to help participants build successful career pathways and access real job opportunities.',
+      ),
       phases: [
         {
           title: 'Phase 1: Employability Skills Foundation (1 Day)',
-          description:
+          description: toHtml(
             'An online, on-demand interactive session covering essential career readiness skills, including: Building a strong CV/Resume; Optimizing LinkedIn and Wuzzuf profiles; Career planning and goal setting; Communication and professional presentation skills; Understanding the job market and recruitment process. This phase helps participants build the foundational life and employability skills needed to navigate the modern job market with confidence.',
+          ),
         },
         {
           title: 'Phase 2: Field-Specific Training (5 Days)',
-          description:
+          description: toHtml(
             'An online, on-demand intensive training track that participants can complete at their own pace within 5 days. The program currently features the Sales Academy, where participants will: Learn the fundamentals of sales and customer engagement; Explore key professional fields such as Sales, Marketing, and Customer Success; Understand real workplace expectations and performance standards; Gain exposure to essential workplace tools such as CRM systems. Additional field-based learning tracks will be introduced over time to align with evolving labor market needs.',
+          ),
         },
         {
           title: 'Phase 3: Coaching & Mentorship',
-          description:
+          description: toHtml(
             'Participants gain access to a dedicated coaching and support ecosystem designed to help them successfully navigate their job search journey. This phase includes: Access to a coaching community where participants can ask questions, receive support from coaches, and engage with peers; Daily live online "Ask Me Anything" sessions where participants can connect with coaches in real time, ask questions, and get support to unblock challenges in their job search journey; Live webinars on career and employability topics; Personalized 1:1 coaching sessions for selected participants where they will receive personalized coaching services: Tailored CV reviews and interview preparation; LinkedIn and professional profile optimization; Career planning and job search guidance. The coaching phase is designed to provide ongoing mentorship, accountability, and practical support throughout the employment journey.',
+          ),
         },
         {
           title: 'Phase 4: Employment Placement',
-          description:
+          description: toHtml(
             'The ultimate goal of Talentex Academy is sustainable employment. Through employer partnerships and curated candidate referrals, the program supports participants in connecting with hiring companies and accessing real job opportunities. Our aim is to help participants secure employment within 3 months of completing their training journey.',
+          ),
         },
       ],
       benefits: [
@@ -111,8 +135,9 @@ async function seedPrograms() {
         'Basic English communication skills preferred',
       ],
       partnerName: 'iCareer',
-      partnerBio:
+      partnerBio: toHtml(
         'iCareer is a leading career development and employability platform dedicated to empowering youth through innovative learning experiences, career guidance, and direct employment opportunities. Through strategic partnerships with employers, development organizations, and educational institutions, iCareer bridges the gap between education and the labor market by equipping young talents with the skills, mentorship, and career support needed to succeed in today’s evolving workforce.',
+      ),
     },
   });
 
@@ -124,11 +149,13 @@ async function seedPrograms() {
       title: 'Next Path',
       subtitleEn: 'A fully free career launchpad for recent graduates and senior students in Greater Cairo.',
       subtitleAr: null,
-      logoUrl: '/programs/nextpath-banner.png',
-      aboutBody:
+      logoUrl: 'http://localhost:3003/programs/nextpath-banner.png',
+      imageAspect: '16:6',
+      aboutBody: toHtml(
         'You worked hard to get that degree. Now comes the part no one really prepares you for — the job search. Next Path is here for exactly that moment.\n\n' +
-        'Next Path is a fully free career launchpad for recent graduates and senior students in Greater Cairo. It gives you the practical skills, the professional coaching, and the direct employer connections you need to land your first real job — fast.\n\n' +
-        'This is not another online course. This is a structured journey from "just graduated" to "I got the offer." Built on a proven employment framework and backed by Plan International, Next Path brings together technical training, soft skills development, and a real hiring pipeline — all in one place, at no cost to you.',
+          'Next Path is a fully free career launchpad for recent graduates and senior students in Greater Cairo. It gives you the practical skills, the professional coaching, and the direct employer connections you need to land your first real job — fast.\n\n' +
+          'This is not another online course. This is a structured journey from "just graduated" to "I got the offer." Built on a proven employment framework and backed by Plan International, Next Path brings together technical training, soft skills development, and a real hiring pipeline — all in one place, at no cost to you.',
+      ),
       phases: [],
       benefits: [
         'Life skills bootcamp — two days of professional readiness training covering self-awareness, career mapping, communication, and workplace confidence',
@@ -142,8 +169,9 @@ async function seedPrograms() {
         'Open to all faculties and backgrounds',
       ],
       partnerName: 'iCareer',
-      partnerBio:
+      partnerBio: toHtml(
         'iCareer is a leading career development and employability solutions provider focused on bridging the gap between education and employment across the MENA region. Founded in 2012, iCareer delivers end-to-end digital services, training programs, and career guidance solutions designed to prepare early talent for the evolving job market.',
+      ),
     },
   });
 }
