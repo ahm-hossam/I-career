@@ -7,6 +7,8 @@ import {
 } from '@nestjs/common';
 import { prisma, type Prisma } from '@i-career/database';
 import type { ProgramFunnelSummary } from '@i-career/types';
+import { trackServerEvent } from '../common/facebook/track-server-event';
+import { computeReferralFunnel } from '../common/referral/referral-funnel';
 import { toPublicProgram } from '../common/types/public-program';
 import { toPublicProgramApplication } from '../common/types/public-program-application';
 import type { ApplyProgramDto } from './dto/apply-program.dto';
@@ -40,7 +42,7 @@ export class ProgramsService {
     return { program: toPublicProgram(program), otherPrograms: others.map(toPublicProgram) };
   }
 
-  async apply(slug: string, userId: string, dto: ApplyProgramDto) {
+  async apply(slug: string, userId: string, userEmail: string, dto: ApplyProgramDto) {
     const program = await prisma.program.findUnique({ where: { slug }, include: FORM_INCLUDE });
     if (!program) {
       throw new NotFoundException('Program not found');
@@ -74,7 +76,10 @@ export class ProgramsService {
       const referralCode = await prisma.referralCode.findUnique({
         where: { code: dto.referralCode },
       });
-      if (referralCode && referralCode.programId === program.id) {
+      if (
+        referralCode &&
+        (referralCode.programId === null || referralCode.programId === program.id)
+      ) {
         referralCodeId = referralCode.id;
       }
     }
@@ -99,7 +104,32 @@ export class ProgramsService {
       });
     }
 
+    void trackServerEvent('Lead', { email: userEmail }, { content_name: program.title });
+
     return { message: 'Application submitted.' };
+  }
+
+  async getMyApplication(slug: string, userId: string) {
+    const program = await prisma.program.findUnique({ where: { slug } });
+    if (!program) {
+      throw new NotFoundException('Program not found');
+    }
+
+    const application = await prisma.programApplication.findUnique({
+      where: { userId_programId: { userId, programId: program.id } },
+    });
+    if (!application) {
+      return { application: null };
+    }
+
+    return {
+      application: {
+        id: application.id,
+        status: application.status,
+        attendedAt: application.attendedAt,
+        createdAt: application.createdAt,
+      },
+    };
   }
 
   async getApplicants(slug: string) {
@@ -178,7 +208,14 @@ export class ProgramsService {
     }
 
     const created = await prisma.referralCode.create({
-      data: { code: dto.code, label: dto.label, type: 'CUSTOM', programId: program.id },
+      data: {
+        code: dto.code,
+        label: dto.label,
+        type: 'CUSTOM',
+        source: (dto.source as never) ?? 'OTHER',
+        campaignName: dto.campaignName,
+        programId: program.id,
+      },
     });
     return { code: created.code };
   }
@@ -189,7 +226,19 @@ export class ProgramsService {
       return { ok: true };
     }
     const referralCode = await prisma.referralCode.findUnique({ where: { code } });
-    if (!referralCode || referralCode.programId !== program.id) {
+    if (
+      !referralCode ||
+      (referralCode.programId !== null && referralCode.programId !== program.id)
+    ) {
+      return { ok: true };
+    }
+    await prisma.referralEvent.create({ data: { referralCodeId: referralCode.id, type: 'CLICK' } });
+    return { ok: true };
+  }
+
+  async trackGenericClick(code: string) {
+    const referralCode = await prisma.referralCode.findUnique({ where: { code } });
+    if (!referralCode) {
       return { ok: true };
     }
     await prisma.referralEvent.create({ data: { referralCodeId: referralCode.id, type: 'CLICK' } });
@@ -208,25 +257,22 @@ export class ProgramsService {
       orderBy: { createdAt: 'desc' },
     });
 
-    const events = await prisma.referralEvent.groupBy({
-      by: ['referralCodeId', 'type'],
-      where: { referralCode: { programId: program.id } },
-      _count: { _all: true },
-    });
-    const countFor = (codeId: string, type: string) =>
-      events.find((e) => e.referralCodeId === codeId && e.type === type)?._count._all ?? 0;
+    const funnelByCode = await computeReferralFunnel(codes.map((c) => c.id));
 
-    const publicCodes = codes.map((c) => ({
-      id: c.id,
-      code: c.code,
-      type: c.type,
-      label: c.label,
-      ownerName: c.ownerUser ? `${c.ownerUser.firstName} ${c.ownerUser.lastName}` : null,
-      clicks: countFor(c.id, 'CLICK'),
-      signups: countFor(c.id, 'SIGNUP'),
-      applications: countFor(c.id, 'APPLICATION'),
-      createdAt: c.createdAt,
-    }));
+    const publicCodes = codes.map((c) => {
+      const funnel = funnelByCode.get(c.id)!;
+      return {
+        id: c.id,
+        code: c.code,
+        type: c.type,
+        label: c.label,
+        source: c.source,
+        campaignName: c.campaignName,
+        ownerName: c.ownerUser ? `${c.ownerUser.firstName} ${c.ownerUser.lastName}` : null,
+        ...funnel,
+        createdAt: c.createdAt,
+      };
+    });
 
     const totalClicks = publicCodes.reduce((sum, c) => sum + c.clicks, 0);
     const totalSignups = publicCodes.reduce((sum, c) => sum + c.signups, 0);

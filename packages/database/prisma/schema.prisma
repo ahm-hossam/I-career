@@ -155,13 +155,23 @@ enum ReferralCodeType {
   CUSTOM
 }
 
+enum ReferralSource {
+  FACEBOOK
+  INSTAGRAM
+  GOOGLE
+  EMAIL
+  OTHER
+}
+
 model ReferralCode {
   id           String           @id @default(cuid())
   code         String           @unique
   type         ReferralCodeType
   label        String?
-  programId    String
-  program      Program          @relation(fields: [programId], references: [id], onDelete: Cascade)
+  source       ReferralSource   @default(OTHER)
+  campaignName String?
+  programId    String?
+  program      Program?         @relation(fields: [programId], references: [id], onDelete: Cascade)
   ownerUserId  String?
   ownerUser    User?            @relation("UserOwnsCode", fields: [ownerUserId], references: [id], onDelete: Cascade)
   createdAt    DateTime         @default(now())

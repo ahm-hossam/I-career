@@ -181,18 +181,71 @@ export interface PublicProgramApplication {
   } | null;
 }
 
+export interface ApplicationListItem {
+  id: string;
+  status: ApplicationStatus;
+  attendedAt: string | null;
+  createdAt: string;
+  program: { id: string; slug: string; title: string };
+  applicant: {
+    id: string;
+    firstName: string;
+    lastName: string;
+    email: string;
+    phone: string;
+    university: string;
+    faculty: string;
+  };
+  referral: {
+    code: string;
+    label: string | null;
+    type: ReferralCodeType;
+  } | null;
+}
+
+export interface MyApplicationStatus {
+  id: string;
+  status: ApplicationStatus;
+  attendedAt: string | null;
+  createdAt: string;
+}
+
 export type ReferralCodeType = 'PERSONAL' | 'CUSTOM';
+export type ReferralSource = 'FACEBOOK' | 'INSTAGRAM' | 'GOOGLE' | 'EMAIL' | 'OTHER';
 
 export interface PublicReferralCode {
   id: string;
   code: string;
   type: ReferralCodeType;
   label: string | null;
+  source: ReferralSource;
+  campaignName: string | null;
   ownerName: string | null;
   clicks: number;
   signups: number;
   applications: number;
+  accepted: number;
+  rejected: number;
+  attended: number;
   createdAt: string;
+}
+
+export interface CampaignProgramBreakdown {
+  program: { id: string; slug: string; title: string };
+  count: number;
+}
+
+export interface CampaignSummary extends PublicReferralCode {
+  program: { id: string; slug: string; title: string } | null;
+  url: string;
+  programBreakdown: CampaignProgramBreakdown[];
+}
+
+export interface CreateReferralCodeInput {
+  code: string;
+  label: string;
+  source: ReferralSource;
+  campaignName?: string;
 }
 
 export interface ProgramFunnelSummary {

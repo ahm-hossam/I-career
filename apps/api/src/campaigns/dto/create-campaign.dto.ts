@@ -2,7 +2,11 @@ import { IsIn, IsNotEmpty, IsOptional, IsString, Matches } from 'class-validator
 
 const SOURCES = ['FACEBOOK', 'INSTAGRAM', 'GOOGLE', 'EMAIL', 'OTHER'];
 
-export class CreateReferralCodeDto {
+export class CreateCampaignDto {
+  @IsOptional()
+  @IsString()
+  programSlug?: string;
+
   @IsString()
   @IsNotEmpty()
   @Matches(/^[A-Za-z0-9_-]{3,40}$/, {

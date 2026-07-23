@@ -1,6 +1,8 @@
 import { Module } from '@nestjs/common';
+import { ApplicationsModule } from './applications/applications.module';
 import { ArticlesModule } from './articles/articles.module';
 import { AuthModule } from './auth/auth.module';
+import { CampaignsModule } from './campaigns/campaigns.module';
 import { DashboardAuthModule } from './dashboard-auth/dashboard-auth.module';
 import { DashboardUsersModule } from './dashboard-users/dashboard-users.module';
 import { EmployerAuthModule } from './employer-auth/employer-auth.module';
@@ -21,6 +23,8 @@ import { UsersModule } from './users/users.module';
     DashboardUsersModule,
     ProgramsModule,
     ProgramFormsModule,
+    CampaignsModule,
+    ApplicationsModule,
     ArticlesModule,
     EventsModule,
     UploadsModule,

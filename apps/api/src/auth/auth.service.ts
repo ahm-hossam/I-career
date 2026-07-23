@@ -2,6 +2,7 @@ import { ConflictException, Injectable, UnauthorizedException } from '@nestjs/co
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcryptjs';
 import { prisma } from '@i-career/database';
+import { trackServerEvent } from '../common/facebook/track-server-event';
 import { toPublicUser } from '../common/types/public-user';
 import type { LoginDto } from './dto/login.dto';
 import type { RegisterDto } from './dto/register.dto';
@@ -68,6 +69,8 @@ export class AuthService {
         data: { referralCodeId: referredByCodeId, type: 'SIGNUP', userId: user.id },
       });
     }
+
+    void trackServerEvent('CompleteRegistration', { email: user.email, phone: user.phone });
 
     const token = await this.signToken(user);
     return { user: toPublicUser(user), token };

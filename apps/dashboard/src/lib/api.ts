@@ -1,4 +1,6 @@
 import type {
+  ApplicationListItem,
+  CampaignSummary,
   PasswordResetRequestSummary,
   ProgramFunnelSummary,
   PublicDashboardUser,
@@ -73,6 +75,20 @@ export async function fetchApplicants(slug: string): Promise<PublicProgramApplic
 
 export async function fetchDashboardUsers(): Promise<PublicDashboardUser[]> {
   const res = await fetch(`${process.env.API_URL}/dashboard-users`, { headers: internalHeaders(), cache: 'no-store' });
+  if (!res.ok) return [];
+  const data = await res.json();
+  return data.items;
+}
+
+export async function fetchApplications(): Promise<ApplicationListItem[]> {
+  const res = await fetch(`${process.env.API_URL}/applications`, { headers: internalHeaders(), cache: 'no-store' });
+  if (!res.ok) return [];
+  const data = await res.json();
+  return data.items;
+}
+
+export async function fetchCampaigns(): Promise<CampaignSummary[]> {
+  const res = await fetch(`${process.env.API_URL}/campaigns`, { headers: internalHeaders(), cache: 'no-store' });
   if (!res.ok) return [];
   const data = await res.json();
   return data.items;

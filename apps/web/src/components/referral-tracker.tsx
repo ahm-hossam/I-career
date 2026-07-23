@@ -3,7 +3,7 @@
 import { useEffect, useRef } from 'react';
 import { useSearchParams } from 'next/navigation';
 
-export function ReferralTracker({ slug }: { slug: string }) {
+export function ReferralTracker({ slug }: { slug?: string }) {
   const searchParams = useSearchParams();
   const fired = useRef(false);
 
@@ -11,7 +11,10 @@ export function ReferralTracker({ slug }: { slug: string }) {
     const ref = searchParams.get('ref');
     if (!ref || fired.current) return;
     fired.current = true;
-    fetch(`/api/referral/track?ref=${encodeURIComponent(ref)}&slug=${encodeURIComponent(slug)}`).catch(() => {});
+    const url = slug
+      ? `/api/referral/track?ref=${encodeURIComponent(ref)}&slug=${encodeURIComponent(slug)}`
+      : `/api/referral/track?ref=${encodeURIComponent(ref)}`;
+    fetch(url).catch(() => {});
   }, [searchParams, slug]);
 
   return null;

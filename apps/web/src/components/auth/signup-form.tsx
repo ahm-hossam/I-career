@@ -13,6 +13,7 @@ import {
   STUDENT_STATUS_OPTIONS,
   UNIVERSITIES,
 } from '@/data/registration-options';
+import { trackCompleteRegistration } from '@/lib/facebook-pixel';
 
 const inputClass =
   'rounded-xl border border-ink/10 px-4 py-2.5 font-normal text-ink outline-none transition-colors focus:border-brand-500';
@@ -135,6 +136,7 @@ export function SignupForm() {
         return;
       }
       setUser(data.user);
+      trackCompleteRegistration();
       close();
       router.refresh();
     } finally {

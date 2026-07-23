@@ -1,6 +1,8 @@
 import type { Metadata } from 'next';
 import { Almarai } from 'next/font/google';
 import { AuthModal } from '@/components/auth/auth-modal';
+import { FacebookPixel } from '@/components/facebook-pixel';
+import { SiteReferralTracker } from '@/components/site-referral-tracker';
 import { SiteHeader } from '@/components/site-header';
 import { SiteFooter } from '@/components/site-footer';
 import { AuthProvider } from '@/lib/auth/auth-context';
@@ -48,6 +50,8 @@ export default async function RootLayout({
   return (
     <html lang="en" className={`${almarai.variable} h-full antialiased`}>
       <body className="flex min-h-full flex-col font-sans">
+        <FacebookPixel />
+        <SiteReferralTracker />
         <AuthProvider initialUser={user}>
           <EmployerAuthProvider initialEmployer={employer}>
             <AuthModalProvider>

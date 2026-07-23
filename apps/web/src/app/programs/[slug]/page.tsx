@@ -6,15 +6,17 @@ import { ProgramCard } from '@/components/program-card';
 import { ProgramRegisterButton } from '@/components/program-register-button';
 import { ReferralShareCard } from '@/components/referral-share-card';
 import { ReferralTracker } from '@/components/referral-tracker';
-import { fetchProgramBySlug } from '@/lib/api';
+import { fetchMyApplication, fetchProgramBySlug } from '@/lib/api';
+import { getSessionToken } from '@/lib/auth/session';
 import { aspectRatioClass } from '@/lib/rich-text';
 
 export default async function ProgramDetailPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
-  const data = await fetchProgramBySlug(slug);
+  const [data, token] = await Promise.all([fetchProgramBySlug(slug), getSessionToken()]);
   if (!data) notFound();
 
   const { program, otherPrograms } = data;
+  const myApplication = token ? await fetchMyApplication(slug, token) : null;
 
   return (
     <article className="relative -mt-[80px] mx-auto max-w-4xl px-4 pb-12 pt-[124px] sm:px-6 sm:pb-16 sm:pt-[140px] lg:px-8">
@@ -28,7 +30,7 @@ export default async function ProgramDetailPage({ params }: { params: Promise<{ 
 
       <div className="mt-6 flex flex-wrap items-center justify-between gap-4">
         <h1 className="text-3xl font-extrabold text-ink sm:text-4xl">{program.title}</h1>
-        <ProgramRegisterButton slug={program.slug} form={program.form} />
+        <ProgramRegisterButton slug={program.slug} form={program.form} initialApplication={myApplication} />
       </div>
 
       <ReferralShareCard slug={program.slug} />

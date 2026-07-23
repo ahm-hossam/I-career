@@ -21,6 +21,7 @@ export type {
   FormFieldType,
   ReferralCode,
   ReferralCodeType,
+  ReferralSource,
   ReferralEvent,
   ReferralEventType,
   Article,

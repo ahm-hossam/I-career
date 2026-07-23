@@ -43,12 +43,17 @@ export class ProgramsController {
     @Body() dto: ApplyProgramDto,
     @Req() req: Request & { userSession?: UserSessionPayload },
   ) {
-    return this.programsService.apply(slug, req.userSession!.sub, dto);
+    return this.programsService.apply(slug, req.userSession!.sub, req.userSession!.email, dto);
   }
 
   @Post(':slug/track-click')
   trackClick(@Param('slug') slug: string, @Body() dto: TrackClickDto) {
     return this.programsService.trackClick(slug, dto.code);
+  }
+
+  @Post('track-click')
+  trackGenericClick(@Body() dto: TrackClickDto) {
+    return this.programsService.trackGenericClick(dto.code);
   }
 
   @Post(':slug/referral-code')
@@ -58,6 +63,15 @@ export class ProgramsController {
     @Req() req: Request & { userSession?: UserSessionPayload },
   ) {
     return this.programsService.getOrCreateReferralCode(slug, req.userSession!.sub);
+  }
+
+  @Get(':slug/my-application')
+  @UseGuards(UserSessionGuard)
+  getMyApplication(
+    @Param('slug') slug: string,
+    @Req() req: Request & { userSession?: UserSessionPayload },
+  ) {
+    return this.programsService.getMyApplication(slug, req.userSession!.sub);
   }
 
   @Get(':slug/applicants')

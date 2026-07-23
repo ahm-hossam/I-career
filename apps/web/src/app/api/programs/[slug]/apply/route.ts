@@ -9,7 +9,8 @@ export async function POST(req: Request, { params }: { params: Promise<{ slug: s
   }
 
   const body = await req.json().catch(() => ({}));
-  const referralCookie = (await cookies()).get(`referral_${slug}`)?.value;
+  const cookieStore = await cookies();
+  const referralCookie = cookieStore.get(`referral_${slug}`)?.value ?? cookieStore.get('referral_code')?.value;
 
   const apiRes = await fetch(`${process.env.API_URL}/programs/${slug}/apply`, {
     method: 'POST',

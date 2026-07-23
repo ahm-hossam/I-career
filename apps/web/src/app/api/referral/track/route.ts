@@ -4,11 +4,14 @@ export async function GET(req: Request) {
   const { searchParams } = new URL(req.url);
   const code = searchParams.get('ref');
   const slug = searchParams.get('slug');
-  if (!code || !slug) {
+  if (!code) {
     return Response.json({ ok: false }, { status: 400 });
   }
 
-  await fetch(`${process.env.API_URL}/programs/${slug}/track-click`, {
+  const trackUrl = slug
+    ? `${process.env.API_URL}/programs/${slug}/track-click`
+    : `${process.env.API_URL}/programs/track-click`;
+  await fetch(trackUrl, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ code }),
@@ -22,7 +25,9 @@ export async function GET(req: Request) {
     path: '/',
     maxAge: 60 * 60 * 24 * 30,
   };
-  cookieStore.set(`referral_${slug}`, code, cookieOptions);
+  if (slug) {
+    cookieStore.set(`referral_${slug}`, code, cookieOptions);
+  }
   cookieStore.set('referral_code', code, cookieOptions);
 
   return Response.json({ ok: true });

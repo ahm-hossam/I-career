@@ -1,17 +1,29 @@
 'use client';
 
 import { useState } from 'react';
-import { Check, Loader2 } from 'lucide-react';
-import type { PublicProgramForm } from '@i-career/types';
+import { useRouter } from 'next/navigation';
+import { Check, Clock, Loader2, X } from 'lucide-react';
+import type { MyApplicationStatus, PublicProgramForm } from '@i-career/types';
 import { useAuth } from '@/lib/auth/auth-context';
 import { useAuthModal } from '@/lib/auth/auth-modal-context';
 import { ApplyFormModal } from '@/components/apply-form-modal';
+import { trackLead } from '@/lib/facebook-pixel';
 
-export function ProgramRegisterButton({ slug, form }: { slug: string; form: PublicProgramForm | null }) {
+export function ProgramRegisterButton({
+  slug,
+  form,
+  initialApplication,
+}: {
+  slug: string;
+  form: PublicProgramForm | null;
+  initialApplication: MyApplicationStatus | null;
+}) {
   const { user } = useAuth();
   const { open } = useAuthModal();
+  const router = useRouter();
   const [modalOpen, setModalOpen] = useState(false);
-  const [status, setStatus] = useState<'idle' | 'submitting' | 'applied' | 'error'>('idle');
+  const [application, setApplication] = useState<MyApplicationStatus | null>(initialApplication);
+  const [status, setStatus] = useState<'idle' | 'submitting' | 'error'>('idle');
   const [message, setMessage] = useState<string | null>(null);
 
   async function submitApplication(answers?: Record<string, string | string[]>) {
@@ -28,8 +40,11 @@ export function ProgramRegisterButton({ slug, form }: { slug: string; form: Publ
         setMessage(data.message ?? 'Something went wrong. Please try again.');
         return;
       }
-      setStatus('applied');
+      setStatus('idle');
       setModalOpen(false);
+      setApplication({ id: 'pending', status: 'PENDING', attendedAt: null, createdAt: new Date().toISOString() });
+      trackLead();
+      router.refresh();
     } catch {
       setStatus('error');
       setMessage('Something went wrong. Please try again.');
@@ -38,7 +53,9 @@ export function ProgramRegisterButton({ slug, form }: { slug: string; form: Publ
 
   function handleClick() {
     if (!user) {
-      open('login');
+      // A "Register" click from a guest most likely means they don't have an account
+      // yet — send them to sign up rather than log in.
+      open('signup');
       return;
     }
     if (form) {
@@ -48,11 +65,35 @@ export function ProgramRegisterButton({ slug, form }: { slug: string; form: Publ
     void submitApplication();
   }
 
-  if (status === 'applied') {
+  if (application) {
+    if (application.status === 'ACCEPTED' && application.attendedAt) {
+      return (
+        <span className="inline-flex items-center gap-2 rounded-full bg-brand-500/10 px-6 py-3 text-sm font-bold text-brand-700">
+          <Check size={16} />
+          Attended
+        </span>
+      );
+    }
+    if (application.status === 'ACCEPTED') {
+      return (
+        <span className="inline-flex items-center gap-2 rounded-full bg-brand-500/10 px-6 py-3 text-sm font-bold text-brand-700">
+          <Check size={16} />
+          Accepted
+        </span>
+      );
+    }
+    if (application.status === 'REJECTED') {
+      return (
+        <span className="inline-flex items-center gap-2 rounded-full bg-ink/[0.06] px-6 py-3 text-sm font-bold text-ink-soft">
+          <X size={16} />
+          Not selected this time
+        </span>
+      );
+    }
     return (
-      <span className="inline-flex items-center gap-2 rounded-full bg-brand-500/10 px-6 py-3 text-sm font-bold text-brand-700">
-        <Check size={16} />
-        Applied
+      <span className="inline-flex items-center gap-2 rounded-full bg-accent-50 px-6 py-3 text-sm font-bold text-ink">
+        <Clock size={16} />
+        Application under review
       </span>
     );
   }

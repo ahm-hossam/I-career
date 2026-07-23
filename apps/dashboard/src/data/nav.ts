@@ -1,12 +1,9 @@
 import {
-  Building2,
-  CalendarDays,
+  ClipboardCheck,
   ClipboardList,
   GraduationCap,
-  HeartHandshake,
   LayoutDashboard,
-  School,
-  Settings,
+  Megaphone,
   Users,
   UsersRound,
   type LucideIcon,
@@ -29,24 +26,14 @@ export const NAV_SECTIONS: NavSection[] = [
     items: [
       { key: 'overview', href: '/', icon: LayoutDashboard },
       { key: 'applicants', href: '/applicants', icon: Users },
+      { key: 'applications', href: '/applications', icon: ClipboardCheck },
       { key: 'programs', href: '/programs', icon: GraduationCap },
+      { key: 'campaigns', href: '/campaigns', icon: Megaphone },
       { key: 'forms', href: '/forms', icon: ClipboardList },
-      { key: 'events', href: '/events', icon: CalendarDays },
-    ],
-  },
-  {
-    key: 'section_network',
-    items: [
-      { key: 'employers', href: '/employers', icon: Building2 },
-      { key: 'universities', href: '/universities', icon: School },
-      { key: 'partners', href: '/partners', icon: HeartHandshake },
     ],
   },
   {
     key: 'section_workspace',
-    items: [
-      { key: 'team', href: '/team', icon: UsersRound },
-      { key: 'settings', href: '/settings', icon: Settings },
-    ],
+    items: [{ key: 'team', href: '/team', icon: UsersRound }],
   },
 ];

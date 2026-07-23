@@ -8,7 +8,7 @@ function internalHeaders() {
 
 export async function createCustomReferralCode(
   slug: string,
-  input: { code: string; label: string },
+  input: { code: string; label: string; source: string; campaignName?: string },
 ): Promise<{ code: string }> {
   const res = await fetch(`${process.env.API_URL}/programs/${slug}/referral-codes`, {
     method: 'POST',

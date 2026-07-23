@@ -1,4 +1,4 @@
-import type { PublicArticle, PublicEvent, PublicProgram } from '@i-career/types';
+import type { MyApplicationStatus, PublicArticle, PublicEvent, PublicProgram } from '@i-career/types';
 
 export async function fetchPrograms(): Promise<PublicProgram[]> {
   const res = await fetch(`${process.env.API_URL}/programs`, { cache: 'no-store' });
@@ -13,6 +13,16 @@ export async function fetchProgramBySlug(
   const res = await fetch(`${process.env.API_URL}/programs/${slug}`, { cache: 'no-store' });
   if (!res.ok) return null;
   return res.json();
+}
+
+export async function fetchMyApplication(slug: string, token: string): Promise<MyApplicationStatus | null> {
+  const res = await fetch(`${process.env.API_URL}/programs/${slug}/my-application`, {
+    headers: { Authorization: `Bearer ${token}` },
+    cache: 'no-store',
+  });
+  if (!res.ok) return null;
+  const data = await res.json();
+  return data.application;
 }
 
 export async function fetchArticles(category?: string): Promise<PublicArticle[]> {
