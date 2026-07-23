@@ -8,6 +8,7 @@ import { useAuthModal } from '@/lib/auth/auth-modal-context';
 import {
   FACULTIES,
   GENDER_OPTIONS,
+  GOVERNORATES,
   NATIONALITIES,
   STUDENT_STATUS_OPTIONS,
   UNIVERSITIES,
@@ -24,6 +25,7 @@ interface FormState {
   email: string;
   password: string;
   nationality: string;
+  governorate: string;
   birthday: string;
   gender: string;
   studentStatus: string;
@@ -39,6 +41,7 @@ const REQUIRED_FIELDS: (keyof FormState)[] = [
   'email',
   'password',
   'nationality',
+  'governorate',
   'birthday',
   'gender',
   'studentStatus',
@@ -54,6 +57,7 @@ const INITIAL_STATE: FormState = {
   email: '',
   password: '',
   nationality: '',
+  governorate: '',
   birthday: '',
   gender: '',
   studentStatus: '',
@@ -214,6 +218,24 @@ export function SignupForm() {
           {NATIONALITIES.map((n) => (
             <option key={n} value={n}>
               {n}
+            </option>
+          ))}
+        </select>
+      </Field>
+
+      <Field label="Governorate" showError={!!isInvalid('governorate')}>
+        <select
+          value={form.governorate}
+          onChange={(e) => set('governorate', e.target.value)}
+          onBlur={() => markTouched('governorate')}
+          className={`${inputClass} ${isInvalid('governorate') ? errorInputClass : ''} bg-white`}
+        >
+          <option value="" disabled>
+            Select governorate
+          </option>
+          {GOVERNORATES.map((g) => (
+            <option key={g} value={g}>
+              {g}
             </option>
           ))}
         </select>

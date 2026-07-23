@@ -4,6 +4,7 @@ import {
   IsEnum,
   IsInt,
   IsNotEmpty,
+  IsOptional,
   IsString,
   Max,
   MaxLength,
@@ -38,6 +39,10 @@ export class RegisterDto {
   @IsNotEmpty()
   nationality!: string;
 
+  @IsString()
+  @IsNotEmpty()
+  governorate!: string;
+
   @IsDateString()
   birthday!: string;
 
@@ -59,4 +64,8 @@ export class RegisterDto {
   @IsString()
   @IsNotEmpty()
   faculty!: string;
+
+  @IsOptional()
+  @IsString()
+  referralCode?: string;
 }

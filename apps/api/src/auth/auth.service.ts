@@ -23,6 +23,7 @@ export class AuthService {
       role: user.role,
       firstName: user.firstName,
       lastName: user.lastName,
+      kind: 'user',
     });
   }
 
@@ -30,6 +31,16 @@ export class AuthService {
     const existing = await prisma.user.findUnique({ where: { email: dto.email } });
     if (existing) {
       throw new ConflictException('An account with this email already exists');
+    }
+
+    let referredByCodeId: string | undefined;
+    if (dto.referralCode) {
+      const referralCode = await prisma.referralCode.findUnique({
+        where: { code: dto.referralCode },
+      });
+      if (referralCode) {
+        referredByCodeId = referralCode.id;
+      }
     }
 
     const passwordHash = await bcrypt.hash(dto.password, 10);
@@ -41,14 +52,22 @@ export class AuthService {
         lastName: dto.lastName,
         phone: dto.phone,
         nationality: dto.nationality,
+        governorate: dto.governorate,
         birthday: new Date(dto.birthday),
         gender: dto.gender,
         studentStatus: dto.studentStatus,
         university: dto.university,
         graduationYear: dto.graduationYear,
         faculty: dto.faculty,
+        referredByCodeId,
       },
     });
+
+    if (referredByCodeId) {
+      await prisma.referralEvent.create({
+        data: { referralCodeId: referredByCodeId, type: 'SIGNUP', userId: user.id },
+      });
+    }
 
     const token = await this.signToken(user);
     return { user: toPublicUser(user), token };

@@ -12,7 +12,7 @@ import {
   COMPANY_TYPE_OPTIONS,
   EMPLOYEE_COUNT_OPTIONS,
   INDUSTRY_OPTIONS,
-} from '@/data/hub-registration-options';
+} from '@/data/employer-registration-options';
 import { FileUploadField } from './file-upload-field';
 
 const inputClass =

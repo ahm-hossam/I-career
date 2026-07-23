@@ -1,6 +1,6 @@
 import { Module } from '@nestjs/common';
 import { JwtModule } from '@nestjs/jwt';
-import { HubSessionGuard } from '../common/guards/hub-session.guard';
+import { UserSessionGuard } from '../common/guards/user-session.guard';
 import { ProgramsController } from './programs.controller';
 import { ProgramsService } from './programs.service';
 
@@ -12,6 +12,6 @@ import { ProgramsService } from './programs.service';
     }),
   ],
   controllers: [ProgramsController],
-  providers: [ProgramsService, HubSessionGuard],
+  providers: [ProgramsService, UserSessionGuard],
 })
 export class ProgramsModule {}

@@ -6,18 +6,25 @@ import type {
   PublicProgramApplication,
   PublicProgramForm,
   PublicReferralCode,
-  PublicUser,
+  UserDetail,
+  UserListItem,
 } from '@i-career/types';
 
 function internalHeaders() {
   return { 'x-internal-token': process.env.INTERNAL_API_TOKEN! };
 }
 
-export async function fetchUsers(): Promise<PublicUser[]> {
+export async function fetchUsers(): Promise<UserListItem[]> {
   const res = await fetch(`${process.env.API_URL}/users`, { headers: internalHeaders(), cache: 'no-store' });
   if (!res.ok) return [];
   const data = await res.json();
   return data.items;
+}
+
+export async function fetchUser(id: string): Promise<UserDetail | null> {
+  const res = await fetch(`${process.env.API_URL}/users/${id}`, { headers: internalHeaders(), cache: 'no-store' });
+  if (!res.ok) return null;
+  return res.json();
 }
 
 export async function fetchResetRequests(): Promise<PasswordResetRequestSummary[]> {

@@ -3,13 +3,13 @@
 import { useState } from 'react';
 import { Check, Loader2 } from 'lucide-react';
 import type { PublicProgramForm } from '@i-career/types';
-import { useHubAuth } from '@/lib/auth/hub-auth-context';
-import { useHubAuthModal } from '@/lib/auth/hub-auth-modal-context';
+import { useAuth } from '@/lib/auth/auth-context';
+import { useAuthModal } from '@/lib/auth/auth-modal-context';
 import { ApplyFormModal } from '@/components/apply-form-modal';
 
 export function ProgramRegisterButton({ slug, form }: { slug: string; form: PublicProgramForm | null }) {
-  const { user } = useHubAuth();
-  const { open } = useHubAuthModal();
+  const { user } = useAuth();
+  const { open } = useAuthModal();
   const [modalOpen, setModalOpen] = useState(false);
   const [status, setStatus] = useState<'idle' | 'submitting' | 'applied' | 'error'>('idle');
   const [message, setMessage] = useState<string | null>(null);

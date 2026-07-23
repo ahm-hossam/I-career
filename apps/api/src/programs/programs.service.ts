@@ -40,14 +40,14 @@ export class ProgramsService {
     return { program: toPublicProgram(program), otherPrograms: others.map(toPublicProgram) };
   }
 
-  async apply(slug: string, hubUserId: string, dto: ApplyProgramDto) {
+  async apply(slug: string, userId: string, dto: ApplyProgramDto) {
     const program = await prisma.program.findUnique({ where: { slug }, include: FORM_INCLUDE });
     if (!program) {
       throw new NotFoundException('Program not found');
     }
 
     const existing = await prisma.programApplication.findUnique({
-      where: { hubUserId_programId: { hubUserId, programId: program.id } },
+      where: { userId_programId: { userId, programId: program.id } },
     });
     if (existing) {
       throw new ConflictException('You have already applied to this program');
@@ -81,7 +81,7 @@ export class ProgramsService {
 
     const application = await prisma.programApplication.create({
       data: {
-        hubUserId,
+        userId,
         programId: program.id,
         answers: dto.answers ? (dto.answers as unknown as Prisma.InputJsonValue) : undefined,
         referralCodeId,
@@ -93,7 +93,7 @@ export class ProgramsService {
         data: {
           referralCodeId,
           type: 'APPLICATION',
-          hubUserId,
+          userId,
           programApplicationId: application.id,
         },
       });
@@ -109,7 +109,7 @@ export class ProgramsService {
     }
     const applications = await prisma.programApplication.findMany({
       where: { programId: program.id },
-      include: { hubUser: true, referralCode: true },
+      include: { user: true, referralCode: true },
       orderBy: { createdAt: 'desc' },
     });
     return applications.map(toPublicProgramApplication);
@@ -134,19 +134,19 @@ export class ProgramsService {
         status: dto.status as never,
         attendedAt: dto.attended === undefined ? undefined : dto.attended ? new Date() : null,
       },
-      include: { hubUser: true, referralCode: true },
+      include: { user: true, referralCode: true },
     });
     return toPublicProgramApplication(updated);
   }
 
-  async getOrCreateReferralCode(slug: string, hubUserId: string) {
+  async getOrCreateReferralCode(slug: string, userId: string) {
     const program = await prisma.program.findUnique({ where: { slug } });
     if (!program) {
       throw new NotFoundException('Program not found');
     }
 
     const existing = await prisma.referralCode.findUnique({
-      where: { ownerHubUserId_programId: { ownerHubUserId: hubUserId, programId: program.id } },
+      where: { ownerUserId_programId: { ownerUserId: userId, programId: program.id } },
     });
     if (existing) {
       return { code: existing.code };
@@ -156,7 +156,7 @@ export class ProgramsService {
       const code = randomBytes(4).toString('hex').toUpperCase();
       try {
         const created = await prisma.referralCode.create({
-          data: { code, type: 'PERSONAL', programId: program.id, ownerHubUserId: hubUserId },
+          data: { code, type: 'PERSONAL', programId: program.id, ownerUserId: userId },
         });
         return { code: created.code };
       } catch {
@@ -204,7 +204,7 @@ export class ProgramsService {
 
     const codes = await prisma.referralCode.findMany({
       where: { programId: program.id },
-      include: { ownerHubUser: true },
+      include: { ownerUser: true },
       orderBy: { createdAt: 'desc' },
     });
 
@@ -221,7 +221,7 @@ export class ProgramsService {
       code: c.code,
       type: c.type,
       label: c.label,
-      ownerName: c.ownerHubUser ? `${c.ownerHubUser.firstName} ${c.ownerHubUser.lastName}` : null,
+      ownerName: c.ownerUser ? `${c.ownerUser.firstName} ${c.ownerUser.lastName}` : null,
       clicks: countFor(c.id, 'CLICK'),
       signups: countFor(c.id, 'SIGNUP'),
       applications: countFor(c.id, 'APPLICATION'),

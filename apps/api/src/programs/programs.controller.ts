@@ -11,8 +11,8 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import type { Request } from 'express';
-import { HubSessionGuard, type HubSessionPayload } from '../common/guards/hub-session.guard';
 import { InternalTokenGuard } from '../common/guards/internal-token.guard';
+import { UserSessionGuard, type UserSessionPayload } from '../common/guards/user-session.guard';
 import { ApplyProgramDto } from './dto/apply-program.dto';
 import { CreateProgramDto } from './dto/create-program.dto';
 import { CreateReferralCodeDto } from './dto/create-referral-code.dto';
@@ -37,13 +37,13 @@ export class ProgramsController {
   }
 
   @Post(':slug/apply')
-  @UseGuards(HubSessionGuard)
+  @UseGuards(UserSessionGuard)
   apply(
     @Param('slug') slug: string,
     @Body() dto: ApplyProgramDto,
-    @Req() req: Request & { hubSession?: HubSessionPayload },
+    @Req() req: Request & { userSession?: UserSessionPayload },
   ) {
-    return this.programsService.apply(slug, req.hubSession!.sub, dto);
+    return this.programsService.apply(slug, req.userSession!.sub, dto);
   }
 
   @Post(':slug/track-click')
@@ -52,12 +52,12 @@ export class ProgramsController {
   }
 
   @Post(':slug/referral-code')
-  @UseGuards(HubSessionGuard)
+  @UseGuards(UserSessionGuard)
   getOrCreateReferralCode(
     @Param('slug') slug: string,
-    @Req() req: Request & { hubSession?: HubSessionPayload },
+    @Req() req: Request & { userSession?: UserSessionPayload },
   ) {
-    return this.programsService.getOrCreateReferralCode(slug, req.hubSession!.sub);
+    return this.programsService.getOrCreateReferralCode(slug, req.userSession!.sub);
   }
 
   @Get(':slug/applicants')

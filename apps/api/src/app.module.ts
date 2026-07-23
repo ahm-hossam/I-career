@@ -5,7 +5,6 @@ import { DashboardAuthModule } from './dashboard-auth/dashboard-auth.module';
 import { DashboardUsersModule } from './dashboard-users/dashboard-users.module';
 import { EmployerAuthModule } from './employer-auth/employer-auth.module';
 import { EventsModule } from './events/events.module';
-import { HubAuthModule } from './hub-auth/hub-auth.module';
 import { PasswordResetRequestsModule } from './password-reset-requests/password-reset-requests.module';
 import { ProgramFormsModule } from './program-forms/program-forms.module';
 import { ProgramsModule } from './programs/programs.module';
@@ -17,7 +16,6 @@ import { UsersModule } from './users/users.module';
     AuthModule,
     UsersModule,
     PasswordResetRequestsModule,
-    HubAuthModule,
     EmployerAuthModule,
     DashboardAuthModule,
     DashboardUsersModule,

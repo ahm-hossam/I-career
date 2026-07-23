@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { AnimatePresence, motion } from 'motion/react';
 import { UserRound, KeyRound } from 'lucide-react';
-import type { PasswordResetRequestSummary, PublicUser } from '@i-career/types';
+import type { PasswordResetRequestSummary, UserListItem } from '@i-career/types';
 import { cn } from '@i-career/utils';
 import { useLocale } from '@/lib/i18n/locale-context';
 import { RegisteredUsersTable } from './registered-users-table';
@@ -19,7 +19,7 @@ export function ApplicantsView({
   users,
   requests,
 }: {
-  users: PublicUser[];
+  users: UserListItem[];
   requests: PasswordResetRequestSummary[];
 }) {
   const { t } = useLocale();

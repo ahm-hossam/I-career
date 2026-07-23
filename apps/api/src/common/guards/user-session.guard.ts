@@ -2,20 +2,21 @@ import { CanActivate, ExecutionContext, Injectable, UnauthorizedException } from
 import { JwtService } from '@nestjs/jwt';
 import type { Request } from 'express';
 
-export interface HubSessionPayload {
+export interface UserSessionPayload {
   sub: string;
   email: string;
   firstName: string;
   lastName: string;
-  kind: 'hub';
+  role: string;
+  kind: 'user';
 }
 
 @Injectable()
-export class HubSessionGuard implements CanActivate {
+export class UserSessionGuard implements CanActivate {
   constructor(private readonly jwtService: JwtService) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
-    const req = context.switchToHttp().getRequest<Request & { hubSession?: HubSessionPayload }>();
+    const req = context.switchToHttp().getRequest<Request & { userSession?: UserSessionPayload }>();
     const authHeader = req.headers.authorization;
     const token = authHeader?.startsWith('Bearer ') ? authHeader.slice(7) : null;
     if (!token) {
@@ -23,13 +24,13 @@ export class HubSessionGuard implements CanActivate {
     }
 
     try {
-      const payload = await this.jwtService.verifyAsync<HubSessionPayload>(token, {
+      const payload = await this.jwtService.verifyAsync<UserSessionPayload>(token, {
         secret: process.env.AUTH_JWT_SECRET,
       });
-      if (payload.kind !== 'hub') {
+      if (payload.kind !== 'user') {
         throw new UnauthorizedException('Invalid session token');
       }
-      req.hubSession = payload;
+      req.userSession = payload;
       return true;
     } catch {
       throw new UnauthorizedException('Invalid or expired session token');

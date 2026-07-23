@@ -1,16 +1,12 @@
 import type { Metadata } from 'next';
 import { Almarai } from 'next/font/google';
 import { AuthModal } from '@/components/auth/auth-modal';
-import { HubAuthModal } from '@/components/hub-auth/auth-modal';
 import { SiteHeader } from '@/components/site-header';
 import { SiteFooter } from '@/components/site-footer';
 import { AuthProvider } from '@/lib/auth/auth-context';
 import { AuthModalProvider } from '@/lib/auth/auth-modal-context';
-import { HubAuthProvider } from '@/lib/auth/hub-auth-context';
-import { HubAuthModalProvider } from '@/lib/auth/hub-auth-modal-context';
 import { EmployerAuthProvider } from '@/lib/auth/employer-auth-context';
 import { getSessionUser } from '@/lib/auth/session';
-import { getHubSessionUser } from '@/lib/auth/hub-session';
 import { getEmployerSessionUser } from '@/lib/auth/employer-session';
 import './globals.css';
 
@@ -47,29 +43,20 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const [user, hubUser, employer] = await Promise.all([
-    getSessionUser(),
-    getHubSessionUser(),
-    getEmployerSessionUser(),
-  ]);
+  const [user, employer] = await Promise.all([getSessionUser(), getEmployerSessionUser()]);
 
   return (
     <html lang="en" className={`${almarai.variable} h-full antialiased`}>
       <body className="flex min-h-full flex-col font-sans">
         <AuthProvider initialUser={user}>
-          <HubAuthProvider initialUser={hubUser}>
-            <EmployerAuthProvider initialEmployer={employer}>
-              <AuthModalProvider>
-                <HubAuthModalProvider>
-                  <SiteHeader />
-                  <main className="flex-1">{children}</main>
-                  <SiteFooter />
-                  <AuthModal />
-                  <HubAuthModal />
-                </HubAuthModalProvider>
-              </AuthModalProvider>
-            </EmployerAuthProvider>
-          </HubAuthProvider>
+          <EmployerAuthProvider initialEmployer={employer}>
+            <AuthModalProvider>
+              <SiteHeader />
+              <main className="flex-1">{children}</main>
+              <SiteFooter />
+              <AuthModal />
+            </AuthModalProvider>
+          </EmployerAuthProvider>
         </AuthProvider>
       </body>
     </html>

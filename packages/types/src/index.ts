@@ -8,6 +8,7 @@ export interface AuthUser {
   firstName: string;
   lastName: string;
   role: Role;
+  kind: 'user';
 }
 
 export interface PublicUser {
@@ -18,13 +19,32 @@ export interface PublicUser {
   phone: string;
   role: Role;
   nationality: string;
+  governorate: string;
   birthday: string;
   gender: Gender;
   studentStatus: StudentStatus;
   university: string;
   graduationYear: number;
   faculty: string;
+  archived: boolean;
   createdAt: string;
+}
+
+export interface UserListItem extends PublicUser {
+  applicationsCount: number;
+  attendedCount: number;
+}
+
+export interface UserApplicationSummary {
+  id: string;
+  status: ApplicationStatus;
+  attendedAt: string | null;
+  createdAt: string;
+  program: { id: string; slug: string; title: string };
+}
+
+export interface UserDetail extends PublicUser {
+  applications: UserApplicationSummary[];
 }
 
 export type ResetRequestStatus = 'PENDING' | 'RESOLVED';
@@ -41,31 +61,6 @@ export interface PasswordResetRequestSummary {
     email: string;
     phone: string;
   };
-}
-
-// --- iCareer Hub -------------------------------------------------------
-
-export interface HubAuthUser {
-  id: string;
-  email: string;
-  firstName: string;
-  lastName: string;
-  kind: 'hub';
-}
-
-export interface PublicHubUser {
-  id: string;
-  firstName: string;
-  lastName: string;
-  email: string;
-  phone: string;
-  governorate: string;
-  birthday: string;
-  gender: Gender;
-  studentStatus: StudentStatus;
-  university: string;
-  faculty: string;
-  createdAt: string;
 }
 
 export interface ProgramPhase {

@@ -1,7 +1,7 @@
-import type { HubUser, ProgramApplication, ReferralCode } from '@i-career/database';
+import type { ProgramApplication, ReferralCode, User } from '@i-career/database';
 
 type ApplicationWithRelations = ProgramApplication & {
-  hubUser: HubUser;
+  user: User;
   referralCode: ReferralCode | null;
 };
 
@@ -13,13 +13,13 @@ export function toPublicProgramApplication(app: ApplicationWithRelations) {
     answers: app.answers as Record<string, string | string[]> | null,
     createdAt: app.createdAt,
     applicant: {
-      id: app.hubUser.id,
-      firstName: app.hubUser.firstName,
-      lastName: app.hubUser.lastName,
-      email: app.hubUser.email,
-      phone: app.hubUser.phone,
-      university: app.hubUser.university,
-      faculty: app.hubUser.faculty,
+      id: app.user.id,
+      firstName: app.user.firstName,
+      lastName: app.user.lastName,
+      email: app.user.email,
+      phone: app.user.phone,
+      university: app.user.university,
+      faculty: app.user.faculty,
     },
     referral: app.referralCode
       ? {

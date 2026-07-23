@@ -1,9 +1,9 @@
 import { cookies } from 'next/headers';
-import { getHubSessionToken } from '@/lib/auth/hub-session';
+import { getSessionToken } from '@/lib/auth/session';
 
 export async function POST(req: Request, { params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
-  const token = await getHubSessionToken();
+  const token = await getSessionToken();
   if (!token) {
     return Response.json({ message: 'You must be logged in to apply.' }, { status: 401 });
   }

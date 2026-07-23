@@ -13,7 +13,6 @@ export type {
   Gender,
   StudentStatus,
   ResetRequestStatus,
-  HubUser,
   Program,
   ProgramApplication,
   ApplicationStatus,

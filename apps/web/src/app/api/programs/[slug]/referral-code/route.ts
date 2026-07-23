@@ -1,8 +1,8 @@
-import { getHubSessionToken } from '@/lib/auth/hub-session';
+import { getSessionToken } from '@/lib/auth/session';
 
 export async function POST(_req: Request, { params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
-  const token = await getHubSessionToken();
+  const token = await getSessionToken();
   if (!token) {
     return Response.json({ message: 'You must be logged in.' }, { status: 401 });
   }

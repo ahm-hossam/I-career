@@ -9,12 +9,14 @@ export function toPublicUser(user: User) {
     phone: user.phone,
     role: user.role,
     nationality: user.nationality,
+    governorate: user.governorate,
     birthday: user.birthday,
     gender: user.gender,
     studentStatus: user.studentStatus,
     university: user.university,
     graduationYear: user.graduationYear,
     faculty: user.faculty,
+    archived: user.archived,
     createdAt: user.createdAt,
   };
 }
