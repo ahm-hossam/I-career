@@ -1,4 +1,4 @@
-import type { PasswordResetRequestSummary, PublicUser } from '@i-career/types';
+import type { PasswordResetRequestSummary, PublicProgram, PublicUser } from '@i-career/types';
 
 export interface KpiDatum {
   key: 'kpiApplicants' | 'kpiPrograms' | 'kpiEmployers' | 'kpiEvents';
@@ -48,6 +48,24 @@ export function buildApplicantsKpi(users: PublicUser[], now = new Date()): KpiDa
   else if (thisMonth > 0) trend = 100;
 
   return { key: 'kpiApplicants', value: users.length, trend, spark };
+}
+
+export function buildProgramsKpi(programs: PublicProgram[], now = new Date()): KpiDatum {
+  const spark = trailingMonths(now, 12).map(
+    (monthDate) =>
+      programs.filter((p) => {
+        const created = new Date(p.createdAt);
+        return created.getFullYear() === monthDate.getFullYear() && created.getMonth() === monthDate.getMonth();
+      }).length,
+  );
+  const thisMonth = spark[spark.length - 1] ?? 0;
+  const lastMonth = spark[spark.length - 2] ?? 0;
+
+  let trend = 0;
+  if (lastMonth > 0) trend = Math.round(((thisMonth - lastMonth) / lastMonth) * 1000) / 10;
+  else if (thisMonth > 0) trend = 100;
+
+  return { key: 'kpiPrograms', value: programs.length, trend, spark };
 }
 
 export function emptyKpi(key: KpiDatum['key']): KpiDatum {

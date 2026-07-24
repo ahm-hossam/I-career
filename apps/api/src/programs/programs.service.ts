@@ -9,6 +9,7 @@ import { prisma, type Prisma } from '@i-career/database';
 import type { ProgramFunnelSummary } from '@i-career/types';
 import { trackServerEvent } from '../common/facebook/track-server-event';
 import { computeReferralFunnel } from '../common/referral/referral-funnel';
+import { sanitizeRichText } from '../common/sanitize/sanitize-rich-text';
 import { toPublicProgram } from '../common/types/public-program';
 import { toPublicProgramApplication } from '../common/types/public-program-application';
 import type { ApplyProgramDto } from './dto/apply-program.dto';
@@ -18,6 +19,24 @@ import type { UpdateApplicantDto } from './dto/update-applicant.dto';
 import type { UpdateProgramDto } from './dto/update-program.dto';
 
 const FORM_INCLUDE = { form: { include: { fields: true } } } as const;
+const MAX_ANSWERS_KEYS = 100;
+const MAX_ANSWERS_BYTES = 20_000;
+
+function sanitizeProgramRichText<T extends Partial<CreateProgramDto>>(dto: T): T {
+  return {
+    ...dto,
+    aboutBody: dto.aboutBody !== undefined ? sanitizeRichText(dto.aboutBody) : dto.aboutBody,
+    partnerBio: dto.partnerBio !== undefined ? sanitizeRichText(dto.partnerBio) : dto.partnerBio,
+    phases: dto.phases?.map((phase) => ({
+      ...phase,
+      description: sanitizeRichText(phase.description),
+    })),
+    sponsors: dto.sponsors?.map((sponsor) => ({
+      ...sponsor,
+      description: sanitizeRichText(sponsor.description),
+    })),
+  };
+}
 
 @Injectable()
 export class ProgramsService {
@@ -56,6 +75,13 @@ export class ProgramsService {
     }
 
     const answers = dto.answers ?? {};
+    if (
+      Object.keys(answers).length > MAX_ANSWERS_KEYS ||
+      JSON.stringify(answers).length > MAX_ANSWERS_BYTES
+    ) {
+      throw new BadRequestException('Answers payload is too large');
+    }
+
     if (program.form) {
       for (const field of program.form.fields) {
         if (!field.required) continue;
@@ -300,12 +326,13 @@ export class ProgramsService {
     return { summary, codes: publicCodes };
   }
 
-  async create(dto: CreateProgramDto) {
-    const existing = await prisma.program.findUnique({ where: { slug: dto.slug } });
+  async create(rawDto: CreateProgramDto) {
+    const existing = await prisma.program.findUnique({ where: { slug: rawDto.slug } });
     if (existing) {
       throw new ConflictException('A program with this slug already exists');
     }
 
+    const dto = sanitizeProgramRichText(rawDto);
     const program = await prisma.program.create({
       data: {
         ...dto,
@@ -317,19 +344,20 @@ export class ProgramsService {
     return toPublicProgram(program);
   }
 
-  async update(slug: string, dto: UpdateProgramDto) {
+  async update(slug: string, rawDto: UpdateProgramDto) {
     const existing = await prisma.program.findUnique({ where: { slug } });
     if (!existing) {
       throw new NotFoundException('Program not found');
     }
 
-    if (dto.slug && dto.slug !== slug) {
-      const slugTaken = await prisma.program.findUnique({ where: { slug: dto.slug } });
+    if (rawDto.slug && rawDto.slug !== slug) {
+      const slugTaken = await prisma.program.findUnique({ where: { slug: rawDto.slug } });
       if (slugTaken) {
         throw new ConflictException('A program with this slug already exists');
       }
     }
 
+    const dto = sanitizeProgramRichText(rawDto);
     const program = await prisma.program.update({
       where: { slug },
       data: {

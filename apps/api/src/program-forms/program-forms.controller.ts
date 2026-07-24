@@ -5,6 +5,7 @@ import { UpdateProgramFormDto } from './dto/update-program-form.dto';
 import { ProgramFormsService } from './program-forms.service';
 
 @Controller('program-forms')
+@UseGuards(InternalTokenGuard)
 export class ProgramFormsController {
   constructor(private readonly programFormsService: ProgramFormsService) {}
 
@@ -20,19 +21,16 @@ export class ProgramFormsController {
   }
 
   @Post()
-  @UseGuards(InternalTokenGuard)
   create(@Body() dto: CreateProgramFormDto) {
     return this.programFormsService.create(dto);
   }
 
   @Put(':id')
-  @UseGuards(InternalTokenGuard)
   update(@Param('id') id: string, @Body() dto: UpdateProgramFormDto) {
     return this.programFormsService.update(id, dto);
   }
 
   @Delete(':id')
-  @UseGuards(InternalTokenGuard)
   remove(@Param('id') id: string) {
     return this.programFormsService.remove(id);
   }

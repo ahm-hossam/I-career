@@ -1,6 +1,5 @@
 'use client';
 
-import Image from 'next/image';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useState } from 'react';
@@ -31,7 +30,8 @@ export function Sidebar() {
 
       <div className={cn('relative flex h-[72px] items-center border-b border-border-subtle px-4', collapsed && 'justify-center px-0')}>
         <Link href="/" className="flex items-center gap-2 overflow-hidden">
-          <Image src="/brand/favicon-icon.png" alt="" width={28} height={28} className="h-7 w-7 shrink-0" />
+          {/* eslint-disable-next-line @next/next/no-img-element -- next/image's optimizer fails to decode this PNG; plain img avoids it for this small fixed-size icon */}
+          <img src="/brand/favicon-icon.png" alt="" width={28} height={28} className="h-7 w-7 shrink-0" />
           <AnimatePresence initial={false}>
             {!collapsed && (
               <motion.span

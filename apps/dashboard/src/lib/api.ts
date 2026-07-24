@@ -51,14 +51,17 @@ export async function fetchProgram(slug: string): Promise<PublicProgram | null> 
 }
 
 export async function fetchProgramForms(): Promise<PublicProgramForm[]> {
-  const res = await fetch(`${process.env.API_URL}/program-forms`, { cache: 'no-store' });
+  const res = await fetch(`${process.env.API_URL}/program-forms`, { headers: internalHeaders(), cache: 'no-store' });
   if (!res.ok) return [];
   const data = await res.json();
   return data.items;
 }
 
 export async function fetchProgramForm(id: string): Promise<PublicProgramForm | null> {
-  const res = await fetch(`${process.env.API_URL}/program-forms/${id}`, { cache: 'no-store' });
+  const res = await fetch(`${process.env.API_URL}/program-forms/${id}`, {
+    headers: internalHeaders(),
+    cache: 'no-store',
+  });
   if (!res.ok) return null;
   return res.json();
 }

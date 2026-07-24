@@ -1,4 +1,6 @@
 import { Module } from '@nestjs/common';
+import { APP_GUARD } from '@nestjs/core';
+import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
 import { ApplicationsModule } from './applications/applications.module';
 import { ArticlesModule } from './articles/articles.module';
 import { AuthModule } from './auth/auth.module';
@@ -15,6 +17,7 @@ import { UsersModule } from './users/users.module';
 
 @Module({
   imports: [
+    ThrottlerModule.forRoot([{ name: 'default', ttl: 60_000, limit: 100 }]),
     AuthModule,
     UsersModule,
     PasswordResetRequestsModule,
@@ -29,5 +32,6 @@ import { UsersModule } from './users/users.module';
     EventsModule,
     UploadsModule,
   ],
+  providers: [{ provide: APP_GUARD, useClass: ThrottlerGuard }],
 })
 export class AppModule {}
