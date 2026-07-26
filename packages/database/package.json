@@ -5,6 +5,7 @@
   "main": "./src/client.ts",
   "types": "./src/client.ts",
   "scripts": {
+    "build": "prisma generate",
     "db:generate": "prisma generate",
     "db:migrate": "prisma migrate dev",
     "db:studio": "prisma studio",
