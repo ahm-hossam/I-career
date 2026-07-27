@@ -5,15 +5,15 @@ import { ProgramsTeaser } from '@/components/programs-teaser';
 import { EventsTeaser } from '@/components/events-teaser';
 import { TestimonialCarousel } from '@/components/testimonial-carousel';
 import { CtaBand } from '@/components/cta-band';
-import { fetchPrograms } from '@/lib/api';
+import { fetchPartnerLogos, fetchPrograms } from '@/lib/api';
 
 export default async function Home() {
-  const programs = await fetchPrograms();
+  const [programs, partnerLogos] = await Promise.all([fetchPrograms(), fetchPartnerLogos()]);
 
   return (
     <>
       <Hero />
-      <LogoTicker />
+      <LogoTicker logos={partnerLogos} />
       <ServiceTabs />
       <ProgramsTeaser programs={programs} />
       <EventsTeaser />

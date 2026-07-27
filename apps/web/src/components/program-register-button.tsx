@@ -1,8 +1,9 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { Check, Clock, Loader2, X } from 'lucide-react';
+import { AnimatePresence, motion } from 'motion/react';
+import { Check, Clock, Info, Loader2, X } from 'lucide-react';
 import type { MyApplicationStatus, PublicProgramForm } from '@i-career/types';
 import { useAuth } from '@/lib/auth/auth-context';
 import { useAuthModal } from '@/lib/auth/auth-modal-context';
@@ -25,6 +26,17 @@ export function ProgramRegisterButton({
   const [application, setApplication] = useState<MyApplicationStatus | null>(initialApplication);
   const [status, setStatus] = useState<'idle' | 'submitting' | 'error'>('idle');
   const [message, setMessage] = useState<string | null>(null);
+  const [reasonOpen, setReasonOpen] = useState(false);
+  const reasonRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!reasonOpen) return;
+    const onClick = (e: MouseEvent) => {
+      if (reasonRef.current && !reasonRef.current.contains(e.target as Node)) setReasonOpen(false);
+    };
+    document.addEventListener('mousedown', onClick);
+    return () => document.removeEventListener('mousedown', onClick);
+  }, [reasonOpen]);
 
   async function submitApplication(answers?: Record<string, string | string[]>) {
     setStatus('submitting');
@@ -42,7 +54,13 @@ export function ProgramRegisterButton({
       }
       setStatus('idle');
       setModalOpen(false);
-      setApplication({ id: 'pending', status: 'PENDING', attendedAt: null, createdAt: new Date().toISOString() });
+      setApplication({
+        id: 'pending',
+        status: data.status ?? 'PENDING',
+        rejectionReason: data.rejectionReason ?? null,
+        attendedAt: null,
+        createdAt: new Date().toISOString(),
+      });
       trackLead();
       router.refresh();
     } catch {
@@ -84,10 +102,38 @@ export function ProgramRegisterButton({
     }
     if (application.status === 'REJECTED') {
       return (
-        <span className="inline-flex items-center gap-2 rounded-full bg-ink/[0.06] px-6 py-3 text-sm font-bold text-ink-soft">
-          <X size={16} />
-          Not selected this time
-        </span>
+        <div className="flex items-center gap-2">
+          <span className="inline-flex items-center gap-2 rounded-full bg-ink/[0.06] px-6 py-3 text-sm font-bold text-ink-soft">
+            <X size={16} />
+            Not selected this time
+          </span>
+          {application.rejectionReason && (
+            <div ref={reasonRef} className="relative">
+              <button
+                type="button"
+                onClick={() => setReasonOpen((v) => !v)}
+                aria-label="Why wasn't I selected?"
+                className="flex h-9 w-9 items-center justify-center rounded-full border border-ink/10 text-ink-faint transition-colors hover:bg-ink/[0.04] hover:text-ink"
+              >
+                <Info size={15} />
+              </button>
+              <AnimatePresence>
+                {reasonOpen && (
+                  <motion.div
+                    initial={{ opacity: 0, y: 6, scale: 0.97 }}
+                    animate={{ opacity: 1, y: 0, scale: 1 }}
+                    exit={{ opacity: 0, y: 6, scale: 0.97 }}
+                    transition={{ duration: 0.15 }}
+                    className="absolute end-0 top-[calc(100%+8px)] z-20 w-64 rounded-xl border border-ink/[0.06] bg-white p-3.5 shadow-xl"
+                  >
+                    <p className="text-xs font-semibold text-ink">Why wasn&apos;t I selected?</p>
+                    <p className="mt-1 text-xs leading-snug text-ink-soft">{application.rejectionReason}</p>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>
+          )}
+        </div>
       );
     }
     return (

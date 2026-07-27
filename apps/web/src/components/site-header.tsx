@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useEffect, useRef, useState } from 'react';
 import { AnimatePresence, motion, useAnimation } from 'motion/react';
-import { LogOut, Menu, X } from 'lucide-react';
+import { ChevronDown, LogOut, Menu, X } from 'lucide-react';
 import { cn } from '@i-career/utils';
 import { NAV_ITEMS } from '@/data/site';
 import { useAuth } from '@/lib/auth/auth-context';
@@ -18,11 +18,14 @@ export function SiteHeader() {
   const [sectionDark, setSectionDark] = useState(false);
   const [open, setOpen] = useState(false);
   const [profileOpen, setProfileOpen] = useState(false);
+  const [openDropdown, setOpenDropdown] = useState<string | null>(null);
+  const [mobileDropdown, setMobileDropdown] = useState<string | null>(null);
   const pathname = usePathname();
   const controls = useAnimation();
   const { user, logout } = useAuth();
   const { open: openAuthModal } = useAuthModal();
   const profileRef = useRef<HTMLDivElement>(null);
+  const dropdownRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (!profileOpen) return;
@@ -32,6 +35,15 @@ export function SiteHeader() {
     document.addEventListener('mousedown', onClick);
     return () => document.removeEventListener('mousedown', onClick);
   }, [profileOpen]);
+
+  useEffect(() => {
+    if (!openDropdown) return;
+    const onClick = (e: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) setOpenDropdown(null);
+    };
+    document.addEventListener('mousedown', onClick);
+    return () => document.removeEventListener('mousedown', onClick);
+  }, [openDropdown]);
 
   // At the very top the bar is full-width & see-through everywhere (not just home).
   // Once scrolled, it shrinks into a floating pill whose fill is the INVERSE of
@@ -119,31 +131,79 @@ export function SiteHeader() {
         </Link>
 
         <nav className="hidden items-center gap-1 lg:flex" aria-label="Primary">
-          {NAV_ITEMS.map((item) => (
-            <Link
-              key={item.label}
-              href={item.href}
-              className={cn(
-                'relative rounded-full px-4 py-2 text-[15px] font-medium transition-colors',
-                useWhiteText
-                  ? 'text-white/75 hover:bg-white/10 hover:text-white'
-                  : 'text-ink/80 hover:bg-ink/[0.04] hover:text-ink',
-                isActive(item.href) && (useWhiteText ? 'text-white' : 'text-brand-700'),
-              )}
-            >
-              {item.label}
-              {isActive(item.href) && (
-                <motion.span
-                  layoutId="nav-active"
+          {NAV_ITEMS.map((item) =>
+            item.children ? (
+              <div key={item.label} ref={dropdownRef} className="relative">
+                <button
+                  type="button"
+                  onClick={() => setOpenDropdown((v) => (v === item.label ? null : item.label))}
                   className={cn(
-                    'absolute inset-x-3 -bottom-0.5 h-0.5 rounded-full',
-                    useWhiteText ? 'bg-brand-300' : 'bg-brand-500',
+                    'relative flex items-center gap-1 rounded-full px-4 py-2 text-[15px] font-medium transition-colors',
+                    useWhiteText
+                      ? 'text-white/75 hover:bg-white/10 hover:text-white'
+                      : 'text-ink/80 hover:bg-ink/[0.04] hover:text-ink',
+                    item.children.some((c) => isActive(c.href)) && (useWhiteText ? 'text-white' : 'text-brand-700'),
                   )}
-                  transition={{ type: 'spring', stiffness: 420, damping: 34 }}
-                />
-              )}
-            </Link>
-          ))}
+                  aria-expanded={openDropdown === item.label}
+                >
+                  {item.label}
+                  <ChevronDown
+                    size={14}
+                    className={cn('transition-transform', openDropdown === item.label && 'rotate-180')}
+                  />
+                </button>
+                <AnimatePresence>
+                  {openDropdown === item.label && (
+                    <motion.div
+                      initial={{ opacity: 0, y: 8, scale: 0.97 }}
+                      animate={{ opacity: 1, y: 0, scale: 1 }}
+                      exit={{ opacity: 0, y: 8, scale: 0.97 }}
+                      transition={{ duration: 0.15 }}
+                      className="absolute start-0 top-[calc(100%+8px)] w-56 overflow-hidden rounded-2xl border border-ink/[0.06] bg-white p-1.5 shadow-xl"
+                    >
+                      {item.children.map((child) => (
+                        <Link
+                          key={child.href}
+                          href={child.href}
+                          onClick={() => setOpenDropdown(null)}
+                          className={cn(
+                            'block rounded-xl px-3.5 py-2.5 text-sm font-medium text-ink/80 transition-colors hover:bg-ink/[0.04] hover:text-ink',
+                            isActive(child.href) && 'bg-brand-50 text-brand-700',
+                          )}
+                        >
+                          {child.label}
+                        </Link>
+                      ))}
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </div>
+            ) : (
+              <Link
+                key={item.label}
+                href={item.href}
+                className={cn(
+                  'relative rounded-full px-4 py-2 text-[15px] font-medium transition-colors',
+                  useWhiteText
+                    ? 'text-white/75 hover:bg-white/10 hover:text-white'
+                    : 'text-ink/80 hover:bg-ink/[0.04] hover:text-ink',
+                  isActive(item.href) && (useWhiteText ? 'text-white' : 'text-brand-700'),
+                )}
+              >
+                {item.label}
+                {isActive(item.href) && (
+                  <motion.span
+                    layoutId="nav-active"
+                    className={cn(
+                      'absolute inset-x-3 -bottom-0.5 h-0.5 rounded-full',
+                      useWhiteText ? 'bg-brand-300' : 'bg-brand-500',
+                    )}
+                    transition={{ type: 'spring', stiffness: 420, damping: 34 }}
+                  />
+                )}
+              </Link>
+            ),
+          )}
         </nav>
 
         <div className="flex items-center gap-2">
@@ -247,19 +307,66 @@ export function SiteHeader() {
             aria-label="Mobile"
           >
             <div className="flex flex-col gap-1 p-4">
-              {NAV_ITEMS.map((item) => (
-                <Link
-                  key={item.label}
-                  href={item.href}
-                  onClick={() => setOpen(false)}
-                  className={cn(
-                    'rounded-xl px-4 py-3 text-base font-medium text-ink/80 transition-colors hover:bg-ink/[0.04]',
-                    isActive(item.href) && 'bg-brand-50 text-brand-700',
-                  )}
-                >
-                  {item.label}
-                </Link>
-              ))}
+              {NAV_ITEMS.map((item) =>
+                item.children ? (
+                  <div key={item.label}>
+                    <button
+                      type="button"
+                      onClick={() => setMobileDropdown((v) => (v === item.label ? null : item.label))}
+                      className={cn(
+                        'flex w-full items-center justify-between rounded-xl px-4 py-3 text-base font-medium text-ink/80 transition-colors hover:bg-ink/[0.04]',
+                        item.children.some((c) => isActive(c.href)) && 'bg-brand-50 text-brand-700',
+                      )}
+                    >
+                      {item.label}
+                      <ChevronDown
+                        size={16}
+                        className={cn('transition-transform', mobileDropdown === item.label && 'rotate-180')}
+                      />
+                    </button>
+                    <AnimatePresence>
+                      {mobileDropdown === item.label && (
+                        <motion.div
+                          initial={{ height: 0, opacity: 0 }}
+                          animate={{ height: 'auto', opacity: 1 }}
+                          exit={{ height: 0, opacity: 0 }}
+                          transition={{ duration: 0.2 }}
+                          className="overflow-hidden ps-4"
+                        >
+                          {item.children.map((child) => (
+                            <Link
+                              key={child.href}
+                              href={child.href}
+                              onClick={() => {
+                                setOpen(false);
+                                setMobileDropdown(null);
+                              }}
+                              className={cn(
+                                'block rounded-xl px-4 py-2.5 text-sm font-medium text-ink/70 transition-colors hover:bg-ink/[0.04]',
+                                isActive(child.href) && 'bg-brand-50 text-brand-700',
+                              )}
+                            >
+                              {child.label}
+                            </Link>
+                          ))}
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
+                  </div>
+                ) : (
+                  <Link
+                    key={item.label}
+                    href={item.href}
+                    onClick={() => setOpen(false)}
+                    className={cn(
+                      'rounded-xl px-4 py-3 text-base font-medium text-ink/80 transition-colors hover:bg-ink/[0.04]',
+                      isActive(item.href) && 'bg-brand-50 text-brand-700',
+                    )}
+                  >
+                    {item.label}
+                  </Link>
+                ),
+              )}
               {user ? (
                 <button
                   type="button"

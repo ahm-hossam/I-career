@@ -1,10 +1,32 @@
-import type { MyApplicationStatus, PublicArticle, PublicEvent, PublicProgram } from '@i-career/types';
+import type {
+  MyApplicationStatus,
+  PublicArticle,
+  PublicEvent,
+  PublicPartnerLogo,
+  PublicProgram,
+  PublicServiceProject,
+  ServiceCategory,
+} from '@i-career/types';
 
 export async function fetchPrograms(): Promise<PublicProgram[]> {
   const res = await fetch(`${process.env.API_URL}/programs`, { cache: 'no-store' });
   if (!res.ok) return [];
   const data = await res.json();
   return data.items;
+}
+
+export async function fetchPartnerLogos(): Promise<PublicPartnerLogo[]> {
+  const res = await fetch(`${process.env.API_URL}/partner-logos`, { cache: 'no-store' });
+  if (!res.ok) return [];
+  const data = await res.json();
+  return data.items;
+}
+
+export async function fetchServiceProjects(category: ServiceCategory): Promise<PublicServiceProject[]> {
+  const res = await fetch(`${process.env.API_URL}/service-projects`, { cache: 'no-store' });
+  if (!res.ok) return [];
+  const data = await res.json();
+  return (data.items as PublicServiceProject[]).filter((p) => p.category === category);
 }
 
 export async function fetchProgramBySlug(

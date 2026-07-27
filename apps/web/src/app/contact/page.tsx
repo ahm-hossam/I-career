@@ -11,6 +11,8 @@ export default function ContactPage() {
   const [who, setWho] = useState<string | null>(null);
   const [service, setService] = useState<string | null>(null);
   const [submitted, setSubmitted] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   return (
     <div>
@@ -41,9 +43,34 @@ export default function ContactPage() {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, margin: '-60px' }}
           transition={{ duration: 0.5 }}
-          onSubmit={(e) => {
+          onSubmit={async (e) => {
             e.preventDefault();
-            setSubmitted(true);
+            setError(null);
+            const form = e.currentTarget;
+            const formData = new FormData(form);
+            setSubmitting(true);
+            try {
+              const res = await fetch('/api/contact', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                  name: formData.get('name'),
+                  email: formData.get('email'),
+                  message: formData.get('message'),
+                  audience: who ?? undefined,
+                  service: service ?? undefined,
+                }),
+              });
+              if (!res.ok) throw new Error('Failed to send message');
+              setSubmitted(true);
+              form.reset();
+              setWho(null);
+              setService(null);
+            } catch {
+              setError('Something went wrong. Please try again.');
+            } finally {
+              setSubmitting(false);
+            }
           }}
           className="rounded-3xl border border-ink/[0.07] bg-white p-6 shadow-sm sm:p-8"
         >
@@ -122,13 +149,20 @@ export default function ContactPage() {
 
           <motion.button
             type="submit"
+            disabled={submitting}
             whileHover={{ y: -2 }}
             whileTap={{ scale: 0.98 }}
-            className="mt-6 inline-flex items-center gap-2 rounded-full bg-accent-300 px-6 py-3 text-sm font-semibold text-ink shadow-sm transition-shadow hover:shadow-md"
+            className="mt-6 inline-flex items-center gap-2 rounded-full bg-accent-300 px-6 py-3 text-sm font-semibold text-ink shadow-sm transition-shadow hover:shadow-md disabled:cursor-not-allowed disabled:opacity-60"
           >
-            {CONTACT_FORM.submitLabel}
+            {submitting ? 'Sending…' : CONTACT_FORM.submitLabel}
             <Send size={16} />
           </motion.button>
+
+          {error && (
+            <p className="mt-4 text-sm font-medium text-status-coral" role="alert">
+              {error}
+            </p>
+          )}
 
           {submitted && (
             <motion.p

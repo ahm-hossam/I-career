@@ -4,7 +4,7 @@ import { notFound } from 'next/navigation';
 import { Check } from 'lucide-react';
 import { ProgramCard } from '@/components/program-card';
 import { ProgramRegisterButton } from '@/components/program-register-button';
-import { ReferralShareCard } from '@/components/referral-share-card';
+import { ReferralShareButton } from '@/components/referral-share-button';
 import { ReferralTracker } from '@/components/referral-tracker';
 import { fetchMyApplication, fetchProgramBySlug } from '@/lib/api';
 import { getSessionToken } from '@/lib/auth/session';
@@ -30,10 +30,11 @@ export default async function ProgramDetailPage({ params }: { params: Promise<{ 
 
       <div className="mt-6 flex flex-wrap items-center justify-between gap-4">
         <h1 className="text-3xl font-extrabold text-ink sm:text-4xl">{program.title}</h1>
-        <ProgramRegisterButton slug={program.slug} form={program.form} initialApplication={myApplication} />
+        <div className="flex items-center gap-3">
+          <ReferralShareButton slug={program.slug} />
+          <ProgramRegisterButton slug={program.slug} form={program.form} initialApplication={myApplication} />
+        </div>
       </div>
-
-      <ReferralShareCard slug={program.slug} />
 
       <section className="mt-10">
         <h2 className="text-xl font-bold text-ink">About Program</h2>
@@ -50,8 +51,8 @@ export default async function ProgramDetailPage({ params }: { params: Promise<{ 
           <h2 className="text-xl font-bold text-ink">What you&apos;ll go through</h2>
           <p className="mt-1 text-sm text-ink-faint">The program is delivered across connected phases</p>
           <div className="mt-4 flex flex-col gap-4">
-            {program.phases.map((phase) => (
-              <div key={phase.title} className="rounded-2xl border border-ink/[0.06] bg-white p-5 shadow-sm">
+            {program.phases.map((phase, i) => (
+              <div key={i} className="rounded-2xl border border-ink/[0.06] bg-white p-5 shadow-sm">
                 <h3 className="font-bold text-ink">{phase.title}</h3>
                 <div
                   className="prose prose-sm mt-1.5 max-w-none text-sm text-ink-soft prose-headings:text-ink prose-strong:text-ink"
@@ -67,8 +68,8 @@ export default async function ProgramDetailPage({ params }: { params: Promise<{ 
         <section className="mt-10">
           <h2 className="text-xl font-bold text-ink">Benefits</h2>
           <ul className="mt-4 flex flex-col gap-2.5">
-            {program.benefits.map((benefit) => (
-              <li key={benefit} className="flex items-start gap-2.5 text-sm text-ink-soft">
+            {program.benefits.map((benefit, i) => (
+              <li key={i} className="flex items-start gap-2.5 text-sm text-ink-soft">
                 <span className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-brand-500 text-white">
                   <Check size={12} strokeWidth={3} />
                 </span>
@@ -83,8 +84,8 @@ export default async function ProgramDetailPage({ params }: { params: Promise<{ 
         <section className="mt-10">
           <h2 className="text-xl font-bold text-ink">Program Criteria</h2>
           <ul className="mt-4 flex flex-col gap-2.5">
-            {program.criteria.map((criterion) => (
-              <li key={criterion} className="flex items-start gap-2.5 text-sm text-ink-soft">
+            {program.criteria.map((criterion, i) => (
+              <li key={i} className="flex items-start gap-2.5 text-sm text-ink-soft">
                 <span className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-accent-300 text-ink">
                   <Check size={12} strokeWidth={3} />
                 </span>

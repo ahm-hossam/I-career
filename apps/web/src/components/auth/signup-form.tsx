@@ -33,6 +33,8 @@ interface FormState {
   university: string;
   graduationYear: string;
   faculty: string;
+  hasDisability: string;
+  disabilityDetails: string;
 }
 
 const REQUIRED_FIELDS: (keyof FormState)[] = [
@@ -49,6 +51,7 @@ const REQUIRED_FIELDS: (keyof FormState)[] = [
   'university',
   'graduationYear',
   'faculty',
+  'hasDisability',
 ];
 
 const INITIAL_STATE: FormState = {
@@ -65,6 +68,8 @@ const INITIAL_STATE: FormState = {
   university: '',
   graduationYear: '',
   faculty: '',
+  hasDisability: '',
+  disabilityDetails: '',
 };
 
 function Field({
@@ -119,6 +124,11 @@ export function SignupForm() {
       setError('Please fill in all required fields.');
       return;
     }
+    if (form.hasDisability === 'yes' && !form.disabilityDetails.trim()) {
+      setTouched((t) => ({ ...t, disabilityDetails: true }));
+      setError('Please specify your disability.');
+      return;
+    }
 
     setSubmitting(true);
     try {
@@ -128,6 +138,8 @@ export function SignupForm() {
         body: JSON.stringify({
           ...form,
           graduationYear: Number(form.graduationYear),
+          hasDisability: form.hasDisability === 'yes',
+          disabilityDetails: form.hasDisability === 'yes' ? form.disabilityDetails.trim() : undefined,
         }),
       });
       const data = await res.json();
@@ -339,6 +351,33 @@ export function SignupForm() {
           ))}
         </select>
       </Field>
+
+      <Field label="Do you have a disability?" showError={!!isInvalid('hasDisability')}>
+        <select
+          value={form.hasDisability}
+          onChange={(e) => set('hasDisability', e.target.value)}
+          onBlur={() => markTouched('hasDisability')}
+          className={`${inputClass} ${isInvalid('hasDisability') ? errorInputClass : ''} bg-white`}
+        >
+          <option value="" disabled>
+            Select an option
+          </option>
+          <option value="no">No</option>
+          <option value="yes">Yes</option>
+        </select>
+      </Field>
+
+      {form.hasDisability === 'yes' && (
+        <Field label="Please specify" showError={!!touched.disabilityDetails && !form.disabilityDetails.trim()}>
+          <input
+            type="text"
+            value={form.disabilityDetails}
+            onChange={(e) => set('disabilityDetails', e.target.value)}
+            onBlur={() => markTouched('disabilityDetails')}
+            className={`${inputClass} ${touched.disabilityDetails && !form.disabilityDetails.trim() ? errorInputClass : ''}`}
+          />
+        </Field>
+      )}
 
       {error && <p className="text-sm font-medium text-status-coral">{error}</p>}
 

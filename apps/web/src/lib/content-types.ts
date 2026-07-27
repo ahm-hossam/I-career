@@ -4,18 +4,7 @@ export type SortOption = (typeof SORT_OPTIONS)[number];
 export interface NavItem {
   label: string;
   href: string;
-}
-
-export interface PartnerLogo {
-  name: string;
-  src: string;
-  width: number;
-  height: number;
-}
-
-export interface PartnerGroup {
-  label: string;
-  logos: PartnerLogo[];
+  children?: NavItem[];
 }
 
 export interface ServiceTab {

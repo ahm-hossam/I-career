@@ -2,7 +2,15 @@ import type { NavItem } from '@/lib/content-types';
 
 export const NAV_ITEMS: NavItem[] = [
   { label: 'Home', href: '/' },
-  { label: 'Services', href: '/#services' },
+  {
+    label: 'Services',
+    href: '/#services',
+    children: [
+      { label: 'Youth', href: '/services/youth' },
+      { label: 'Employers', href: '/services/employers' },
+      { label: 'NGOs', href: '/services/ngos' },
+    ],
+  },
   { label: 'Programs', href: '/programs' },
   { label: 'Events', href: '/events' },
   { label: 'Articles', href: '/articles' },
