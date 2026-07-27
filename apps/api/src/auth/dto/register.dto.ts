@@ -1,4 +1,5 @@
 import {
+  IsBoolean,
   IsDateString,
   IsEmail,
   IsEnum,
@@ -10,6 +11,7 @@ import {
   MaxLength,
   Min,
   MinLength,
+  ValidateIf,
 } from 'class-validator';
 import type { Gender, StudentStatus } from '@i-career/database';
 
@@ -64,6 +66,15 @@ export class RegisterDto {
   @IsString()
   @IsNotEmpty()
   faculty!: string;
+
+  @IsBoolean()
+  hasDisability!: boolean;
+
+  @ValidateIf((o) => o.hasDisability)
+  @IsString()
+  @IsNotEmpty()
+  @MaxLength(500)
+  disabilityDetails?: string;
 
   @IsOptional()
   @IsString()

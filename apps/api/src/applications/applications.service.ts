@@ -13,6 +13,8 @@ function toApplicationListItem(app: ApplicationWithRelations) {
   return {
     id: app.id,
     status: app.status,
+    decidedBy: app.decidedBy,
+    rejectionReason: app.rejectionReason,
     attendedAt: app.attendedAt,
     createdAt: app.createdAt,
     program: app.program,
@@ -24,6 +26,9 @@ function toApplicationListItem(app: ApplicationWithRelations) {
       phone: app.user.phone,
       university: app.user.university,
       faculty: app.user.faculty,
+      hasDisability: app.user.hasDisability,
+      disabilityDetails: app.user.disabilityDetails,
+      archived: app.user.archived,
     },
     referral: app.referralCode
       ? { code: app.referralCode.code, label: app.referralCode.label, type: app.referralCode.type }
@@ -57,6 +62,8 @@ export class ApplicationsService {
       where: { id },
       data: {
         status: dto.status as never,
+        decidedBy: dto.status ? 'ADMIN' : undefined,
+        rejectionReason: dto.status ? null : undefined,
         attendedAt: dto.attended === undefined ? undefined : dto.attended ? new Date() : null,
       },
       include: INCLUDE,

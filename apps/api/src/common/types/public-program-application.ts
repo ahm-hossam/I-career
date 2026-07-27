@@ -9,6 +9,8 @@ export function toPublicProgramApplication(app: ApplicationWithRelations) {
   return {
     id: app.id,
     status: app.status,
+    decidedBy: app.decidedBy,
+    rejectionReason: app.rejectionReason,
     attendedAt: app.attendedAt,
     answers: app.answers as Record<string, string | string[]> | null,
     createdAt: app.createdAt,
@@ -20,6 +22,8 @@ export function toPublicProgramApplication(app: ApplicationWithRelations) {
       phone: app.user.phone,
       university: app.user.university,
       faculty: app.user.faculty,
+      hasDisability: app.user.hasDisability,
+      disabilityDetails: app.user.disabilityDetails,
     },
     referral: app.referralCode
       ? {

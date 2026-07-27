@@ -60,6 +60,8 @@ export class AuthService {
         university: dto.university,
         graduationYear: dto.graduationYear,
         faculty: dto.faculty,
+        hasDisability: dto.hasDisability,
+        disabilityDetails: dto.hasDisability ? dto.disabilityDetails : null,
         referredByCodeId,
       },
     });
@@ -85,6 +87,10 @@ export class AuthService {
     const valid = await bcrypt.compare(dto.password, user.passwordHash);
     if (!valid) {
       throw new UnauthorizedException('Invalid email or password');
+    }
+
+    if (user.archived) {
+      throw new UnauthorizedException('This account has been archived and can no longer sign in.');
     }
 
     const token = await this.signToken(user);

@@ -1,5 +1,5 @@
 import type { Program, ProgramForm, ProgramFormField } from '@i-career/database';
-import type { ImageAspect, ProgramPhase, ProgramSponsor } from '@i-career/types';
+import type { ImageAspect, ProgramAcceptanceCriteria, ProgramPhase, ProgramSponsor } from '@i-career/types';
 import { toPublicProgramForm } from './public-program-form';
 
 type ProgramWithForm = Program & { form: (ProgramForm & { fields: ProgramFormField[] }) | null };
@@ -21,6 +21,7 @@ export function toPublicProgram(program: ProgramWithForm) {
     partnerBio: program.partnerBio,
     partnerLogoUrl: program.partnerLogoUrl,
     sponsors: program.sponsors as unknown as ProgramSponsor[],
+    acceptanceCriteria: (program.acceptanceCriteria ?? {}) as unknown as ProgramAcceptanceCriteria,
     form: program.form ? toPublicProgramForm(program.form) : null,
     createdAt: program.createdAt,
     updatedAt: program.updatedAt,

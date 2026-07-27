@@ -6,12 +6,13 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { prisma, type Prisma } from '@i-career/database';
-import type { ProgramFunnelSummary } from '@i-career/types';
+import type { ProgramAcceptanceCriteria, ProgramFunnelSummary } from '@i-career/types';
 import { trackServerEvent } from '../common/facebook/track-server-event';
 import { computeReferralFunnel } from '../common/referral/referral-funnel';
 import { sanitizeRichText } from '../common/sanitize/sanitize-rich-text';
 import { toPublicProgram } from '../common/types/public-program';
 import { toPublicProgramApplication } from '../common/types/public-program-application';
+import { evaluateAcceptanceCriteria } from './acceptance-criteria';
 import type { ApplyProgramDto } from './dto/apply-program.dto';
 import type { CreateProgramDto } from './dto/create-program.dto';
 import type { CreateReferralCodeDto } from './dto/create-referral-code.dto';
@@ -110,12 +111,24 @@ export class ProgramsService {
       }
     }
 
+    const applicant = await prisma.user.findUnique({ where: { id: userId } });
+    if (!applicant) {
+      throw new NotFoundException('User not found');
+    }
+    const decision = evaluateAcceptanceCriteria(
+      applicant,
+      program.acceptanceCriteria as unknown as ProgramAcceptanceCriteria,
+    );
+
     const application = await prisma.programApplication.create({
       data: {
         userId,
         programId: program.id,
         answers: dto.answers ? (dto.answers as unknown as Prisma.InputJsonValue) : undefined,
         referralCodeId,
+        status: decision.status ?? 'PENDING',
+        decidedBy: decision.status ? 'AUTO' : undefined,
+        rejectionReason: decision.reason,
       },
     });
 
@@ -132,7 +145,11 @@ export class ProgramsService {
 
     void trackServerEvent('Lead', { email: userEmail }, { content_name: program.title });
 
-    return { message: 'Application submitted.' };
+    return {
+      message: 'Application submitted.',
+      status: application.status,
+      rejectionReason: application.rejectionReason,
+    };
   }
 
   async getMyApplication(slug: string, userId: string) {
@@ -152,6 +169,7 @@ export class ProgramsService {
       application: {
         id: application.id,
         status: application.status,
+        rejectionReason: application.rejectionReason,
         attendedAt: application.attendedAt,
         createdAt: application.createdAt,
       },
@@ -188,6 +206,8 @@ export class ProgramsService {
       where: { id: applicationId },
       data: {
         status: dto.status as never,
+        decidedBy: dto.status ? 'ADMIN' : undefined,
+        rejectionReason: dto.status ? null : undefined,
         attendedAt: dto.attended === undefined ? undefined : dto.attended ? new Date() : null,
       },
       include: { user: true, referralCode: true },
@@ -338,6 +358,7 @@ export class ProgramsService {
         ...dto,
         phases: dto.phases as unknown as Prisma.InputJsonValue,
         sponsors: dto.sponsors as unknown as Prisma.InputJsonValue,
+        acceptanceCriteria: (dto.acceptanceCriteria ?? {}) as unknown as Prisma.InputJsonValue,
       },
       include: FORM_INCLUDE,
     });
@@ -364,6 +385,9 @@ export class ProgramsService {
         ...dto,
         phases: dto.phases ? (dto.phases as unknown as Prisma.InputJsonValue) : undefined,
         sponsors: dto.sponsors ? (dto.sponsors as unknown as Prisma.InputJsonValue) : undefined,
+        acceptanceCriteria: dto.acceptanceCriteria
+          ? (dto.acceptanceCriteria as unknown as Prisma.InputJsonValue)
+          : undefined,
       },
       include: FORM_INCLUDE,
     });

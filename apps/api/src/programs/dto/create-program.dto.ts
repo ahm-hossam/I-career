@@ -1,5 +1,6 @@
 import { Type } from 'class-transformer';
 import { IsArray, IsIn, IsNotEmpty, IsOptional, IsString, ValidateNested } from 'class-validator';
+import { ProgramAcceptanceCriteriaDto } from './program-acceptance-criteria.dto';
 import { ProgramPhaseDto } from './program-phase.dto';
 import { ProgramSponsorDto } from './program-sponsor.dto';
 
@@ -60,6 +61,11 @@ export class CreateProgramDto {
   @ValidateNested({ each: true })
   @Type(() => ProgramSponsorDto)
   sponsors!: ProgramSponsorDto[];
+
+  @IsOptional()
+  @ValidateNested()
+  @Type(() => ProgramAcceptanceCriteriaDto)
+  acceptanceCriteria?: ProgramAcceptanceCriteriaDto;
 
   @IsOptional()
   @IsString()
