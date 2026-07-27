@@ -4,9 +4,10 @@ import { useMemo, useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { motion } from 'motion/react';
-import { Archive, ArchiveRestore, ChevronLeft, ChevronRight, Eye, Trash2 } from 'lucide-react';
+import { Archive, ArchiveRestore, ChevronLeft, ChevronRight, Eye, Search, Trash2 } from 'lucide-react';
 import type { UserListItem } from '@i-career/types';
 import { cn } from '@i-career/utils';
+import { ExportButton } from '@/components/export-button';
 import { useLocale } from '@/lib/i18n/locale-context';
 import { deleteUser, setUserArchived } from '@/app/applicants/actions';
 
@@ -20,10 +21,45 @@ export function RegisteredUsersTable({ users }: { users: UserListItem[] }) {
   const { t, locale } = useLocale();
   const router = useRouter();
   const [page, setPage] = useState(0);
+  const [search, setSearch] = useState('');
+  const [statusFilter, setStatusFilter] = useState<'ALL' | 'ACTIVE' | 'ARCHIVED'>('ALL');
   const [pendingId, setPendingId] = useState<string | null>(null);
-  const totalPages = Math.max(1, Math.ceil(users.length / PAGE_SIZE));
 
-  const rows = useMemo(() => users.slice(page * PAGE_SIZE, page * PAGE_SIZE + PAGE_SIZE), [users, page]);
+  const filtered = useMemo(() => {
+    const q = search.trim().toLowerCase();
+    return users
+      .filter((u) => statusFilter === 'ALL' || (statusFilter === 'ARCHIVED' ? u.archived : !u.archived))
+      .filter(
+        (u) => !q || `${u.firstName} ${u.lastName}`.toLowerCase().includes(q) || u.email.toLowerCase().includes(q),
+      );
+  }, [users, search, statusFilter]);
+
+  const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
+  const rows = useMemo(() => filtered.slice(page * PAGE_SIZE, page * PAGE_SIZE + PAGE_SIZE), [filtered, page]);
+
+  const exportRows = useMemo(
+    () =>
+      filtered.map((u) => ({
+        'First Name': u.firstName,
+        'Last Name': u.lastName,
+        Email: u.email,
+        Phone: u.phone,
+        Nationality: u.nationality,
+        Governorate: u.governorate,
+        Gender: u.gender,
+        'Student Status': u.studentStatus,
+        University: u.university,
+        Faculty: u.faculty,
+        'Graduation Year': u.graduationYear,
+        'Has Disability': u.hasDisability ? 'Yes' : 'No',
+        'Disability Details': u.disabilityDetails ?? '',
+        Applications: u.applicationsCount,
+        Attended: u.attendedCount,
+        Status: u.archived ? 'Archived' : 'Active',
+        'Registered At': u.createdAt,
+      })),
+    [filtered],
+  );
 
   const formatDate = (iso: string) =>
     new Intl.DateTimeFormat(locale === 'ar' ? 'ar-EG' : 'en-US', { month: 'short', day: 'numeric', year: 'numeric' }).format(
@@ -61,6 +97,38 @@ export function RegisteredUsersTable({ users }: { users: UserListItem[] }) {
 
   return (
     <div className="rounded-3xl border border-border-subtle bg-surface p-5 shadow-sm sm:p-6">
+      <div className="mb-4 flex flex-wrap items-center gap-3">
+        <div className="relative max-w-xs flex-1">
+          <Search size={15} className="pointer-events-none absolute start-3.5 top-1/2 -translate-y-1/2 text-ink-faint" />
+          <input
+            value={search}
+            onChange={(e) => {
+              setSearch(e.target.value);
+              setPage(0);
+            }}
+            placeholder={t('applicants.searchPlaceholder')}
+            className="w-full rounded-xl border border-border-subtle bg-surface py-2.5 ps-9 pe-3 text-sm text-ink outline-none transition-colors focus:border-brand-500 dark:text-white"
+          />
+        </div>
+        <select
+          value={statusFilter}
+          onChange={(e) => {
+            setStatusFilter(e.target.value as 'ALL' | 'ACTIVE' | 'ARCHIVED');
+            setPage(0);
+          }}
+          className="w-auto rounded-xl border border-border-subtle bg-surface px-4 py-2.5 text-sm text-ink outline-none transition-colors focus:border-brand-500 dark:text-white"
+        >
+          <option value="ALL">{t('applicants.allStatuses')}</option>
+          <option value="ACTIVE">{t('applicants.statusActive')}</option>
+          <option value="ARCHIVED">{t('applicants.statusArchived')}</option>
+        </select>
+        <ExportButton filename="registered-users.csv" rows={exportRows} />
+      </div>
+
+      {filtered.length === 0 ? (
+        <div className="py-8 text-center text-sm text-ink-faint">{t('common.noResults')}</div>
+      ) : (
+      <>
       <div className="overflow-x-auto">
         <table className="w-full min-w-[1080px] border-collapse text-sm">
           <thead>
@@ -90,9 +158,12 @@ export function RegisteredUsersTable({ users }: { users: UserListItem[] }) {
                     <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-brand-500 to-brand-700 text-[11px] font-bold text-white">
                       {initialsFrom(row.firstName, row.lastName)}
                     </span>
-                    <span className="font-semibold text-ink dark:text-white">
+                    <Link
+                      href={`/applicants/users/${row.id}`}
+                      className="font-semibold text-ink hover:text-brand-600 hover:underline dark:text-white dark:hover:text-brand-300"
+                    >
                       {row.firstName} {row.lastName}
-                    </span>
+                    </Link>
                   </div>
                 </td>
                 <td className="px-3 py-3 text-ink-soft dark:text-white/75">{row.email}</td>
@@ -170,6 +241,8 @@ export function RegisteredUsersTable({ users }: { users: UserListItem[] }) {
           </button>
         </div>
       </div>
+      </>
+      )}
     </div>
   );
 }

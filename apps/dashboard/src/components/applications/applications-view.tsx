@@ -4,9 +4,10 @@ import { useMemo, useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { motion } from 'motion/react';
-import { Check, ClipboardList, X } from 'lucide-react';
+import { Accessibility, Check, ClipboardList, Search, X } from 'lucide-react';
 import type { ApplicationListItem, ApplicationStatus, PublicProgram } from '@i-career/types';
 import { cn } from '@i-career/utils';
+import { ExportButton } from '@/components/export-button';
 import { updateApplication } from '@/app/applications/actions';
 
 const inputClass =
@@ -34,14 +35,43 @@ export function ApplicationsView({
   const router = useRouter();
   const [programFilter, setProgramFilter] = useState<'ALL' | string>('ALL');
   const [statusFilter, setStatusFilter] = useState<'ALL' | ApplicationStatus>('ALL');
+  const [search, setSearch] = useState('');
   const [pendingId, setPendingId] = useState<string | null>(null);
 
-  const filtered = useMemo(
+  const filtered = useMemo(() => {
+    const q = search.trim().toLowerCase();
+    return applications
+      .filter((a) => programFilter === 'ALL' || a.program.slug === programFilter)
+      .filter((a) => statusFilter === 'ALL' || a.status === statusFilter)
+      .filter(
+        (a) =>
+          !q ||
+          `${a.applicant.firstName} ${a.applicant.lastName}`.toLowerCase().includes(q) ||
+          a.applicant.email.toLowerCase().includes(q),
+      );
+  }, [applications, programFilter, statusFilter, search]);
+
+  const exportRows = useMemo(
     () =>
-      applications
-        .filter((a) => programFilter === 'ALL' || a.program.slug === programFilter)
-        .filter((a) => statusFilter === 'ALL' || a.status === statusFilter),
-    [applications, programFilter, statusFilter],
+      filtered.map((a) => ({
+        'First Name': a.applicant.firstName,
+        'Last Name': a.applicant.lastName,
+        Email: a.applicant.email,
+        Phone: a.applicant.phone,
+        University: a.applicant.university,
+        Faculty: a.applicant.faculty,
+        'Has Disability': a.applicant.hasDisability ? 'Yes' : 'No',
+        'Account Status': a.applicant.archived ? 'Archived' : 'Active',
+        Program: a.program.title,
+        Status: a.status,
+        'Decided By': a.decidedBy ?? '',
+        'Rejection Reason': a.rejectionReason ?? '',
+        'Referral Code': a.referral?.code ?? '',
+        'Referral Label': a.referral?.label ?? '',
+        'Applied At': a.createdAt,
+        'Attended At': a.attendedAt ?? '',
+      })),
+    [filtered],
   );
 
   async function handleAction(id: string, patch: { status?: 'ACCEPTED' | 'REJECTED'; attended?: boolean }) {
@@ -62,6 +92,15 @@ export function ApplicationsView({
       </div>
 
       <div className="mt-6 flex flex-wrap items-center gap-3">
+        <div className="relative">
+          <Search size={15} className="pointer-events-none absolute start-3.5 top-1/2 -translate-y-1/2 text-ink-faint" />
+          <input
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            placeholder="Search by name or email…"
+            className={cn(inputClass, 'w-auto bg-surface ps-9')}
+          />
+        </div>
         <select
           value={programFilter}
           onChange={(e) => setProgramFilter(e.target.value)}
@@ -84,6 +123,7 @@ export function ApplicationsView({
           <option value="ACCEPTED">Accepted</option>
           <option value="REJECTED">Rejected</option>
         </select>
+        <ExportButton filename="applications.csv" rows={exportRows} />
       </div>
 
       <div className="mt-6 rounded-3xl border border-border-subtle bg-surface p-5 shadow-sm sm:p-6">
@@ -118,8 +158,21 @@ export function ApplicationsView({
                     className="border-t border-border-subtle transition-colors hover:bg-ink/[0.025] dark:hover:bg-white/[0.03]"
                   >
                     <td className="px-3 py-3">
-                      <div className="font-semibold text-ink dark:text-white">
-                        {row.applicant.firstName} {row.applicant.lastName}
+                      <div className="flex items-center gap-1.5 font-semibold text-ink dark:text-white">
+                        <Link
+                          href={`/applicants/users/${row.applicant.id}`}
+                          className="hover:text-brand-600 hover:underline dark:hover:text-brand-300"
+                        >
+                          {row.applicant.firstName} {row.applicant.lastName}
+                        </Link>
+                        {row.applicant.hasDisability && (
+                          <span
+                            title={`Disability: ${row.applicant.disabilityDetails ?? 'Yes'}`}
+                            className="inline-flex shrink-0 text-brand-600"
+                          >
+                            <Accessibility size={14} />
+                          </span>
+                        )}
                       </div>
                       <div className="text-xs text-ink-faint">{row.applicant.email}</div>
                     </td>
@@ -145,16 +198,31 @@ export function ApplicationsView({
                         new Date(row.createdAt),
                       )}
                     </td>
-                    <td className="px-3 py-3">
-                      <span
-                        className={cn(
-                          'inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-bold',
-                          STATUS_STYLES[row.status],
+                    <td className="max-w-[200px] px-3 py-3">
+                      <div className="flex items-center gap-1.5">
+                        <span
+                          className={cn(
+                            'inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-bold',
+                            STATUS_STYLES[row.status],
+                          )}
+                        >
+                          <span className={cn('h-1.5 w-1.5 rounded-full', STATUS_DOT[row.status])} />
+                          {row.status[0] + row.status.slice(1).toLowerCase()}
+                        </span>
+                        {row.decidedBy === 'AUTO' && (
+                          <span
+                            title="Automatically decided by acceptance criteria"
+                            className="inline-flex items-center rounded-full bg-ink/[0.06] px-2 py-0.5 text-[10px] font-bold text-ink-soft dark:text-white/70"
+                          >
+                            Auto
+                          </span>
                         )}
-                      >
-                        <span className={cn('h-1.5 w-1.5 rounded-full', STATUS_DOT[row.status])} />
-                        {row.status[0] + row.status.slice(1).toLowerCase()}
-                      </span>
+                      </div>
+                      {row.status === 'REJECTED' && row.rejectionReason && (
+                        <p className="mt-1 truncate text-[11px] text-ink-faint" title={row.rejectionReason}>
+                          {row.rejectionReason}
+                        </p>
+                      )}
                     </td>
                     <td className="px-3 py-3">
                       {row.status === 'ACCEPTED' ? (
@@ -177,8 +245,8 @@ export function ApplicationsView({
                       )}
                     </td>
                     <td className="px-3 py-3">
-                      {row.status === 'PENDING' && (
-                        <div className="flex items-center gap-2">
+                      <div className="flex items-center gap-2">
+                        {row.status !== 'ACCEPTED' && (
                           <button
                             type="button"
                             disabled={pendingId === row.id}
@@ -186,8 +254,10 @@ export function ApplicationsView({
                             className="flex items-center gap-1 rounded-full bg-brand-500 px-3 py-1.5 text-xs font-bold text-white transition-colors hover:bg-brand-600 disabled:opacity-60"
                           >
                             <Check size={12} />
-                            Accept
+                            {row.status === 'REJECTED' ? 'Override: Accept' : 'Accept'}
                           </button>
+                        )}
+                        {row.status !== 'REJECTED' && (
                           <button
                             type="button"
                             disabled={pendingId === row.id}
@@ -195,10 +265,10 @@ export function ApplicationsView({
                             className="flex items-center gap-1 rounded-full border border-status-coral/30 px-3 py-1.5 text-xs font-bold text-status-coral transition-colors hover:bg-status-coral/[0.08] disabled:opacity-60"
                           >
                             <X size={12} />
-                            Reject
+                            {row.status === 'ACCEPTED' ? 'Override: Reject' : 'Reject'}
                           </button>
-                        </div>
-                      )}
+                        )}
+                      </div>
                     </td>
                   </motion.tr>
                 ))}

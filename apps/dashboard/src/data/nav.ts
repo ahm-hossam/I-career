@@ -1,8 +1,11 @@
 import {
+  Briefcase,
   ClipboardCheck,
   ClipboardList,
   GraduationCap,
+  Images,
   LayoutDashboard,
+  Mail,
   Megaphone,
   Users,
   UsersRound,
@@ -30,10 +33,15 @@ export const NAV_SECTIONS: NavSection[] = [
       { key: 'programs', href: '/programs', icon: GraduationCap },
       { key: 'campaigns', href: '/campaigns', icon: Megaphone },
       { key: 'forms', href: '/forms', icon: ClipboardList },
+      { key: 'contactSubmissions', href: '/contact-submissions', icon: Mail },
     ],
   },
   {
     key: 'section_workspace',
-    items: [{ key: 'team', href: '/team', icon: UsersRound }],
+    items: [
+      { key: 'team', href: '/team', icon: UsersRound },
+      { key: 'partnerLogos', href: '/partner-logos', icon: Images },
+      { key: 'serviceProjects', href: '/service-projects', icon: Briefcase },
+    ],
   },
 ];

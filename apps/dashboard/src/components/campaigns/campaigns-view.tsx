@@ -6,6 +6,7 @@ import { AnimatePresence, motion } from 'motion/react';
 import { Check, Copy, Globe, Megaphone, Plus, Trash2, X } from 'lucide-react';
 import type { CampaignSummary, PublicProgram, ReferralSource } from '@i-career/types';
 import { cn } from '@i-career/utils';
+import { ExportButton } from '@/components/export-button';
 import { SOURCE_ICONS, SOURCE_OPTIONS, SOURCE_STYLES } from '@/lib/referral-sources';
 import { createCampaign, deleteCampaign } from '@/app/campaigns/actions';
 
@@ -70,6 +71,26 @@ export function CampaignsView({
         return c.program?.slug === programFilter;
       }),
     [campaigns, sourceFilter, programFilter],
+  );
+
+  const exportRows = useMemo(
+    () =>
+      filtered.map((c) => ({
+        Campaign: c.campaignName ?? c.label ?? c.code,
+        Code: c.code,
+        Label: c.label ?? '',
+        Source: c.source,
+        Program: c.program ? c.program.title : 'Sitewide',
+        Owner: c.ownerName ?? '',
+        Clicks: c.clicks,
+        Signups: c.signups,
+        Applications: c.applications,
+        Accepted: c.accepted,
+        Rejected: c.rejected,
+        Attended: c.attended,
+        'Created At': c.createdAt,
+      })),
+    [filtered],
   );
 
   const totals = useMemo(
@@ -177,6 +198,7 @@ export function CampaignsView({
             </option>
           ))}
         </select>
+        <ExportButton filename="campaigns.csv" rows={exportRows} />
       </div>
 
       <div className="mt-6 rounded-3xl border border-border-subtle bg-surface p-5 shadow-sm sm:p-6">

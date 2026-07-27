@@ -1,11 +1,12 @@
 'use client';
 
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { AnimatePresence, motion } from 'motion/react';
 import { Check, Copy, KeyRound, Plus, Trash2, UserPlus, X } from 'lucide-react';
 import type { PublicDashboardUser } from '@i-career/types';
 import { cn } from '@i-career/utils';
+import { ExportButton } from '@/components/export-button';
 import { useLocale } from '@/lib/i18n/locale-context';
 import {
   createDashboardUser,
@@ -88,6 +89,18 @@ export function TeamView({ users }: { users: PublicDashboardUser[] }) {
   const [error, setError] = useState<string | null>(null);
   const [revealed, setRevealed] = useState<{ title: string; subtitle: string; password: string } | null>(null);
 
+  const exportRows = useMemo(
+    () =>
+      users.map((u) => ({
+        Name: u.name,
+        Email: u.email,
+        Role: u.role,
+        Status: u.active ? 'Active' : 'Inactive',
+        'Created At': u.createdAt,
+      })),
+    [users],
+  );
+
   async function handleCreate(e: React.FormEvent) {
     e.preventDefault();
     setError(null);
@@ -153,14 +166,17 @@ export function TeamView({ users }: { users: PublicDashboardUser[] }) {
           <h1 className="text-2xl font-extrabold text-ink dark:text-white sm:text-3xl">{t('team.title')}</h1>
           <p className="mt-1 text-ink-faint">{t('team.subtitle')}</p>
         </div>
-        <button
-          type="button"
-          onClick={() => setAddOpen(true)}
-          className="flex items-center gap-1.5 rounded-full bg-brand-500 px-4 py-2.5 text-sm font-bold text-white shadow-sm transition-colors hover:bg-brand-600"
-        >
-          <UserPlus size={16} />
-          {t('team.addUser')}
-        </button>
+        <div className="flex items-center gap-2">
+          <ExportButton filename="team.csv" rows={exportRows} />
+          <button
+            type="button"
+            onClick={() => setAddOpen(true)}
+            className="flex items-center gap-1.5 rounded-full bg-brand-500 px-4 py-2.5 text-sm font-bold text-white shadow-sm transition-colors hover:bg-brand-600"
+          >
+            <UserPlus size={16} />
+            {t('team.addUser')}
+          </button>
+        </div>
       </div>
 
       <div className="mt-6 rounded-3xl border border-border-subtle bg-surface p-5 shadow-sm sm:p-6">

@@ -180,6 +180,12 @@ export function UserDetailView({ user }: { user: UserDetail }) {
               <dt className="text-xs font-semibold text-ink-faint">{t('applicants.columnRegistered')}</dt>
               <dd className="mt-0.5 text-sm text-ink dark:text-white/90">{formatDate(user.createdAt)}</dd>
             </div>
+            <div>
+              <dt className="text-xs font-semibold text-ink-faint">{t('applicants.disability')}</dt>
+              <dd className="mt-0.5 text-sm text-ink dark:text-white/90">
+                {user.hasDisability ? user.disabilityDetails ?? t('applicants.disabilityYes') : t('applicants.disabilityNo')}
+              </dd>
+            </div>
           </dl>
         </div>
 

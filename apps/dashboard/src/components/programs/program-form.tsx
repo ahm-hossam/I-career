@@ -5,11 +5,27 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
 import { AnimatePresence, motion } from 'motion/react';
-import { Eye, Loader2, Megaphone, Plus, Trash2, Upload, Users, X } from 'lucide-react';
-import type { ImageAspect, ProgramInput, ProgramSponsor, PublicProgram, PublicProgramForm } from '@i-career/types';
+import { Eye, Loader2, Megaphone, Plus, ShieldCheck, Trash2, Upload, Users, X } from 'lucide-react';
+import type {
+  ImageAspect,
+  ProgramAcceptanceCriteria,
+  ProgramInput,
+  ProgramSponsor,
+  PublicProgram,
+  PublicProgramForm,
+} from '@i-career/types';
 import { cn } from '@i-career/utils';
+import { CriteriaMultiSelect } from '@/components/programs/criteria-multi-select';
 import { RichTextEditor } from '@/components/rich-text-editor';
 import { ProgramPreview } from '@/components/programs/program-preview';
+import {
+  FACULTIES,
+  GENDER_OPTIONS,
+  GOVERNORATES,
+  NATIONALITIES,
+  STUDENT_STATUS_OPTIONS,
+  UNIVERSITIES,
+} from '@/data/registration-options';
 import { createProgram, deleteProgram, updateProgram, uploadProgramImage } from '@/app/programs/actions';
 
 const ASPECT_OPTIONS: { value: ImageAspect; label: string }[] = [
@@ -54,6 +70,9 @@ export function ProgramForm({ program, forms }: { program?: PublicProgram; forms
   const [partnerBio, setPartnerBio] = useState(program?.partnerBio ?? '');
   const [partnerLogoUrl, setPartnerLogoUrl] = useState(program?.partnerLogoUrl ?? '');
   const [sponsors, setSponsors] = useState<ProgramSponsor[]>(program?.sponsors ?? []);
+  const [acceptanceCriteria, setAcceptanceCriteria] = useState<ProgramAcceptanceCriteria>(
+    program?.acceptanceCriteria ?? {},
+  );
   const [formId, setFormId] = useState<string>(program?.form?.id ?? '');
 
   const [uploading, setUploading] = useState(false);
@@ -115,6 +134,10 @@ export function ProgramForm({ program, forms }: { program?: PublicProgram; forms
     setSponsors((prev) => prev.filter((_, i) => i !== index));
   }
 
+  function updateAcceptanceCriteria(patch: Partial<ProgramAcceptanceCriteria>) {
+    setAcceptanceCriteria((prev) => ({ ...prev, ...patch }));
+  }
+
   function updatePhase(index: number, field: 'title' | 'description', value: string) {
     setPhases((prev) => prev.map((p, i) => (i === index ? { ...p, [field]: value } : p)));
   }
@@ -147,6 +170,7 @@ export function ProgramForm({ program, forms }: { program?: PublicProgram; forms
         partnerBio,
         partnerLogoUrl: partnerLogoUrl || null,
         sponsors: sponsors.filter((s) => s.name.trim()),
+        acceptanceCriteria,
         formId: formId || null,
       };
       if (isEdit) {
@@ -499,6 +523,118 @@ export function ProgramForm({ program, forms }: { program?: PublicProgram; forms
             e.target.value = '';
           }}
         />
+      </section>
+
+      <section className="rounded-3xl border border-border-subtle bg-surface p-5 shadow-sm sm:p-6">
+        <div className="flex items-center gap-2.5">
+          <ShieldCheck size={18} className="text-brand-600" />
+          <h2 className="text-base font-bold text-ink dark:text-white">Acceptance Criteria</h2>
+        </div>
+        <p className="mt-1 text-xs text-ink-faint">
+          Applicants who don&apos;t match every criterion you set below are rejected automatically on submission —
+          you can still override any decision manually afterward. Leave a field on &ldquo;Any&rdquo; to skip
+          filtering by it.
+        </p>
+
+        <div className="mt-4 grid gap-4 sm:grid-cols-2">
+          <CriteriaMultiSelect
+            label="Gender"
+            options={GENDER_OPTIONS.map((g) => g.value)}
+            selected={acceptanceCriteria.gender ?? []}
+            onChange={(next) => updateAcceptanceCriteria({ gender: next })}
+          />
+          <CriteriaMultiSelect
+            label="Student status"
+            options={STUDENT_STATUS_OPTIONS.map((s) => s.value)}
+            selected={acceptanceCriteria.studentStatus ?? []}
+            onChange={(next) => updateAcceptanceCriteria({ studentStatus: next })}
+          />
+          <CriteriaMultiSelect
+            label="Nationality"
+            options={NATIONALITIES}
+            selected={acceptanceCriteria.nationality ?? []}
+            onChange={(next) => updateAcceptanceCriteria({ nationality: next })}
+          />
+          <CriteriaMultiSelect
+            label="Governorate"
+            options={GOVERNORATES}
+            selected={acceptanceCriteria.governorate ?? []}
+            onChange={(next) => updateAcceptanceCriteria({ governorate: next })}
+          />
+          <CriteriaMultiSelect
+            label="University"
+            options={UNIVERSITIES}
+            selected={acceptanceCriteria.university ?? []}
+            onChange={(next) => updateAcceptanceCriteria({ university: next })}
+          />
+          <CriteriaMultiSelect
+            label="Faculty"
+            options={FACULTIES}
+            selected={acceptanceCriteria.faculty ?? []}
+            onChange={(next) => updateAcceptanceCriteria({ faculty: next })}
+          />
+        </div>
+
+        <div className="mt-5 grid gap-4 sm:grid-cols-2">
+          <div>
+            <p className="text-sm font-semibold text-ink dark:text-white/90">Disability</p>
+            <div className="mt-1.5 flex flex-wrap gap-4">
+              {[
+                { value: false, label: 'No disability' },
+                { value: true, label: 'Has a disability' },
+              ].map((opt) => (
+                <label
+                  key={String(opt.value)}
+                  className="flex items-center gap-2 text-sm text-ink-soft dark:text-white/80"
+                >
+                  <input
+                    type="checkbox"
+                    className="accent-brand-500"
+                    checked={(acceptanceCriteria.hasDisability ?? []).includes(opt.value)}
+                    onChange={(e) => {
+                      const current = acceptanceCriteria.hasDisability ?? [];
+                      const next = e.target.checked
+                        ? [...current, opt.value]
+                        : current.filter((v) => v !== opt.value);
+                      updateAcceptanceCriteria({ hasDisability: next });
+                    }}
+                  />
+                  {opt.label}
+                </label>
+              ))}
+            </div>
+            <p className="mt-1 text-[11px] text-ink-faint">Leave both unchecked (or both checked) to skip this filter.</p>
+          </div>
+
+          <div>
+            <p className="text-sm font-semibold text-ink dark:text-white/90">Accepted age range</p>
+            <div className="mt-1.5 flex items-center gap-3">
+              <input
+                type="number"
+                min={0}
+                max={120}
+                placeholder="From"
+                value={acceptanceCriteria.minAge ?? ''}
+                onChange={(e) =>
+                  updateAcceptanceCriteria({ minAge: e.target.value === '' ? undefined : Number(e.target.value) })
+                }
+                className={cn(inputClass, 'w-24')}
+              />
+              <span className="text-sm text-ink-faint">to</span>
+              <input
+                type="number"
+                min={0}
+                max={120}
+                placeholder="To"
+                value={acceptanceCriteria.maxAge ?? ''}
+                onChange={(e) =>
+                  updateAcceptanceCriteria({ maxAge: e.target.value === '' ? undefined : Number(e.target.value) })
+                }
+                className={cn(inputClass, 'w-24')}
+              />
+            </div>
+          </div>
+        </div>
       </section>
 
       {error && <p className="text-sm font-medium text-status-coral">{error}</p>}

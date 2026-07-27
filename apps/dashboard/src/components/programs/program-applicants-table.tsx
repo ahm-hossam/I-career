@@ -1,11 +1,12 @@
 'use client';
 
-import { Fragment, useState } from 'react';
+import { Fragment, useMemo, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { motion } from 'motion/react';
-import { Check, ChevronDown, ChevronUp, X } from 'lucide-react';
+import { Accessibility, Check, ChevronDown, ChevronUp, X } from 'lucide-react';
 import type { ProgramFormField, PublicProgramApplication } from '@i-career/types';
 import { cn } from '@i-career/utils';
+import { ExportButton } from '@/components/export-button';
 import { updateApplicant } from '@/app/programs/[slug]/applicants/actions';
 
 const STATUS_STYLES = {
@@ -37,6 +38,31 @@ export function ProgramApplicantsTable({
 
   const sorted = [...applicants].sort((a, b) => (a.status === b.status ? 0 : a.status === 'PENDING' ? -1 : 1));
 
+  const exportRows = useMemo(
+    () =>
+      sorted.map((a) => ({
+        'First Name': a.applicant.firstName,
+        'Last Name': a.applicant.lastName,
+        Email: a.applicant.email,
+        Phone: a.applicant.phone,
+        University: a.applicant.university,
+        Faculty: a.applicant.faculty,
+        'Has Disability': a.applicant.hasDisability ? 'Yes' : 'No',
+        Status: a.status,
+        'Decided By': a.decidedBy ?? '',
+        'Rejection Reason': a.rejectionReason ?? '',
+        'Referral Code': a.referral?.code ?? '',
+        'Applied At': a.createdAt,
+        'Attended At': a.attendedAt ?? '',
+        Answers: a.answers
+          ? Object.entries(a.answers)
+              .map(([fieldId, value]) => `${labelFor(fieldId)}: ${Array.isArray(value) ? value.join('/') : value}`)
+              .join('; ')
+          : '',
+      })),
+    [sorted, formFields],
+  );
+
   async function handleAction(id: string, patch: { status?: 'ACCEPTED' | 'REJECTED'; attended?: boolean }) {
     setPendingId(id);
     try {
@@ -57,6 +83,9 @@ export function ProgramApplicantsTable({
 
   return (
     <div className="rounded-3xl border border-border-subtle bg-surface p-5 shadow-sm sm:p-6">
+      <div className="mb-4 flex justify-end">
+        <ExportButton filename="program-applicants.csv" rows={exportRows} />
+      </div>
       <div className="overflow-x-auto">
         <table className="w-full min-w-[760px] border-collapse text-sm">
           <thead>
@@ -79,8 +108,16 @@ export function ProgramApplicantsTable({
                   className="border-t border-border-subtle transition-colors hover:bg-ink/[0.025] dark:hover:bg-white/[0.03]"
                 >
                   <td className="px-3 py-3">
-                    <div className="font-semibold text-ink dark:text-white">
+                    <div className="flex items-center gap-1.5 font-semibold text-ink dark:text-white">
                       {row.applicant.firstName} {row.applicant.lastName}
+                      {row.applicant.hasDisability && (
+                        <span
+                          title={`Disability: ${row.applicant.disabilityDetails ?? 'Yes'}`}
+                          className="inline-flex shrink-0 text-brand-600"
+                        >
+                          <Accessibility size={14} />
+                        </span>
+                      )}
                     </div>
                     <div className="text-xs text-ink-faint">{row.applicant.email}</div>
                     {row.answers && Object.keys(row.answers).length > 0 && (
@@ -108,16 +145,31 @@ export function ProgramApplicantsTable({
                       new Date(row.createdAt),
                     )}
                   </td>
-                  <td className="px-3 py-3">
-                    <span
-                      className={cn(
-                        'inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-bold',
-                        STATUS_STYLES[row.status],
+                  <td className="max-w-[200px] px-3 py-3">
+                    <div className="flex items-center gap-1.5">
+                      <span
+                        className={cn(
+                          'inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-bold',
+                          STATUS_STYLES[row.status],
+                        )}
+                      >
+                        <span className={cn('h-1.5 w-1.5 rounded-full', STATUS_DOT[row.status])} />
+                        {row.status[0] + row.status.slice(1).toLowerCase()}
+                      </span>
+                      {row.decidedBy === 'AUTO' && (
+                        <span
+                          title="Automatically decided by acceptance criteria"
+                          className="inline-flex items-center rounded-full bg-ink/[0.06] px-2 py-0.5 text-[10px] font-bold text-ink-soft dark:text-white/70"
+                        >
+                          Auto
+                        </span>
                       )}
-                    >
-                      <span className={cn('h-1.5 w-1.5 rounded-full', STATUS_DOT[row.status])} />
-                      {row.status[0] + row.status.slice(1).toLowerCase()}
-                    </span>
+                    </div>
+                    {row.status === 'REJECTED' && row.rejectionReason && (
+                      <p className="mt-1 truncate text-[11px] text-ink-faint" title={row.rejectionReason}>
+                        {row.rejectionReason}
+                      </p>
+                    )}
                   </td>
                   <td className="px-3 py-3">
                     {row.status === 'ACCEPTED' ? (
@@ -140,8 +192,8 @@ export function ProgramApplicantsTable({
                     )}
                   </td>
                   <td className="px-3 py-3">
-                    {row.status === 'PENDING' && (
-                      <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-2">
+                      {row.status !== 'ACCEPTED' && (
                         <button
                           type="button"
                           disabled={pendingId === row.id}
@@ -149,8 +201,10 @@ export function ProgramApplicantsTable({
                           className="flex items-center gap-1 rounded-full bg-brand-500 px-3 py-1.5 text-xs font-bold text-white transition-colors hover:bg-brand-600 disabled:opacity-60"
                         >
                           <Check size={12} />
-                          Accept
+                          {row.status === 'REJECTED' ? 'Override: Accept' : 'Accept'}
                         </button>
+                      )}
+                      {row.status !== 'REJECTED' && (
                         <button
                           type="button"
                           disabled={pendingId === row.id}
@@ -158,10 +212,10 @@ export function ProgramApplicantsTable({
                           className="flex items-center gap-1 rounded-full border border-status-coral/30 px-3 py-1.5 text-xs font-bold text-status-coral transition-colors hover:bg-status-coral/[0.08] disabled:opacity-60"
                         >
                           <X size={12} />
-                          Reject
+                          {row.status === 'ACCEPTED' ? 'Override: Reject' : 'Reject'}
                         </button>
-                      </div>
-                    )}
+                      )}
+                    </div>
                   </td>
                 </motion.tr>
                 {expanded === row.id && row.answers && (

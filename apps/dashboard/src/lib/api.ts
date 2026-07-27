@@ -1,10 +1,13 @@
 import type {
   ApplicationListItem,
   CampaignSummary,
+  ContactSubmissionListItem,
   PasswordResetRequestSummary,
   ProgramFunnelSummary,
   PublicDashboardUser,
+  PublicPartnerLogo,
   PublicProgram,
+  PublicServiceProject,
   PublicProgramApplication,
   PublicProgramForm,
   PublicReferralCode,
@@ -78,6 +81,30 @@ export async function fetchApplicants(slug: string): Promise<PublicProgramApplic
 
 export async function fetchDashboardUsers(): Promise<PublicDashboardUser[]> {
   const res = await fetch(`${process.env.API_URL}/dashboard-users`, { headers: internalHeaders(), cache: 'no-store' });
+  if (!res.ok) return [];
+  const data = await res.json();
+  return data.items;
+}
+
+export async function fetchPartnerLogos(): Promise<PublicPartnerLogo[]> {
+  const res = await fetch(`${process.env.API_URL}/partner-logos`, { cache: 'no-store' });
+  if (!res.ok) return [];
+  const data = await res.json();
+  return data.items;
+}
+
+export async function fetchServiceProjects(): Promise<PublicServiceProject[]> {
+  const res = await fetch(`${process.env.API_URL}/service-projects`, { cache: 'no-store' });
+  if (!res.ok) return [];
+  const data = await res.json();
+  return data.items;
+}
+
+export async function fetchContactSubmissions(): Promise<ContactSubmissionListItem[]> {
+  const res = await fetch(`${process.env.API_URL}/contact-submissions`, {
+    headers: internalHeaders(),
+    cache: 'no-store',
+  });
   if (!res.ok) return [];
   const data = await res.json();
   return data.items;

@@ -6,6 +6,7 @@ import { AnimatePresence, motion } from 'motion/react';
 import { Check, Copy, KeyRound } from 'lucide-react';
 import type { PasswordResetRequestSummary } from '@i-career/types';
 import { cn } from '@i-career/utils';
+import { ExportButton } from '@/components/export-button';
 import { useLocale } from '@/lib/i18n/locale-context';
 import { resolveResetRequest } from '@/app/applicants/actions';
 
@@ -29,6 +30,20 @@ export function ResetRequestsTable({ requests }: { requests: PasswordResetReques
   const sorted = useMemo(
     () => [...requests].sort((a, b) => (a.status === b.status ? 0 : a.status === 'PENDING' ? -1 : 1)),
     [requests],
+  );
+
+  const exportRows = useMemo(
+    () =>
+      sorted.map((r) => ({
+        'First Name': r.user.firstName,
+        'Last Name': r.user.lastName,
+        Email: r.user.email,
+        Phone: r.user.phone,
+        Status: r.status,
+        'Requested At': r.createdAt,
+        'Resolved At': r.resolvedAt ?? '',
+      })),
+    [sorted],
   );
 
   const formatDate = (iso: string) =>
@@ -66,6 +81,9 @@ export function ResetRequestsTable({ requests }: { requests: PasswordResetReques
   return (
     <>
       <div className="rounded-3xl border border-border-subtle bg-surface p-5 shadow-sm sm:p-6">
+        <div className="mb-4 flex justify-end">
+          <ExportButton filename="reset-requests.csv" rows={exportRows} />
+        </div>
         <div className="overflow-x-auto">
           <table className="w-full min-w-[560px] border-collapse text-sm">
             <thead>
