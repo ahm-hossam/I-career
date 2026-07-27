@@ -8,24 +8,26 @@ generator client {
 }
 
 model User {
-  id             String        @id @default(cuid())
-  email          String        @unique
-  passwordHash   String
-  firstName      String
-  lastName       String
-  phone          String
-  nationality    String
-  governorate    String
-  birthday       DateTime      @db.Date
-  gender         Gender
-  studentStatus  StudentStatus
-  university     String
-  graduationYear Int
-  faculty        String
-  role           Role          @default(USER)
-  archived       Boolean       @default(false)
-  createdAt      DateTime      @default(now())
-  updatedAt      DateTime      @updatedAt
+  id                String        @id @default(cuid())
+  email             String        @unique
+  passwordHash      String
+  firstName         String
+  lastName          String
+  phone             String
+  nationality       String
+  governorate       String
+  birthday          DateTime      @db.Date
+  gender            Gender
+  studentStatus     StudentStatus
+  university        String
+  graduationYear    Int
+  faculty           String
+  hasDisability     Boolean       @default(false)
+  disabilityDetails String?
+  role              Role          @default(USER)
+  archived          Boolean       @default(false)
+  createdAt         DateTime      @default(now())
+  updatedAt         DateTime      @updatedAt
 
   resetRequests PasswordResetRequest[]
 
@@ -83,6 +85,7 @@ model Program {
   partnerBio     String
   partnerLogoUrl String?
   sponsors       Json     @default("[]")
+  acceptanceCriteria Json @default("{}")
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
@@ -99,6 +102,11 @@ enum ApplicationStatus {
   REJECTED
 }
 
+enum ApplicationDecisionSource {
+  AUTO
+  ADMIN
+}
+
 model ProgramApplication {
   id        String            @id @default(cuid())
   userId    String
@@ -106,6 +114,8 @@ model ProgramApplication {
   programId String
   program   Program           @relation(fields: [programId], references: [id], onDelete: Cascade)
   status    ApplicationStatus @default(PENDING)
+  decidedBy ApplicationDecisionSource?
+  rejectionReason String?
   attendedAt DateTime?
   answers   Json?
   createdAt DateTime          @default(now())
@@ -286,4 +296,64 @@ model DashboardUser {
   active       Boolean           @default(true)
   createdAt    DateTime          @default(now())
   updatedAt    DateTime          @updatedAt
+}
+
+enum ContactSubmissionStatus {
+  NEW
+  READ
+  RESOLVED
+}
+
+model ContactSubmission {
+  id        String                  @id @default(cuid())
+  name      String
+  email     String
+  message   String
+  audience  String?
+  service   String?
+  status    ContactSubmissionStatus @default(NEW)
+  createdAt DateTime                @default(now())
+
+  @@index([status])
+}
+
+enum ServiceCategory {
+  YOUTH
+  EMPLOYERS
+  NGOS
+}
+
+model ServiceProject {
+  id          String          @id @default(cuid())
+  category    ServiceCategory
+  name        String
+  description String
+  logoUrl     String
+  linkUrl     String?
+  order       Int             @default(0)
+  createdAt   DateTime        @default(now())
+  updatedAt   DateTime        @updatedAt
+
+  @@index([category, order])
+}
+
+enum PartnerLogoCategory {
+  GOVERNMENTAL
+  ORGANIZATIONS
+  EMPLOYERS
+  UNIVERSITIES
+}
+
+model PartnerLogo {
+  id        String              @id @default(cuid())
+  category  PartnerLogoCategory
+  name      String
+  imageUrl  String
+  width     Int                 @default(160)
+  height    Int                 @default(64)
+  order     Int                 @default(0)
+  createdAt DateTime            @default(now())
+  updatedAt DateTime            @updatedAt
+
+  @@index([category, order])
 }

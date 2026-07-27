@@ -26,6 +26,8 @@ export interface PublicUser {
   university: string;
   graduationYear: number;
   faculty: string;
+  hasDisability: boolean;
+  disabilityDetails: string | null;
   archived: boolean;
   createdAt: string;
 }
@@ -75,6 +77,20 @@ export interface ProgramSponsor {
 }
 
 export type ImageAspect = '16:6' | '16:9' | '1:1';
+
+export interface ProgramAcceptanceCriteria {
+  gender?: string[];
+  nationality?: string[];
+  governorate?: string[];
+  studentStatus?: string[];
+  university?: string[];
+  faculty?: string[];
+  hasDisability?: boolean[];
+  minAge?: number;
+  maxAge?: number;
+}
+
+export type ApplicationDecisionSource = 'AUTO' | 'ADMIN';
 
 export type FormFieldType =
   | 'SHORT_TEXT'
@@ -134,6 +150,7 @@ export interface PublicProgram {
   partnerBio: string;
   partnerLogoUrl: string | null;
   sponsors: ProgramSponsor[];
+  acceptanceCriteria: ProgramAcceptanceCriteria;
   form: PublicProgramForm | null;
   createdAt: string;
   updatedAt: string;
@@ -154,6 +171,7 @@ export interface ProgramInput {
   partnerBio: string;
   partnerLogoUrl: string | null;
   sponsors: ProgramSponsor[];
+  acceptanceCriteria: ProgramAcceptanceCriteria;
   formId: string | null;
 }
 
@@ -162,6 +180,8 @@ export type ApplicationStatus = 'PENDING' | 'ACCEPTED' | 'REJECTED';
 export interface PublicProgramApplication {
   id: string;
   status: ApplicationStatus;
+  decidedBy: ApplicationDecisionSource | null;
+  rejectionReason: string | null;
   attendedAt: string | null;
   answers: Record<string, string | string[]> | null;
   createdAt: string;
@@ -173,6 +193,8 @@ export interface PublicProgramApplication {
     phone: string;
     university: string;
     faculty: string;
+    hasDisability: boolean;
+    disabilityDetails: string | null;
   };
   referral: {
     code: string;
@@ -184,6 +206,8 @@ export interface PublicProgramApplication {
 export interface ApplicationListItem {
   id: string;
   status: ApplicationStatus;
+  decidedBy: ApplicationDecisionSource | null;
+  rejectionReason: string | null;
   attendedAt: string | null;
   createdAt: string;
   program: { id: string; slug: string; title: string };
@@ -195,6 +219,9 @@ export interface ApplicationListItem {
     phone: string;
     university: string;
     faculty: string;
+    hasDisability: boolean;
+    disabilityDetails: string | null;
+    archived: boolean;
   };
   referral: {
     code: string;
@@ -206,6 +233,7 @@ export interface ApplicationListItem {
 export interface MyApplicationStatus {
   id: string;
   status: ApplicationStatus;
+  rejectionReason: string | null;
   attendedAt: string | null;
   createdAt: string;
 }
@@ -346,4 +374,65 @@ export interface DashboardUserInput {
   name: string;
   email: string;
   role: DashboardUserRole;
+}
+
+export type PartnerLogoCategory = 'GOVERNMENTAL' | 'ORGANIZATIONS' | 'EMPLOYERS' | 'UNIVERSITIES';
+
+export interface PublicPartnerLogo {
+  id: string;
+  category: PartnerLogoCategory;
+  name: string;
+  imageUrl: string;
+  width: number;
+  height: number;
+  order: number;
+}
+
+export interface PartnerLogoInput {
+  category: PartnerLogoCategory;
+  name: string;
+  imageUrl: string;
+  width: number;
+  height: number;
+}
+
+export type ServiceCategory = 'YOUTH' | 'EMPLOYERS' | 'NGOS';
+
+export interface PublicServiceProject {
+  id: string;
+  category: ServiceCategory;
+  name: string;
+  description: string;
+  logoUrl: string;
+  linkUrl: string | null;
+  order: number;
+}
+
+export interface ServiceProjectInput {
+  category: ServiceCategory;
+  name: string;
+  description: string;
+  logoUrl: string;
+  linkUrl?: string;
+}
+
+export type ContactSubmissionStatus = 'NEW' | 'READ' | 'RESOLVED';
+
+export interface ContactSubmissionListItem {
+  id: string;
+  name: string;
+  email: string;
+  message: string;
+  audience: string | null;
+  service: string | null;
+  status: ContactSubmissionStatus;
+  createdAt: string;
+}
+
+export interface ContactSubmissionInput {
+  name: string;
+  email: string;
+  message: string;
+  audience?: string;
+  service?: string;
 }
