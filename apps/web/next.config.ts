@@ -7,6 +7,7 @@ const nextConfig: NextConfig = {
       { protocol: "http", hostname: "localhost", port: "3000" },
       { protocol: "http", hostname: "localhost", port: "4000" },
       { protocol: "https", hostname: "i-career.onrender.com" },
+      { protocol: "https", hostname: "res.cloudinary.com" },
     ],
     dangerouslyAllowLocalIP: true,
   },

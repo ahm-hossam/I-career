@@ -1,5 +1,4 @@
 import 'dotenv/config';
-import { join } from 'node:path';
 import { ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import type { NestExpressApplication } from '@nestjs/platform-express';
@@ -27,8 +26,6 @@ async function bootstrap() {
     .split(',')
     .map((origin) => origin.trim());
   app.enableCors({ origin: allowedOrigins });
-
-  app.useStaticAssets(join(process.cwd(), 'uploads'), { prefix: '/uploads/' });
 
   await app.listen(process.env.PORT ?? 4000);
 }

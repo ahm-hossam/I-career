@@ -1,5 +1,3 @@
-import { randomBytes } from 'node:crypto';
-import { promises as fs } from 'node:fs';
 import { extname } from 'node:path';
 import {
   BadRequestException,
@@ -10,8 +8,9 @@ import {
   UseInterceptors,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { diskStorage } from 'multer';
+import { memoryStorage } from 'multer';
 import { InternalTokenGuard } from '../common/guards/internal-token.guard';
+import { uploadBufferToCloudinary } from './cloudinary';
 
 const ALLOWED_EXTENSIONS = new Set(['.pdf', '.jpg', '.jpeg', '.png']);
 const MAX_SIZE_BYTES = 10 * 1024 * 1024;
@@ -25,18 +24,10 @@ const MAGIC_BYTES: Record<string, Buffer> = {
   '.pdf': Buffer.from('%PDF-', 'ascii'),
 };
 
-async function matchesMagicBytes(filePath: string, ext: string): Promise<boolean> {
+function matchesMagicBytes(buffer: Buffer, ext: string): boolean {
   const signature = MAGIC_BYTES[ext];
   if (!signature) return false;
-
-  const handle = await fs.open(filePath, 'r');
-  try {
-    const buffer = Buffer.alloc(signature.length);
-    await handle.read(buffer, 0, signature.length, 0);
-    return buffer.equals(signature);
-  } finally {
-    await handle.close();
-  }
+  return buffer.subarray(0, signature.length).equals(signature);
 }
 
 @Controller('uploads')
@@ -45,13 +36,7 @@ export class UploadsController {
   @Post()
   @UseInterceptors(
     FileInterceptor('file', {
-      storage: diskStorage({
-        destination: 'uploads',
-        filename: (_req, file, callback) => {
-          const ext = extname(file.originalname).toLowerCase();
-          callback(null, `${randomBytes(16).toString('hex')}${ext}`);
-        },
-      }),
+      storage: memoryStorage(),
       limits: { fileSize: MAX_SIZE_BYTES },
       fileFilter: (_req, file, callback) => {
         const ext = extname(file.originalname).toLowerCase();
@@ -71,13 +56,12 @@ export class UploadsController {
       throw new BadRequestException('No file provided');
     }
 
-    const ext = extname(file.filename).toLowerCase();
-    const contentMatches = await matchesMagicBytes(file.path, ext);
-    if (!contentMatches) {
-      await fs.unlink(file.path).catch(() => {});
+    const ext = extname(file.originalname).toLowerCase();
+    if (!matchesMagicBytes(file.buffer, ext)) {
       throw new BadRequestException('File content does not match its extension');
     }
 
-    return { url: `${process.env.PUBLIC_API_URL}/uploads/${file.filename}` };
+    const url = await uploadBufferToCloudinary(file.buffer, 'icareer-uploads');
+    return { url };
   }
 }
