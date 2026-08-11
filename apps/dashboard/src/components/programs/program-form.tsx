@@ -49,6 +49,7 @@ export function ProgramForm({ program, forms }: { program?: PublicProgram; forms
   const router = useRouter();
   const isEdit = !!program;
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const iconInputRef = useRef<HTMLInputElement>(null);
   const partnerLogoInputRef = useRef<HTMLInputElement>(null);
   const sponsorFileInputRef = useRef<HTMLInputElement>(null);
   const [previewOpen, setPreviewOpen] = useState(false);
@@ -61,6 +62,7 @@ export function ProgramForm({ program, forms }: { program?: PublicProgram; forms
   const [subtitleEn, setSubtitleEn] = useState(program?.subtitleEn ?? '');
   const [subtitleAr, setSubtitleAr] = useState(program?.subtitleAr ?? '');
   const [logoUrl, setLogoUrl] = useState(program?.logoUrl ?? '');
+  const [iconUrl, setIconUrl] = useState(program?.iconUrl ?? '');
   const [imageAspect, setImageAspect] = useState<ImageAspect>(program?.imageAspect ?? '16:6');
   const [bannerFullWidth, setBannerFullWidth] = useState(program?.bannerFullWidth ?? false);
   const [aboutBody, setAboutBody] = useState(program?.aboutBody ?? '');
@@ -77,6 +79,7 @@ export function ProgramForm({ program, forms }: { program?: PublicProgram; forms
   const [formId, setFormId] = useState<string>(program?.form?.id ?? '');
 
   const [uploading, setUploading] = useState(false);
+  const [uploadingIcon, setUploadingIcon] = useState(false);
   const [uploadingPartnerLogo, setUploadingPartnerLogo] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [deleting, setDeleting] = useState(false);
@@ -94,6 +97,21 @@ export function ProgramForm({ program, forms }: { program?: PublicProgram; forms
       setError('Image upload failed. PDF, JPG, JPEG, PNG only, max 10 MB.');
     } finally {
       setUploading(false);
+    }
+  }
+
+  async function handleIconUpload(file: File) {
+    setUploadingIcon(true);
+    setError(null);
+    try {
+      const formData = new FormData();
+      formData.append('file', file);
+      const { url } = await uploadProgramImage(formData);
+      setIconUrl(url);
+    } catch {
+      setError('Image upload failed. PDF, JPG, JPEG, PNG only, max 10 MB.');
+    } finally {
+      setUploadingIcon(false);
     }
   }
 
@@ -162,6 +180,7 @@ export function ProgramForm({ program, forms }: { program?: PublicProgram; forms
         subtitleEn,
         subtitleAr: subtitleAr || null,
         logoUrl,
+        iconUrl: iconUrl || null,
         imageAspect,
         bannerFullWidth,
         aboutBody,
@@ -334,6 +353,50 @@ export function ProgramForm({ program, forms }: { program?: PublicProgram; forms
               Stretches the banner edge-to-edge on the program page instead of the default boxed layout.
             </p>
           </div>
+        </div>
+      </section>
+
+      <section className="rounded-3xl border border-border-subtle bg-surface p-5 shadow-sm sm:p-6">
+        <h2 className="text-base font-bold text-ink dark:text-white">Program icon</h2>
+        <p className="mt-1 text-xs text-ink-faint">
+          A small badge shown next to the program&apos;s name in lists and its detail page — separate from the
+          banner image above.
+        </p>
+        <div className="mt-4 flex items-center gap-4">
+          <div className="relative h-14 w-14 shrink-0 overflow-hidden rounded-2xl bg-ink/[0.04] dark:bg-white/5">
+            {iconUrl ? (
+              <Image src={iconUrl} alt="" fill className="object-cover" />
+            ) : (
+              <div className="flex h-full items-center justify-center text-[9px] text-ink-faint">No icon</div>
+            )}
+          </div>
+          <button
+            type="button"
+            onClick={() => iconInputRef.current?.click()}
+            disabled={uploadingIcon}
+            className="flex w-fit items-center gap-2 rounded-full border border-border-subtle px-4 py-2 text-sm font-semibold text-ink-soft transition-colors hover:bg-ink/[0.04] disabled:opacity-60 dark:text-white/80"
+          >
+            {uploadingIcon ? <Loader2 size={15} className="animate-spin" /> : <Upload size={15} />}
+            {uploadingIcon ? 'Uploading…' : iconUrl ? 'Replace icon' : 'Upload icon'}
+          </button>
+          {iconUrl && (
+            <button
+              type="button"
+              onClick={() => setIconUrl('')}
+              className="text-sm font-semibold text-status-coral hover:underline"
+            >
+              Remove
+            </button>
+          )}
+          <input
+            ref={iconInputRef}
+            type="file"
+            accept=".jpg,.jpeg,.png"
+            className="hidden"
+            onChange={(e) => {
+              if (e.target.files?.[0]) void handleIconUpload(e.target.files[0]);
+            }}
+          />
         </div>
       </section>
 

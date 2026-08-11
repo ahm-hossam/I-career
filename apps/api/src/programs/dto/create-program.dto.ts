@@ -27,6 +27,10 @@ export class CreateProgramDto {
   @IsNotEmpty()
   logoUrl!: string;
 
+  @IsOptional()
+  @IsString()
+  iconUrl?: string | null;
+
   @IsIn(ASPECT_RATIOS)
   imageAspect!: string;
 

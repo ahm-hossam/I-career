@@ -40,7 +40,14 @@ export default async function ProgramDetailPage({ params }: { params: Promise<{ 
 
       <article className="relative mx-auto max-w-4xl px-4 pb-12 sm:px-6 sm:pb-16 lg:px-8">
         <div className="mt-6 flex flex-wrap items-center justify-between gap-4">
-          <h1 className="text-3xl font-extrabold text-ink sm:text-4xl">{program.title}</h1>
+          <h1 className="flex items-center gap-3 text-3xl font-extrabold text-ink sm:text-4xl">
+            {program.iconUrl && (
+              <span className="relative h-9 w-9 shrink-0 overflow-hidden rounded-xl sm:h-10 sm:w-10">
+                <Image src={program.iconUrl} alt="" fill className="object-cover" />
+              </span>
+            )}
+            {program.title}
+          </h1>
           <div className="flex items-center gap-3">
             <ReferralShareButton slug={program.slug} />
             <ProgramRegisterButton

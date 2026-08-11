@@ -141,6 +141,7 @@ export interface PublicProgram {
   subtitleEn: string;
   subtitleAr: string | null;
   logoUrl: string;
+  iconUrl: string | null;
   imageAspect: ImageAspect;
   bannerFullWidth: boolean;
   aboutBody: string;
@@ -163,6 +164,7 @@ export interface ProgramInput {
   subtitleEn: string;
   subtitleAr: string | null;
   logoUrl: string;
+  iconUrl: string | null;
   imageAspect: ImageAspect;
   bannerFullWidth: boolean;
   aboutBody: string;

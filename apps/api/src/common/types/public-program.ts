@@ -12,6 +12,7 @@ export function toPublicProgram(program: ProgramWithForm) {
     subtitleEn: program.subtitleEn,
     subtitleAr: program.subtitleAr,
     logoUrl: program.logoUrl,
+    iconUrl: program.iconUrl,
     imageAspect: program.imageAspect as ImageAspect,
     bannerFullWidth: program.bannerFullWidth,
     aboutBody: program.aboutBody,

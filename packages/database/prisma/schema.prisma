@@ -76,6 +76,7 @@ model Program {
   subtitleEn  String
   subtitleAr  String?
   logoUrl     String
+  iconUrl     String?
   imageAspect String   @default("16:6")
   bannerFullWidth Boolean @default(false)
   aboutBody   String

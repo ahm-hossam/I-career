@@ -24,7 +24,15 @@ export function ProgramCard({ program, index = 0 }: { program: PublicProgram; in
       </Link>
       <div className="flex flex-1 flex-col gap-3 p-5">
         <div className="flex items-start justify-between gap-3">
-          <Link href={`/programs/${program.slug}`} className="font-bold text-ink hover:text-brand-700">
+          <Link
+            href={`/programs/${program.slug}`}
+            className="flex items-center gap-2 font-bold text-ink hover:text-brand-700"
+          >
+            {program.iconUrl && (
+              <span className="relative h-5 w-5 shrink-0 overflow-hidden rounded-md">
+                <Image src={program.iconUrl} alt="" fill className="object-cover" />
+              </span>
+            )}
             {program.title}
           </Link>
           <Link

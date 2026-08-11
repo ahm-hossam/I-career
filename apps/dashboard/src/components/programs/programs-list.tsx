@@ -29,7 +29,14 @@ export function ProgramsList({ programs }: { programs: PublicProgram[] }) {
             <Image src={program.logoUrl} alt={program.title} fill className="object-cover" />
           </div>
           <div className="p-4">
-            <p className="font-bold text-ink dark:text-white">{program.title}</p>
+            <div className="flex items-center gap-2">
+              {program.iconUrl && (
+                <div className="relative h-5 w-5 shrink-0 overflow-hidden rounded-md bg-ink/[0.04] dark:bg-white/5">
+                  <Image src={program.iconUrl} alt="" fill className="object-cover" />
+                </div>
+              )}
+              <p className="font-bold text-ink dark:text-white">{program.title}</p>
+            </div>
             <p className="mt-0.5 truncate font-mono text-xs text-ink-faint">/{program.slug}</p>
             <p className="mt-2 text-xs text-ink-faint">
               Updated {new Intl.DateTimeFormat('en-US', { month: 'short', day: 'numeric' }).format(new Date(program.updatedAt))}
