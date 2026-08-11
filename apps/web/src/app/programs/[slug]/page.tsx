@@ -1,8 +1,13 @@
 import { Suspense } from 'react';
 import Image from 'next/image';
 import { notFound } from 'next/navigation';
-import { Check } from 'lucide-react';
 import { ProgramCard } from '@/components/program-card';
+import {
+  AboutProgramSection,
+  BenefitsSection,
+  CriteriaSection,
+  PhasesSection,
+} from '@/components/programs/program-highlight-sections';
 import { ProgramRegisterButton } from '@/components/program-register-button';
 import { ReferralShareButton } from '@/components/referral-share-button';
 import { ReferralTracker } from '@/components/referral-tracker';
@@ -58,74 +63,17 @@ export default async function ProgramDetailPage({ params }: { params: Promise<{ 
           </div>
         </div>
 
-        <section className="mt-10">
-          <h2 className="text-xl font-bold text-ink">About Program</h2>
-          <p className="mt-2 font-semibold text-ink">{program.subtitleEn}</p>
-          {program.subtitleAr && (
-            <p className="text-ink-soft" dir="rtl">
-              {program.subtitleAr}
-            </p>
-          )}
-          <div
-            className="prose prose-sm mt-4 max-w-none text-ink-soft prose-headings:text-ink prose-strong:text-ink"
-            dangerouslySetInnerHTML={{ __html: program.aboutBody }}
-          />
-        </section>
+        <AboutProgramSection
+          subtitleEn={program.subtitleEn}
+          subtitleAr={program.subtitleAr}
+          aboutBody={program.aboutBody}
+        />
 
-        {program.phases.length > 0 && (
-          <section className="mt-10">
-            <h2 className="text-xl font-bold text-ink">What you&apos;ll go through</h2>
-            <p className="mt-1 text-sm text-ink-faint">
-              The program is delivered across connected phases
-            </p>
-            <div className="mt-4 flex flex-col gap-4">
-              {program.phases.map((phase, i) => (
-                <div
-                  key={i}
-                  className="rounded-2xl border border-ink/[0.06] bg-white p-5 shadow-sm"
-                >
-                  <h3 className="font-bold text-ink">{phase.title}</h3>
-                  <div
-                    className="prose prose-sm mt-1.5 max-w-none text-sm text-ink-soft prose-headings:text-ink prose-strong:text-ink"
-                    dangerouslySetInnerHTML={{ __html: phase.description }}
-                  />
-                </div>
-              ))}
-            </div>
-          </section>
-        )}
+        <PhasesSection phases={program.phases} />
 
-        {program.benefits.length > 0 && (
-          <section className="mt-10">
-            <h2 className="text-xl font-bold text-ink">Benefits</h2>
-            <ul className="mt-4 flex flex-col gap-2.5">
-              {program.benefits.map((benefit, i) => (
-                <li key={i} className="flex items-start gap-2.5 text-sm text-ink-soft">
-                  <span className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-brand-500 text-white">
-                    <Check size={12} strokeWidth={3} />
-                  </span>
-                  {benefit}
-                </li>
-              ))}
-            </ul>
-          </section>
-        )}
+        <BenefitsSection benefits={program.benefits} />
 
-        {program.criteria.length > 0 && (
-          <section className="mt-10">
-            <h2 className="text-xl font-bold text-ink">Program Criteria</h2>
-            <ul className="mt-4 flex flex-col gap-2.5">
-              {program.criteria.map((criterion, i) => (
-                <li key={i} className="flex items-start gap-2.5 text-sm text-ink-soft">
-                  <span className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-accent-300 text-ink">
-                    <Check size={12} strokeWidth={3} />
-                  </span>
-                  {criterion}
-                </li>
-              ))}
-            </ul>
-          </section>
-        )}
+        <CriteriaSection criteria={program.criteria} />
 
         <section className="mt-10 rounded-3xl border border-ink/[0.06] bg-brand-50/40 p-6">
           <div className="flex items-center gap-4">
