@@ -142,6 +142,7 @@ export interface PublicProgram {
   subtitleAr: string | null;
   logoUrl: string;
   imageAspect: ImageAspect;
+  bannerFullWidth: boolean;
   aboutBody: string;
   phases: ProgramPhase[];
   benefits: string[];
@@ -163,6 +164,7 @@ export interface ProgramInput {
   subtitleAr: string | null;
   logoUrl: string;
   imageAspect: ImageAspect;
+  bannerFullWidth: boolean;
   aboutBody: string;
   phases: ProgramPhase[];
   benefits: string[];

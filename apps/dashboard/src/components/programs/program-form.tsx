@@ -62,6 +62,7 @@ export function ProgramForm({ program, forms }: { program?: PublicProgram; forms
   const [subtitleAr, setSubtitleAr] = useState(program?.subtitleAr ?? '');
   const [logoUrl, setLogoUrl] = useState(program?.logoUrl ?? '');
   const [imageAspect, setImageAspect] = useState<ImageAspect>(program?.imageAspect ?? '16:6');
+  const [bannerFullWidth, setBannerFullWidth] = useState(program?.bannerFullWidth ?? false);
   const [aboutBody, setAboutBody] = useState(program?.aboutBody ?? '');
   const [phases, setPhases] = useState(program?.phases ?? []);
   const [benefits, setBenefits] = useState(program?.benefits ?? []);
@@ -162,6 +163,7 @@ export function ProgramForm({ program, forms }: { program?: PublicProgram; forms
         subtitleAr: subtitleAr || null,
         logoUrl,
         imageAspect,
+        bannerFullWidth,
         aboutBody,
         phases,
         benefits: benefits.filter((b) => b.trim()),
@@ -319,6 +321,18 @@ export function ProgramForm({ program, forms }: { program?: PublicProgram; forms
                 ))}
               </select>
             </label>
+            <label className="flex items-center gap-2 text-sm font-semibold text-ink dark:text-white/90">
+              <input
+                type="checkbox"
+                checked={bannerFullWidth}
+                onChange={(e) => setBannerFullWidth(e.target.checked)}
+                className="accent-brand-500"
+              />
+              Full-width banner
+            </label>
+            <p className="text-xs text-ink-faint">
+              Stretches the banner edge-to-edge on the program page instead of the default boxed layout.
+            </p>
           </div>
         </div>
       </section>

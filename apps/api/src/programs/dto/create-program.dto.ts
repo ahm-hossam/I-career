@@ -1,5 +1,5 @@
 import { Type } from 'class-transformer';
-import { IsArray, IsIn, IsNotEmpty, IsOptional, IsString, ValidateNested } from 'class-validator';
+import { IsArray, IsBoolean, IsIn, IsNotEmpty, IsOptional, IsString, ValidateNested } from 'class-validator';
 import { ProgramAcceptanceCriteriaDto } from './program-acceptance-criteria.dto';
 import { ProgramPhaseDto } from './program-phase.dto';
 import { ProgramSponsorDto } from './program-sponsor.dto';
@@ -29,6 +29,9 @@ export class CreateProgramDto {
 
   @IsIn(ASPECT_RATIOS)
   imageAspect!: string;
+
+  @IsBoolean()
+  bannerFullWidth!: boolean;
 
   @IsString()
   aboutBody!: string;
