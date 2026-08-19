@@ -2,6 +2,11 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   transpilePackages: ["@i-career/ui", "@i-career/utils", "@i-career/types"],
+  experimental: {
+    serverActions: {
+      bodySizeLimit: "10mb",
+    },
+  },
   images: {
     remotePatterns: [
       { protocol: "http", hostname: "localhost", port: "3000" },
