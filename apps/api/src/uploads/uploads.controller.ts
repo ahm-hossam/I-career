@@ -2,6 +2,7 @@ import { extname } from 'node:path';
 import {
   BadRequestException,
   Controller,
+  Logger,
   Post,
   UploadedFile,
   UseGuards,
@@ -33,6 +34,8 @@ function matchesMagicBytes(buffer: Buffer, ext: string): boolean {
 @Controller('uploads')
 @UseGuards(InternalTokenGuard)
 export class UploadsController {
+  private readonly logger = new Logger(UploadsController.name);
+
   @Post()
   @UseInterceptors(
     FileInterceptor('file', {
@@ -61,7 +64,14 @@ export class UploadsController {
       throw new BadRequestException('File content does not match its extension');
     }
 
-    const url = await uploadBufferToCloudinary(file.buffer, 'icareer-uploads');
-    return { url };
+    try {
+      const url = await uploadBufferToCloudinary(file.buffer, 'icareer-uploads');
+      return { url };
+    } catch (err) {
+      this.logger.error('Cloudinary upload failed', err instanceof Error ? err.stack : err);
+      throw new BadRequestException(
+        'This file could not be processed — it may be corrupted or in an unsupported format. Please try a different file.',
+      );
+    }
   }
 }

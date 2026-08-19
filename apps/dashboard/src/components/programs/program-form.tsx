@@ -169,8 +169,15 @@ export function ProgramForm({ program, forms }: { program?: PublicProgram; forms
     setList(list.map((item, i) => (i === index ? value : item)));
   }
 
+  const anyUploadInProgress =
+    uploading || uploadingIcon || uploadingPartnerLogo || uploadingSponsorIndex !== null;
+
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
+    if (anyUploadInProgress) {
+      setError('Please wait for the image upload to finish before saving.');
+      return;
+    }
     setError(null);
     setSubmitting(true);
     try {
@@ -732,10 +739,10 @@ export function ProgramForm({ program, forms }: { program?: PublicProgram; forms
         )}
         <button
           type="submit"
-          disabled={submitting}
+          disabled={submitting || anyUploadInProgress}
           className="rounded-full bg-brand-500 px-6 py-2.5 text-sm font-bold text-white shadow-sm transition-colors hover:bg-brand-600 disabled:cursor-not-allowed disabled:opacity-60"
         >
-          {submitting ? 'Saving…' : isEdit ? 'Save changes' : 'Create program'}
+          {submitting ? 'Saving…' : anyUploadInProgress ? 'Waiting for upload…' : isEdit ? 'Save changes' : 'Create program'}
         </button>
       </div>
     </form>
