@@ -103,6 +103,7 @@ const en = {
     disability: 'Disability',
     disabilityYes: 'Yes',
     disabilityNo: 'No',
+    employmentStatus: 'Employment Status',
     pageOf: 'Page {current} of {total}',
     previous: 'Previous',
     next: 'Next',

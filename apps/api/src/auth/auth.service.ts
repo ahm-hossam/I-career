@@ -62,6 +62,7 @@ export class AuthService {
         faculty: dto.faculty,
         hasDisability: dto.hasDisability,
         disabilityDetails: dto.hasDisability ? dto.disabilityDetails : null,
+        employmentStatus: dto.employmentStatus,
         referredByCodeId,
       },
     });

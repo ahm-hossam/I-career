@@ -335,3 +335,15 @@ export const STUDENT_STATUS_OPTIONS: { value: 'STUDENT' | 'GRADUATE'; label: str
   { value: 'STUDENT', label: 'Student' },
   { value: 'GRADUATE', label: 'Graduate' },
 ];
+
+export const EMPLOYMENT_STATUS_OPTIONS: {
+  value: 'FULL_TIME' | 'PART_TIME' | 'FREELANCE' | 'PROJECT_BASED' | 'INTERNSHIP' | 'UNEMPLOYED';
+  label: string;
+}[] = [
+  { value: 'FULL_TIME', label: 'Full time job' },
+  { value: 'PART_TIME', label: 'Part time job' },
+  { value: 'FREELANCE', label: 'Freelance' },
+  { value: 'PROJECT_BASED', label: 'Project based' },
+  { value: 'INTERNSHIP', label: 'Internship' },
+  { value: 'UNEMPLOYED', label: 'Unemployed' },
+];

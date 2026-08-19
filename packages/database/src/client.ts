@@ -12,6 +12,7 @@ export type {
   Role,
   Gender,
   StudentStatus,
+  EmploymentStatus,
   ResetRequestStatus,
   Program,
   ProgramApplication,

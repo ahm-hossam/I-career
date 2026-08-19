@@ -13,7 +13,7 @@ import {
   MinLength,
   ValidateIf,
 } from 'class-validator';
-import type { Gender, StudentStatus } from '@i-career/database';
+import type { EmploymentStatus, Gender, StudentStatus } from '@i-career/database';
 
 export class RegisterDto {
   @IsString()
@@ -75,6 +75,9 @@ export class RegisterDto {
   @IsNotEmpty()
   @MaxLength(500)
   disabilityDetails?: string;
+
+  @IsEnum(['FULL_TIME', 'PART_TIME', 'FREELANCE', 'PROJECT_BASED', 'INTERNSHIP', 'UNEMPLOYED'])
+  employmentStatus!: EmploymentStatus;
 
   @IsOptional()
   @IsString()

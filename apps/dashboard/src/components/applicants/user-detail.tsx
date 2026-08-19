@@ -8,6 +8,7 @@ import type { UserDetail } from '@i-career/types';
 import { cn } from '@i-career/utils';
 import { useLocale } from '@/lib/i18n/locale-context';
 import { deleteUser, setUserArchived } from '@/app/applicants/actions';
+import { EMPLOYMENT_STATUS_OPTIONS } from '@/data/registration-options';
 
 const STATUS_STYLES = {
   PENDING: 'bg-accent-500/10 text-accent-500',
@@ -184,6 +185,15 @@ export function UserDetailView({ user }: { user: UserDetail }) {
               <dt className="text-xs font-semibold text-ink-faint">{t('applicants.disability')}</dt>
               <dd className="mt-0.5 text-sm text-ink dark:text-white/90">
                 {user.hasDisability ? user.disabilityDetails ?? t('applicants.disabilityYes') : t('applicants.disabilityNo')}
+              </dd>
+            </div>
+            <div>
+              <dt className="text-xs font-semibold text-ink-faint">{t('applicants.employmentStatus')}</dt>
+              <dd className="mt-0.5 text-sm text-ink dark:text-white/90">
+                {user.employmentStatus
+                  ? EMPLOYMENT_STATUS_OPTIONS.find((o) => o.value === user.employmentStatus)?.label ??
+                    user.employmentStatus
+                  : '—'}
               </dd>
             </div>
           </dl>

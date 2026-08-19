@@ -105,6 +105,7 @@ const ar: Dictionary = {
     disability: 'الإعاقة',
     disabilityYes: 'نعم',
     disabilityNo: 'لا',
+    employmentStatus: 'الحالة الوظيفية',
     pageOf: 'صفحة {current} من {total}',
     previous: 'السابق',
     next: 'التالي',

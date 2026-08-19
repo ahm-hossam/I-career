@@ -6,6 +6,7 @@ import { Eye, EyeOff } from 'lucide-react';
 import { useAuth } from '@/lib/auth/auth-context';
 import { useAuthModal } from '@/lib/auth/auth-modal-context';
 import {
+  EMPLOYMENT_STATUS_OPTIONS,
   FACULTIES,
   GENDER_OPTIONS,
   GOVERNORATES,
@@ -35,6 +36,7 @@ interface FormState {
   faculty: string;
   hasDisability: string;
   disabilityDetails: string;
+  employmentStatus: string;
 }
 
 const REQUIRED_FIELDS: (keyof FormState)[] = [
@@ -52,6 +54,7 @@ const REQUIRED_FIELDS: (keyof FormState)[] = [
   'graduationYear',
   'faculty',
   'hasDisability',
+  'employmentStatus',
 ];
 
 const INITIAL_STATE: FormState = {
@@ -70,6 +73,7 @@ const INITIAL_STATE: FormState = {
   faculty: '',
   hasDisability: '',
   disabilityDetails: '',
+  employmentStatus: '',
 };
 
 function Field({
@@ -347,6 +351,24 @@ export function SignupForm() {
           {FACULTIES.map((f) => (
             <option key={f} value={f}>
               {f}
+            </option>
+          ))}
+        </select>
+      </Field>
+
+      <Field label="What is your current employment status?" showError={!!isInvalid('employmentStatus')}>
+        <select
+          value={form.employmentStatus}
+          onChange={(e) => set('employmentStatus', e.target.value)}
+          onBlur={() => markTouched('employmentStatus')}
+          className={`${inputClass} ${isInvalid('employmentStatus') ? errorInputClass : ''} bg-white`}
+        >
+          <option value="" disabled>
+            Select an option
+          </option>
+          {EMPLOYMENT_STATUS_OPTIONS.map((opt) => (
+            <option key={opt.value} value={opt.value}>
+              {opt.label}
             </option>
           ))}
         </select>

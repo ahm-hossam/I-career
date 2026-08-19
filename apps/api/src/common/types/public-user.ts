@@ -18,6 +18,7 @@ export function toPublicUser(user: User) {
     faculty: user.faculty,
     hasDisability: user.hasDisability,
     disabilityDetails: user.disabilityDetails,
+    employmentStatus: user.employmentStatus,
     archived: user.archived,
     createdAt: user.createdAt,
   };

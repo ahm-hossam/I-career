@@ -1,6 +1,13 @@
 export type Role = 'ADMIN' | 'USER';
 export type Gender = 'MALE' | 'FEMALE';
 export type StudentStatus = 'STUDENT' | 'GRADUATE';
+export type EmploymentStatus =
+  | 'FULL_TIME'
+  | 'PART_TIME'
+  | 'FREELANCE'
+  | 'PROJECT_BASED'
+  | 'INTERNSHIP'
+  | 'UNEMPLOYED';
 
 export interface AuthUser {
   id: string;
@@ -28,6 +35,7 @@ export interface PublicUser {
   faculty: string;
   hasDisability: boolean;
   disabilityDetails: string | null;
+  employmentStatus: EmploymentStatus | null;
   archived: boolean;
   createdAt: string;
 }

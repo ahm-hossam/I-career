@@ -24,6 +24,7 @@ model User {
   faculty           String
   hasDisability     Boolean       @default(false)
   disabilityDetails String?
+  employmentStatus  EmploymentStatus?
   role              Role          @default(USER)
   archived          Boolean       @default(false)
   createdAt         DateTime      @default(now())
@@ -62,6 +63,15 @@ enum Gender {
 enum StudentStatus {
   STUDENT
   GRADUATE
+}
+
+enum EmploymentStatus {
+  FULL_TIME
+  PART_TIME
+  FREELANCE
+  PROJECT_BASED
+  INTERNSHIP
+  UNEMPLOYED
 }
 
 enum ResetRequestStatus {
