@@ -18,6 +18,7 @@ import { cn } from '@i-career/utils';
 import { CriteriaMultiSelect } from '@/components/programs/criteria-multi-select';
 import { RichTextEditor } from '@/components/rich-text-editor';
 import { ProgramPreview } from '@/components/programs/program-preview';
+import { aspectRatioClass } from '@/lib/rich-text';
 import {
   FACULTIES,
   GENDER_OPTIONS,
@@ -33,6 +34,12 @@ const ASPECT_OPTIONS: { value: ImageAspect; label: string }[] = [
   { value: '16:9', label: 'Standard (16:9)' },
   { value: '1:1', label: 'Square (1:1)' },
 ];
+
+const RECOMMENDED_BANNER_DIMENSIONS: Record<ImageAspect, string> = {
+  '16:6': 'at least 1600×600px',
+  '16:9': 'at least 1600×900px',
+  '1:1': 'at least 1200×1200px',
+};
 
 const inputClass =
   'rounded-xl border border-border-subtle bg-surface px-4 py-2.5 text-sm text-ink outline-none transition-colors focus:border-brand-500 dark:text-white';
@@ -307,9 +314,14 @@ export function ProgramForm({ program, forms }: { program?: PublicProgram; forms
       <section className="rounded-3xl border border-border-subtle bg-surface p-5 shadow-sm sm:p-6">
         <h2 className="text-base font-bold text-ink dark:text-white">Banner image</h2>
         <div className="mt-4 flex flex-col gap-4 sm:flex-row">
-          <div className="relative aspect-[16/9] w-full max-w-xs shrink-0 overflow-hidden rounded-xl bg-ink/[0.04] dark:bg-white/5">
+          <div
+            className={cn(
+              'relative w-full max-w-xs shrink-0 overflow-hidden rounded-xl bg-ink/[0.04] dark:bg-white/5',
+              aspectRatioClass(imageAspect),
+            )}
+          >
             {logoUrl ? (
-              <Image src={logoUrl} alt="" fill className="object-cover" />
+              <Image src={logoUrl} alt="" fill sizes="320px" quality={90} className="object-cover" />
             ) : (
               <div className="flex h-full items-center justify-center text-xs text-ink-faint">No image</div>
             )}
@@ -324,6 +336,10 @@ export function ProgramForm({ program, forms }: { program?: PublicProgram; forms
               {uploading ? <Loader2 size={15} className="animate-spin" /> : <Upload size={15} />}
               {uploading ? 'Uploading…' : 'Upload image'}
             </button>
+            <p className="text-xs text-ink-faint">
+              Recommended: {RECOMMENDED_BANNER_DIMENSIONS[imageAspect]} ({imageAspect}), matching the display shape
+              below. Smaller or mismatched images get stretched to fit and look blurry.
+            </p>
             <input
               ref={fileInputRef}
               type="file"
@@ -372,20 +388,23 @@ export function ProgramForm({ program, forms }: { program?: PublicProgram; forms
         <div className="mt-4 flex items-center gap-4">
           <div className="relative h-14 w-14 shrink-0 overflow-hidden rounded-2xl bg-ink/[0.04] dark:bg-white/5">
             {iconUrl ? (
-              <Image src={iconUrl} alt="" fill className="object-cover" />
+              <Image src={iconUrl} alt="" fill sizes="56px" quality={90} className="object-cover" />
             ) : (
               <div className="flex h-full items-center justify-center text-[9px] text-ink-faint">No icon</div>
             )}
           </div>
-          <button
-            type="button"
-            onClick={() => iconInputRef.current?.click()}
-            disabled={uploadingIcon}
-            className="flex w-fit items-center gap-2 rounded-full border border-border-subtle px-4 py-2 text-sm font-semibold text-ink-soft transition-colors hover:bg-ink/[0.04] disabled:opacity-60 dark:text-white/80"
-          >
-            {uploadingIcon ? <Loader2 size={15} className="animate-spin" /> : <Upload size={15} />}
-            {uploadingIcon ? 'Uploading…' : iconUrl ? 'Replace icon' : 'Upload icon'}
-          </button>
+          <div className="flex flex-col items-start gap-1.5">
+            <button
+              type="button"
+              onClick={() => iconInputRef.current?.click()}
+              disabled={uploadingIcon}
+              className="flex w-fit items-center gap-2 rounded-full border border-border-subtle px-4 py-2 text-sm font-semibold text-ink-soft transition-colors hover:bg-ink/[0.04] disabled:opacity-60 dark:text-white/80"
+            >
+              {uploadingIcon ? <Loader2 size={15} className="animate-spin" /> : <Upload size={15} />}
+              {uploadingIcon ? 'Uploading…' : iconUrl ? 'Replace icon' : 'Upload icon'}
+            </button>
+            <p className="text-xs text-ink-faint">Recommended: at least 256×256px, square.</p>
+          </div>
           {iconUrl && (
             <button
               type="button"
@@ -488,20 +507,23 @@ export function ProgramForm({ program, forms }: { program?: PublicProgram; forms
           <div className="flex items-center gap-4">
             <div className="relative h-16 w-16 shrink-0 overflow-hidden rounded-full bg-ink/[0.04] dark:bg-white/5">
               {partnerLogoUrl ? (
-                <Image src={partnerLogoUrl} alt="" fill className="object-cover" />
+                <Image src={partnerLogoUrl} alt="" fill sizes="64px" quality={90} className="object-cover" />
               ) : (
                 <div className="flex h-full items-center justify-center text-[10px] text-ink-faint">No logo</div>
               )}
             </div>
-            <button
-              type="button"
-              onClick={() => partnerLogoInputRef.current?.click()}
-              disabled={uploadingPartnerLogo}
-              className="flex w-fit items-center gap-2 rounded-full border border-border-subtle px-4 py-2 text-sm font-semibold text-ink-soft transition-colors hover:bg-ink/[0.04] disabled:opacity-60 dark:text-white/80"
-            >
-              {uploadingPartnerLogo ? <Loader2 size={15} className="animate-spin" /> : <Upload size={15} />}
-              {uploadingPartnerLogo ? 'Uploading…' : 'Upload partner logo'}
-            </button>
+            <div className="flex flex-col items-start gap-1.5">
+              <button
+                type="button"
+                onClick={() => partnerLogoInputRef.current?.click()}
+                disabled={uploadingPartnerLogo}
+                className="flex w-fit items-center gap-2 rounded-full border border-border-subtle px-4 py-2 text-sm font-semibold text-ink-soft transition-colors hover:bg-ink/[0.04] disabled:opacity-60 dark:text-white/80"
+              >
+                {uploadingPartnerLogo ? <Loader2 size={15} className="animate-spin" /> : <Upload size={15} />}
+                {uploadingPartnerLogo ? 'Uploading…' : 'Upload partner logo'}
+              </button>
+              <p className="text-xs text-ink-faint">Recommended: at least 256×256px, square.</p>
+            </div>
             <input
               ref={partnerLogoInputRef}
               type="file"
@@ -546,7 +568,7 @@ export function ProgramForm({ program, forms }: { program?: PublicProgram; forms
               <div className="flex items-start gap-4">
                 <div className="relative h-14 w-14 shrink-0 overflow-hidden rounded-full bg-ink/[0.04] dark:bg-white/5">
                   {sponsor.logoUrl ? (
-                    <Image src={sponsor.logoUrl} alt="" fill className="object-cover" />
+                    <Image src={sponsor.logoUrl} alt="" fill sizes="56px" quality={90} className="object-cover" />
                   ) : (
                     <div className="flex h-full items-center justify-center text-[9px] text-ink-faint">No logo</div>
                   )}
@@ -584,6 +606,7 @@ export function ProgramForm({ program, forms }: { program?: PublicProgram; forms
                       <Trash2 size={15} />
                     </button>
                   </div>
+                  <p className="text-xs text-ink-faint">Logo recommended: at least 256×256px, square.</p>
                   <RichTextEditor
                     value={sponsor.description}
                     onChange={(v) => updateSponsor(i, 'description', v)}

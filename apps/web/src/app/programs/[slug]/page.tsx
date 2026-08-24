@@ -30,7 +30,15 @@ export default async function ProgramDetailPage({ params }: { params: Promise<{ 
     <div
       className={`relative w-full overflow-hidden bg-brand-50 ${program.bannerFullWidth ? '' : 'rounded-3xl'} ${aspectRatioClass(program.imageAspect)}`}
     >
-      <Image src={program.logoUrl} alt={program.title} fill className="object-cover" priority />
+      <Image
+        src={program.logoUrl}
+        alt={program.title}
+        fill
+        sizes="100vw"
+        quality={90}
+        className="object-cover"
+        priority
+      />
     </div>
   );
 
@@ -51,7 +59,7 @@ export default async function ProgramDetailPage({ params }: { params: Promise<{ 
           <h1 className="flex items-center gap-3 text-3xl font-extrabold text-ink sm:text-4xl">
             {program.iconUrl && (
               <span className="relative h-9 w-9 shrink-0 overflow-hidden rounded-xl sm:h-10 sm:w-10">
-                <Image src={program.iconUrl} alt="" fill className="object-cover" />
+                <Image src={program.iconUrl} alt="" fill sizes="40px" quality={90} className="object-cover" />
               </span>
             )}
             {program.title}
@@ -86,6 +94,8 @@ export default async function ProgramDetailPage({ params }: { params: Promise<{ 
                   src={program.partnerLogoUrl}
                   alt={program.partnerName}
                   fill
+                  sizes="48px"
+                  quality={90}
                   className="object-cover"
                 />
               </div>
@@ -113,6 +123,8 @@ export default async function ProgramDetailPage({ params }: { params: Promise<{ 
                         src={sponsor.logoUrl}
                         alt={sponsor.name}
                         fill
+                        sizes="40px"
+                        quality={90}
                         className="object-cover"
                       />
                     </div>

@@ -38,7 +38,7 @@ export function ProgramPreview({
     <article className="mx-auto max-w-2xl bg-white p-6 sm:p-8">
       <div className={`relative w-full overflow-hidden rounded-3xl bg-brand-50 ${aspectRatioClass(imageAspect)}`}>
         {logoUrl ? (
-          <Image src={logoUrl} alt={title} fill className="object-cover" />
+          <Image src={logoUrl} alt={title} fill sizes="672px" quality={90} className="object-cover" />
         ) : (
           <div className="flex h-full items-center justify-center text-xs text-ink-faint">No banner image</div>
         )}
@@ -122,7 +122,7 @@ export function ProgramPreview({
           <div className="flex items-center gap-4">
             {partnerLogoUrl && (
               <div className="relative h-12 w-12 shrink-0 overflow-hidden rounded-full bg-white">
-                <Image src={partnerLogoUrl} alt={partnerName} fill className="object-cover" />
+                <Image src={partnerLogoUrl} alt={partnerName} fill sizes="48px" quality={90} className="object-cover" />
               </div>
             )}
             <h2 className="font-bold text-ink">{partnerName || 'Partner name'}</h2>
@@ -142,7 +142,7 @@ export function ProgramPreview({
               <div key={i} className="flex items-start gap-3 rounded-2xl border border-ink/[0.06] bg-white p-4 shadow-sm">
                 {sponsor.logoUrl && (
                   <div className="relative h-10 w-10 shrink-0 overflow-hidden rounded-full bg-brand-50">
-                    <Image src={sponsor.logoUrl} alt={sponsor.name} fill className="object-cover" />
+                    <Image src={sponsor.logoUrl} alt={sponsor.name} fill sizes="40px" quality={90} className="object-cover" />
                   </div>
                 )}
                 <div className="min-w-0">

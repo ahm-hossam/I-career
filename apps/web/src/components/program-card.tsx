@@ -22,7 +22,14 @@ export function ProgramCard({ program, index = 0 }: { program: PublicProgram; in
         href={`/programs/${program.slug}`}
         className={`relative block w-full overflow-hidden bg-brand-50 ${aspectRatioClass(program.imageAspect)}`}
       >
-        <Image src={program.logoUrl} alt={program.title} fill className="object-cover" />
+        <Image
+          src={program.logoUrl}
+          alt={program.title}
+          fill
+          sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"
+          quality={90}
+          className="object-cover"
+        />
       </Link>
       <div className="flex flex-1 flex-col gap-3 p-5">
         <div className="flex items-start justify-between gap-3">
@@ -32,7 +39,7 @@ export function ProgramCard({ program, index = 0 }: { program: PublicProgram; in
           >
             {program.iconUrl && (
               <span className="relative h-5 w-5 shrink-0 overflow-hidden rounded-md">
-                <Image src={program.iconUrl} alt="" fill className="object-cover" />
+                <Image src={program.iconUrl} alt="" fill sizes="20px" quality={90} className="object-cover" />
               </span>
             )}
             {program.title}

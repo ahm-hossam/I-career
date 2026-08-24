@@ -10,6 +10,7 @@ const nextConfig: NextConfig = {
       { protocol: "https", hostname: "res.cloudinary.com" },
     ],
     dangerouslyAllowLocalIP: true,
+    qualities: [75, 90],
   },
   async headers() {
     return [
