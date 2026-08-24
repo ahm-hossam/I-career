@@ -6,18 +6,20 @@ import { motion } from 'motion/react';
 import type { ArticleCategory, PublicArticle } from '@i-career/types';
 import { cn } from '@i-career/utils';
 import { PageHeaderBanner } from '@/components/page-header-banner';
+import { useLocale } from '@/lib/i18n/locale-context';
 
-const CATEGORY_LABELS: Record<ArticleCategory, string> = {
-  CAREER_HACKS: 'Career Hacks',
-  JOB_SEARCH: 'Job Search',
-  DAY_IN_THE_LIFE: 'Day in the Life',
-  GUIDE: 'Guide',
+const CATEGORY_KEYS: Record<ArticleCategory, string> = {
+  CAREER_HACKS: 'articlesPage.categoryCareerHacks',
+  JOB_SEARCH: 'articlesPage.categoryJobSearch',
+  DAY_IN_THE_LIFE: 'articlesPage.categoryDayInTheLife',
+  GUIDE: 'articlesPage.categoryGuide',
 };
 
-const CATEGORIES = Object.keys(CATEGORY_LABELS) as ArticleCategory[];
+const CATEGORIES = Object.keys(CATEGORY_KEYS) as ArticleCategory[];
 
 export function ArticlesView({ articles }: { articles: PublicArticle[] }) {
   const [activeCategory, setActiveCategory] = useState<ArticleCategory | null>(null);
+  const { t } = useLocale();
 
   const filtered = useMemo(
     () => (activeCategory ? articles.filter((a) => a.category === activeCategory) : articles),
@@ -26,20 +28,20 @@ export function ArticlesView({ articles }: { articles: PublicArticle[] }) {
 
   return (
     <div>
-      <PageHeaderBanner heading="Articles" />
+      <PageHeaderBanner heading={t('articlesPage.heading')} />
 
       <div className="mx-auto max-w-7xl px-4 pb-14 sm:px-6 sm:pb-20 lg:px-8">
       <div className="flex flex-col gap-8 sm:flex-row">
         <aside className="shrink-0 sm:w-56">
           <div className="flex items-center justify-between">
-            <p className="text-xs font-bold uppercase tracking-wide text-ink-faint">Category</p>
+            <p className="text-xs font-bold uppercase tracking-wide text-ink-faint">{t('articlesPage.category')}</p>
             {activeCategory && (
               <button
                 type="button"
                 onClick={() => setActiveCategory(null)}
                 className="text-xs font-semibold text-brand-600 hover:underline"
               >
-                Clear Filters
+                {t('articlesPage.clearFilters')}
               </button>
             )}
           </div>
@@ -54,14 +56,14 @@ export function ArticlesView({ articles }: { articles: PublicArticle[] }) {
                   activeCategory === category ? 'bg-brand-500 text-white' : 'bg-ink/[0.04] text-ink-soft hover:bg-ink/[0.08]',
                 )}
               >
-                {CATEGORY_LABELS[category]}
+                {t(CATEGORY_KEYS[category])}
               </button>
             ))}
           </div>
         </aside>
 
         <div className="flex-1">
-          <h1 className="text-xl font-bold text-ink">{filtered.length} Articles</h1>
+          <h1 className="text-xl font-bold text-ink">{t('articlesPage.count', { count: filtered.length })}</h1>
           <div className="mt-4 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
             {filtered.map((article, i) => (
               <motion.div
@@ -76,7 +78,7 @@ export function ArticlesView({ articles }: { articles: PublicArticle[] }) {
                   className="flex h-full flex-col gap-2 rounded-3xl border border-ink/[0.06] bg-white p-5 shadow-sm transition-shadow hover:shadow-xl"
                 >
                   <span className="w-fit rounded-full bg-brand-500/10 px-2.5 py-1 text-xs font-bold text-brand-700">
-                    {CATEGORY_LABELS[article.category]}
+                    {t(CATEGORY_KEYS[article.category])}
                   </span>
                   <h2 className="font-bold text-ink">{article.title}</h2>
                 </Link>

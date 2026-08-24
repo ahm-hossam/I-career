@@ -1,8 +1,11 @@
+'use client';
+
 import Image from 'next/image';
 import Link from 'next/link';
 import type { ComponentType } from 'react';
 import { Facebook, Instagram, Linkedin } from 'lucide-react';
-import { COPYRIGHT, FOOTER_COLUMNS, SOCIAL_LINKS } from '@/data/site';
+import { getSiteContent, SOCIAL_LINKS } from '@/data/site';
+import { useLocale } from '@/lib/i18n/locale-context';
 
 const socialIcons: Record<string, ComponentType<{ size?: number }>> = {
   Instagram,
@@ -11,10 +14,13 @@ const socialIcons: Record<string, ComponentType<{ size?: number }>> = {
 };
 
 export function SiteFooter() {
+  const { locale } = useLocale();
+  const { footerColumns, copyright } = getSiteContent(locale);
+
   return (
     <footer data-nav-theme="dark" className="relative overflow-hidden bg-ink pt-16 pb-10">
-      <div className="pointer-events-none absolute -top-32 left-[15%] h-72 w-72 rounded-full bg-brand-500/10 blur-3xl" />
-      <div className="pointer-events-none absolute -bottom-24 right-[10%] h-64 w-64 rounded-full bg-accent-300/10 blur-3xl" />
+      <div className="pointer-events-none absolute -top-32 start-[15%] h-72 w-72 rounded-full bg-brand-500/10 blur-3xl" />
+      <div className="pointer-events-none absolute -bottom-24 end-[10%] h-64 w-64 rounded-full bg-accent-300/10 blur-3xl" />
 
       <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="flex flex-col gap-12 sm:flex-row sm:justify-between">
@@ -29,7 +35,7 @@ export function SiteFooter() {
           </div>
 
           <div className="grid grid-cols-2 gap-10 sm:gap-16">
-            {FOOTER_COLUMNS.map((col) => (
+            {footerColumns.map((col) => (
               <div key={col.heading}>
                 <h3 className="text-sm font-bold text-white">{col.heading}</h3>
                 <ul className="mt-4 flex flex-col gap-3">
@@ -50,7 +56,7 @@ export function SiteFooter() {
         </div>
 
         <div className="mt-12 flex flex-col items-center justify-between gap-4 border-t border-white/10 pt-6 sm:flex-row">
-          <p className="text-xs text-white/40">{COPYRIGHT}</p>
+          <p className="text-xs text-white/40">{copyright}</p>
           <div className="flex items-center gap-3">
             {SOCIAL_LINKS.map((social) => {
               const Icon = socialIcons[social.label];

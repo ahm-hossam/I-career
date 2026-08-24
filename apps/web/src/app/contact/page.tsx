@@ -5,9 +5,12 @@ import { motion } from 'motion/react';
 import { Facebook, Instagram, Linkedin, Mail, MessageCircle, Send } from 'lucide-react';
 import { cn } from '@i-career/utils';
 import { NetworkField } from '@/components/network-field';
-import { CONTACT_FORM, CONTACT_PAGE, CONTACT_SIDE } from '@/data/contact';
+import { getContactContent } from '@/data/contact';
+import { useLocale } from '@/lib/i18n/locale-context';
 
 export default function ContactPage() {
+  const { t, locale } = useLocale();
+  const { contactPage: CONTACT_PAGE, contactForm: CONTACT_FORM, contactSide: CONTACT_SIDE } = getContactContent(locale);
   const [who, setWho] = useState<string | null>(null);
   const [service, setService] = useState<string | null>(null);
   const [submitted, setSubmitted] = useState(false);
@@ -61,13 +64,13 @@ export default function ContactPage() {
                   service: service ?? undefined,
                 }),
               });
-              if (!res.ok) throw new Error('Failed to send message');
+              if (!res.ok) throw new Error(t('contactPage.failedToSend'));
               setSubmitted(true);
               form.reset();
               setWho(null);
               setService(null);
             } catch {
-              setError('Something went wrong. Please try again.');
+              setError(t('contactPage.somethingWentWrongRetry'));
             } finally {
               setSubmitting(false);
             }
@@ -118,7 +121,7 @@ export default function ContactPage() {
 
           <div className="mt-7 grid gap-4 sm:grid-cols-2">
             <label className="flex flex-col gap-1.5 text-sm font-semibold text-ink">
-              Name
+              {t('contactPage.name')}
               <input
                 required
                 type="text"
@@ -127,7 +130,7 @@ export default function ContactPage() {
               />
             </label>
             <label className="flex flex-col gap-1.5 text-sm font-semibold text-ink">
-              Email
+              {t('contactPage.email')}
               <input
                 required
                 type="email"
@@ -138,7 +141,7 @@ export default function ContactPage() {
           </div>
 
           <label className="mt-4 flex flex-col gap-1.5 text-sm font-semibold text-ink">
-            Message
+            {t('contactPage.message')}
             <textarea
               required
               name="message"
@@ -154,7 +157,7 @@ export default function ContactPage() {
             whileTap={{ scale: 0.98 }}
             className="mt-6 inline-flex items-center gap-2 rounded-full bg-accent-300 px-6 py-3 text-sm font-semibold text-ink shadow-sm transition-shadow hover:shadow-md disabled:cursor-not-allowed disabled:opacity-60"
           >
-            {submitting ? 'Sending…' : CONTACT_FORM.submitLabel}
+            {submitting ? t('contactPage.sending') : CONTACT_FORM.submitLabel}
             <Send size={16} />
           </motion.button>
 
@@ -171,7 +174,7 @@ export default function ContactPage() {
               className="mt-4 text-sm font-medium text-brand-600"
               role="status"
             >
-              Message sent — we&rsquo;ll be in touch soon.
+              {t('contactPage.messageSentSuccess')}
             </motion.p>
           )}
         </motion.form>

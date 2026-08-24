@@ -5,19 +5,25 @@ import { ChevronDown, Sparkles, TrendingUp } from 'lucide-react';
 import { NetworkField } from '@/components/network-field';
 import { StatCounter } from '@/components/stat-counter';
 import { TypewriterHeading } from '@/components/typewriter-heading';
-import { HERO, STATS } from '@/data/home';
-
-const HEADLINE_LINES = [
-  [{ text: HERO.headline[0] }],
-  [
-    { text: 'EDUCATION', className: 'text-brand-600' },
-    { text: ' AND ' },
-    { text: 'EMPLOYMENT', className: 'text-accent-500' },
-  ],
-  [{ text: HERO.headline[2] }],
-];
+import { getHomeContent } from '@/data/home';
+import { useLocale } from '@/lib/i18n/locale-context';
 
 export function Hero() {
+  const { locale } = useLocale();
+  const { hero, stats } = getHomeContent(locale);
+  const headlineLines =
+    locale === 'en'
+      ? [
+          [{ text: hero.headline[0] }],
+          [
+            { text: 'EDUCATION', className: 'text-brand-600' },
+            { text: ' AND ' },
+            { text: 'EMPLOYMENT', className: 'text-accent-500' },
+          ],
+          [{ text: hero.headline[2] }],
+        ]
+      : hero.headline.map((line) => [{ text: line }]);
+
   return (
     <section className="relative -mt-[80px] overflow-hidden bg-white pt-[144px] pb-24 sm:pt-[160px] sm:pb-32">
       <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_80%_55%_at_50%_-10%,rgba(79,186,116,0.1),transparent)]" />
@@ -31,11 +37,11 @@ export function Hero() {
           y: { duration: 4, repeat: Infinity, ease: 'easeInOut', delay: 0.5 },
           rotate: { duration: 4, repeat: Infinity, ease: 'easeInOut', delay: 0.5 },
         }}
-        className="pointer-events-none absolute left-[6%] top-40 hidden items-center gap-1.5 rounded-full border border-brand-500/20 bg-white/90 px-3.5 py-1.5 text-xs font-bold text-brand-700 shadow-lg backdrop-blur-sm lg:flex"
+        className="pointer-events-none absolute start-[6%] top-40 hidden items-center gap-1.5 rounded-full border border-brand-500/20 bg-white/90 px-3.5 py-1.5 text-xs font-bold text-brand-700 shadow-lg backdrop-blur-sm lg:flex"
       >
         <TrendingUp size={13} />
-        {STATS[1].value}
-        {STATS[1].suffix} {STATS[1].label}
+        {stats[1].value}
+        {stats[1].suffix} {stats[1].label}
       </motion.div>
       <motion.div
         initial={{ opacity: 0, y: 14 }}
@@ -45,10 +51,10 @@ export function Hero() {
           y: { duration: 4.5, repeat: Infinity, ease: 'easeInOut', delay: 0.65 },
           rotate: { duration: 4.5, repeat: Infinity, ease: 'easeInOut', delay: 0.65 },
         }}
-        className="pointer-events-none absolute right-[7%] top-56 hidden items-center gap-1.5 rounded-full border border-accent-500/25 bg-white/90 px-3.5 py-1.5 text-xs font-bold text-accent-500 shadow-lg backdrop-blur-sm lg:flex"
+        className="pointer-events-none absolute end-[7%] top-56 hidden items-center gap-1.5 rounded-full border border-accent-500/25 bg-white/90 px-3.5 py-1.5 text-xs font-bold text-accent-500 shadow-lg backdrop-blur-sm lg:flex"
       >
         <Sparkles size={13} />
-        {STATS[2].value} {STATS[2].label}
+        {stats[2].value} {stats[2].label}
       </motion.div>
 
       <div className="relative mx-auto max-w-4xl px-4 text-center sm:px-6 lg:px-8">
@@ -58,11 +64,11 @@ export function Hero() {
           transition={{ duration: 0.5 }}
           className="inline-flex items-center gap-2 rounded-full border border-brand-500/20 bg-white/80 px-4 py-1.5 text-xs font-bold uppercase tracking-wide text-brand-700 shadow-sm backdrop-blur-sm"
         >
-          Be Career Ready
+          {getHomeContent(locale).ctaBandText}
         </motion.span>
 
-        <h1 className="mt-6 text-balance font-sans text-4xl font-bold uppercase leading-[1.12] tracking-tight text-ink sm:text-5xl md:text-[3.4rem]">
-          <TypewriterHeading lines={HEADLINE_LINES} startDelay={0.5} charDelay={0.026} />
+        <h1 className="mt-6 text-balance font-sans text-4xl font-bold uppercase leading-[1.12] tracking-tight text-ink rtl:leading-[1.5] sm:text-5xl md:text-[3.4rem]">
+          <TypewriterHeading lines={headlineLines} startDelay={0.5} charDelay={0.026} />
         </h1>
 
         <motion.p
@@ -71,7 +77,7 @@ export function Hero() {
           transition={{ duration: 0.6, delay: 2.1, ease: [0.16, 1, 0.3, 1] }}
           className="mx-auto mt-6 max-w-xl text-balance text-lg text-ink-soft sm:text-xl"
         >
-          {HERO.subhead}
+          {hero.subhead}
         </motion.p>
       </div>
 
@@ -81,7 +87,7 @@ export function Hero() {
         transition={{ duration: 0.7, delay: 2.3, ease: [0.16, 1, 0.3, 1] }}
         className="relative mx-auto mt-14 flex max-w-3xl justify-center gap-4 px-4 sm:gap-6"
       >
-        {STATS.map((stat, i) => (
+        {stats.map((stat, i) => (
           <motion.div
             key={stat.label}
             whileHover={{ y: -6 }}

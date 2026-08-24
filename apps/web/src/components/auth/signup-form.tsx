@@ -11,10 +11,12 @@ import {
   GENDER_OPTIONS,
   GOVERNORATES,
   NATIONALITIES,
+  optionLabel,
   STUDENT_STATUS_OPTIONS,
   UNIVERSITIES,
 } from '@/data/registration-options';
 import { trackCompleteRegistration } from '@/lib/facebook-pixel';
+import { useLocale } from '@/lib/i18n/locale-context';
 
 const inputClass =
   'rounded-xl border border-ink/10 px-4 py-2.5 font-normal text-ink outline-none transition-colors focus:border-brand-500';
@@ -85,11 +87,12 @@ function Field({
   children: React.ReactNode;
   showError: boolean;
 }) {
+  const { t } = useLocale();
   return (
     <label className="flex flex-col gap-1.5 text-sm font-semibold text-ink">
       {label}
       {children}
-      {showError && <span className="text-xs font-medium text-status-coral">Required</span>}
+      {showError && <span className="text-xs font-medium text-status-coral">{t('auth.required')}</span>}
     </label>
   );
 }
@@ -98,6 +101,7 @@ export function SignupForm() {
   const { setUser } = useAuth();
   const { open, close } = useAuthModal();
   const router = useRouter();
+  const { t, locale } = useLocale();
 
   const [form, setForm] = useState<FormState>(INITIAL_STATE);
   const [touched, setTouched] = useState<Partial<Record<keyof FormState, boolean>>>({});
@@ -125,12 +129,12 @@ export function SignupForm() {
     setTouched(allTouched);
     const missing = REQUIRED_FIELDS.some((k) => !form[k].trim());
     if (missing) {
-      setError('Please fill in all required fields.');
+      setError(t('auth.fillRequiredFields'));
       return;
     }
     if (form.hasDisability === 'yes' && !form.disabilityDetails.trim()) {
-      setTouched((t) => ({ ...t, disabilityDetails: true }));
-      setError('Please specify your disability.');
+      setTouched((prev) => ({ ...prev, disabilityDetails: true }));
+      setError(t('auth.specifyDisability'));
       return;
     }
 
@@ -148,7 +152,7 @@ export function SignupForm() {
       });
       const data = await res.json();
       if (!res.ok) {
-        setError(data.message ?? 'Something went wrong. Please try again.');
+        setError(data.message ?? t('auth.somethingWentWrongRetry'));
         return;
       }
       setUser(data.user);
@@ -163,7 +167,7 @@ export function SignupForm() {
   return (
     <form onSubmit={handleSubmit} className="flex flex-col gap-4">
       <div className="grid gap-4 sm:grid-cols-2">
-        <Field label="First name" showError={!!isInvalid('firstName')}>
+        <Field label={t('auth.firstName')} showError={!!isInvalid('firstName')}>
           <input
             type="text"
             value={form.firstName}
@@ -172,7 +176,7 @@ export function SignupForm() {
             className={`${inputClass} ${isInvalid('firstName') ? errorInputClass : ''}`}
           />
         </Field>
-        <Field label="Last name" showError={!!isInvalid('lastName')}>
+        <Field label={t('auth.lastName')} showError={!!isInvalid('lastName')}>
           <input
             type="text"
             value={form.lastName}
@@ -183,7 +187,7 @@ export function SignupForm() {
         </Field>
       </div>
 
-      <Field label="Phone number" showError={!!isInvalid('phone')}>
+      <Field label={t('auth.phoneNumber')} showError={!!isInvalid('phone')}>
         <input
           type="tel"
           value={form.phone}
@@ -193,7 +197,7 @@ export function SignupForm() {
         />
       </Field>
 
-      <Field label="Email address" showError={!!isInvalid('email')}>
+      <Field label={t('auth.emailAddress')} showError={!!isInvalid('email')}>
         <input
           type="email"
           value={form.email}
@@ -203,27 +207,27 @@ export function SignupForm() {
         />
       </Field>
 
-      <Field label="Password" showError={!!isInvalid('password')}>
+      <Field label={t('auth.password')} showError={!!isInvalid('password')}>
         <div className="relative">
           <input
             type={showPassword ? 'text' : 'password'}
             value={form.password}
             onChange={(e) => set('password', e.target.value)}
             onBlur={() => markTouched('password')}
-            className={`${inputClass} ${isInvalid('password') ? errorInputClass : ''} w-full pr-11`}
+            className={`${inputClass} ${isInvalid('password') ? errorInputClass : ''} w-full pe-11`}
           />
           <button
             type="button"
             onClick={() => setShowPassword((v) => !v)}
-            aria-label={showPassword ? 'Hide password' : 'Show password'}
-            className="absolute inset-y-0 right-3 flex items-center text-ink-faint hover:text-ink"
+            aria-label={showPassword ? t('auth.hidePassword') : t('auth.showPassword')}
+            className="absolute inset-y-0 end-3 flex items-center text-ink-faint hover:text-ink"
           >
             {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
           </button>
         </div>
       </Field>
 
-      <Field label="Nationality" showError={!!isInvalid('nationality')}>
+      <Field label={t('auth.nationality')} showError={!!isInvalid('nationality')}>
         <select
           value={form.nationality}
           onChange={(e) => set('nationality', e.target.value)}
@@ -231,17 +235,17 @@ export function SignupForm() {
           className={`${inputClass} ${isInvalid('nationality') ? errorInputClass : ''} bg-white`}
         >
           <option value="" disabled>
-            Select nationality
+            {t('auth.selectNationality')}
           </option>
           {NATIONALITIES.map((n) => (
-            <option key={n} value={n}>
-              {n}
+            <option key={n.value} value={n.value}>
+              {optionLabel(n, locale)}
             </option>
           ))}
         </select>
       </Field>
 
-      <Field label="Governorate" showError={!!isInvalid('governorate')}>
+      <Field label={t('auth.governorate')} showError={!!isInvalid('governorate')}>
         <select
           value={form.governorate}
           onChange={(e) => set('governorate', e.target.value)}
@@ -249,18 +253,18 @@ export function SignupForm() {
           className={`${inputClass} ${isInvalid('governorate') ? errorInputClass : ''} bg-white`}
         >
           <option value="" disabled>
-            Select governorate
+            {t('auth.selectGovernorate')}
           </option>
           {GOVERNORATES.map((g) => (
-            <option key={g} value={g}>
-              {g}
+            <option key={g.value} value={g.value}>
+              {optionLabel(g, locale)}
             </option>
           ))}
         </select>
       </Field>
 
       <div className="grid gap-4 sm:grid-cols-2">
-        <Field label="Birthday" showError={!!isInvalid('birthday')}>
+        <Field label={t('auth.birthday')} showError={!!isInvalid('birthday')}>
           <input
             type="date"
             value={form.birthday}
@@ -269,7 +273,7 @@ export function SignupForm() {
             className={`${inputClass} ${isInvalid('birthday') ? errorInputClass : ''}`}
           />
         </Field>
-        <Field label="Gender" showError={!!isInvalid('gender')}>
+        <Field label={t('auth.gender')} showError={!!isInvalid('gender')}>
           <select
             value={form.gender}
             onChange={(e) => set('gender', e.target.value)}
@@ -277,18 +281,18 @@ export function SignupForm() {
             className={`${inputClass} ${isInvalid('gender') ? errorInputClass : ''} bg-white`}
           >
             <option value="" disabled>
-              Select gender
+              {t('auth.selectGender')}
             </option>
             {GENDER_OPTIONS.map((g) => (
               <option key={g.value} value={g.value}>
-                {g.label}
+                {optionLabel(g, locale)}
               </option>
             ))}
           </select>
         </Field>
       </div>
 
-      <Field label="Student or graduate status" showError={!!isInvalid('studentStatus')}>
+      <Field label={t('auth.studentOrGraduateStatus')} showError={!!isInvalid('studentStatus')}>
         <select
           value={form.studentStatus}
           onChange={(e) => set('studentStatus', e.target.value)}
@@ -296,18 +300,18 @@ export function SignupForm() {
           className={`${inputClass} ${isInvalid('studentStatus') ? errorInputClass : ''} bg-white`}
         >
           <option value="" disabled>
-            Select status
+            {t('auth.selectStatus')}
           </option>
           {STUDENT_STATUS_OPTIONS.map((s) => (
             <option key={s.value} value={s.value}>
-              {s.label}
+              {optionLabel(s, locale)}
             </option>
           ))}
         </select>
       </Field>
 
       <div className="grid gap-4 sm:grid-cols-2">
-        <Field label="University" showError={!!isInvalid('university')}>
+        <Field label={t('auth.university')} showError={!!isInvalid('university')}>
           <select
             value={form.university}
             onChange={(e) => set('university', e.target.value)}
@@ -315,16 +319,16 @@ export function SignupForm() {
             className={`${inputClass} ${isInvalid('university') ? errorInputClass : ''} bg-white`}
           >
             <option value="" disabled>
-              Select university
+              {t('auth.selectUniversity')}
             </option>
             {UNIVERSITIES.map((u) => (
-              <option key={u} value={u}>
-                {u}
+              <option key={u.value} value={u.value}>
+                {optionLabel(u, locale)}
               </option>
             ))}
           </select>
         </Field>
-        <Field label="Graduation year" showError={!!isInvalid('graduationYear')}>
+        <Field label={t('auth.graduationYear')} showError={!!isInvalid('graduationYear')}>
           <input
             type="number"
             placeholder="yyyy"
@@ -338,7 +342,7 @@ export function SignupForm() {
         </Field>
       </div>
 
-      <Field label="Faculty" showError={!!isInvalid('faculty')}>
+      <Field label={t('auth.faculty')} showError={!!isInvalid('faculty')}>
         <select
           value={form.faculty}
           onChange={(e) => set('faculty', e.target.value)}
@@ -346,17 +350,17 @@ export function SignupForm() {
           className={`${inputClass} ${isInvalid('faculty') ? errorInputClass : ''} bg-white`}
         >
           <option value="" disabled>
-            Select faculty
+            {t('auth.selectFaculty')}
           </option>
           {FACULTIES.map((f) => (
-            <option key={f} value={f}>
-              {f}
+            <option key={f.value} value={f.value}>
+              {optionLabel(f, locale)}
             </option>
           ))}
         </select>
       </Field>
 
-      <Field label="What is your current employment status?" showError={!!isInvalid('employmentStatus')}>
+      <Field label={t('auth.employmentStatusQuestion')} showError={!!isInvalid('employmentStatus')}>
         <select
           value={form.employmentStatus}
           onChange={(e) => set('employmentStatus', e.target.value)}
@@ -364,17 +368,17 @@ export function SignupForm() {
           className={`${inputClass} ${isInvalid('employmentStatus') ? errorInputClass : ''} bg-white`}
         >
           <option value="" disabled>
-            Select an option
+            {t('auth.selectOption')}
           </option>
           {EMPLOYMENT_STATUS_OPTIONS.map((opt) => (
             <option key={opt.value} value={opt.value}>
-              {opt.label}
+              {optionLabel(opt, locale)}
             </option>
           ))}
         </select>
       </Field>
 
-      <Field label="Do you have a disability?" showError={!!isInvalid('hasDisability')}>
+      <Field label={t('auth.hasDisabilityQuestion')} showError={!!isInvalid('hasDisability')}>
         <select
           value={form.hasDisability}
           onChange={(e) => set('hasDisability', e.target.value)}
@@ -382,15 +386,15 @@ export function SignupForm() {
           className={`${inputClass} ${isInvalid('hasDisability') ? errorInputClass : ''} bg-white`}
         >
           <option value="" disabled>
-            Select an option
+            {t('auth.selectOption')}
           </option>
-          <option value="no">No</option>
-          <option value="yes">Yes</option>
+          <option value="no">{t('auth.no')}</option>
+          <option value="yes">{t('auth.yes')}</option>
         </select>
       </Field>
 
       {form.hasDisability === 'yes' && (
-        <Field label="Please specify" showError={!!touched.disabilityDetails && !form.disabilityDetails.trim()}>
+        <Field label={t('auth.pleaseSpecify')} showError={!!touched.disabilityDetails && !form.disabilityDetails.trim()}>
           <input
             type="text"
             value={form.disabilityDetails}
@@ -408,13 +412,13 @@ export function SignupForm() {
         disabled={submitting}
         className="mt-2 rounded-full bg-brand-500 px-5 py-3 text-sm font-bold text-white shadow-sm transition-all hover:-translate-y-0.5 hover:bg-brand-600 hover:shadow-md disabled:cursor-not-allowed disabled:opacity-60"
       >
-        {submitting ? 'Submitting…' : 'Submit'}
+        {submitting ? t('auth.submitting') : t('auth.submit')}
       </button>
 
       <p className="text-center text-sm text-ink-soft">
-        Already have an account?{' '}
+        {t('auth.alreadyHaveAccount')}{' '}
         <button type="button" onClick={() => open('login')} className="font-semibold text-brand-600 hover:underline">
-          Log in
+          {t('auth.logInLink')}
         </button>
       </p>
     </form>

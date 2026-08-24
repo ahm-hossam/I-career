@@ -3,6 +3,7 @@
 import { motion } from 'motion/react';
 import { Award, Check, FileText, ListChecks, Milestone } from 'lucide-react';
 import type { ProgramPhase } from '@i-career/types';
+import { useLocale } from '@/lib/i18n/locale-context';
 
 function SectionHeading({
   icon: Icon,
@@ -35,6 +36,7 @@ export function AboutProgramSection({
   subtitleAr: string | null;
   aboutBody: string;
 }) {
+  const { t } = useLocale();
   return (
     <motion.section
       initial={{ opacity: 0, y: 16 }}
@@ -43,7 +45,7 @@ export function AboutProgramSection({
       transition={{ duration: 0.4 }}
       className="mt-10 rounded-3xl border border-ink/[0.06] bg-white p-6 shadow-sm"
     >
-      <SectionHeading icon={FileText} title="About Program" />
+      <SectionHeading icon={FileText} title={t('programPage.aboutProgram')} />
       <p className="mt-4 font-semibold text-ink">{subtitleEn}</p>
       {subtitleAr && (
         <p className="mt-1 text-ink-soft" dir="rtl">
@@ -59,14 +61,15 @@ export function AboutProgramSection({
 }
 
 export function PhasesSection({ phases }: { phases: ProgramPhase[] }) {
+  const { t } = useLocale();
   if (phases.length === 0) return null;
 
   return (
     <section className="mt-10">
       <SectionHeading
         icon={Milestone}
-        title="What you'll go through"
-        subtitle="The program is delivered across connected phases"
+        title={t('programPage.whatYoullGoThrough')}
+        subtitle={t('programPage.phasesSubtitle')}
       />
       <div className="mt-6 flex flex-col">
         {phases.map((phase, i) => (
@@ -102,11 +105,12 @@ export function PhasesSection({ phases }: { phases: ProgramPhase[] }) {
 }
 
 export function BenefitsSection({ benefits }: { benefits: string[] }) {
+  const { t } = useLocale();
   if (benefits.length === 0) return null;
 
   return (
     <section className="mt-10">
-      <SectionHeading icon={Award} title="Benefits" />
+      <SectionHeading icon={Award} title={t('programPage.benefits')} />
       <div className="mt-5 grid grid-cols-1 gap-3 sm:grid-cols-2">
         {benefits.map((benefit, i) => (
           <motion.div
@@ -130,11 +134,12 @@ export function BenefitsSection({ benefits }: { benefits: string[] }) {
 }
 
 export function CriteriaSection({ criteria }: { criteria: string[] }) {
+  const { t } = useLocale();
   if (criteria.length === 0) return null;
 
   return (
     <section className="mt-10">
-      <SectionHeading icon={ListChecks} title="Program Criteria" />
+      <SectionHeading icon={ListChecks} title={t('programPage.programCriteria')} />
       <div className="mt-5 grid grid-cols-1 gap-3 sm:grid-cols-2">
         {criteria.map((criterion, i) => (
           <motion.div

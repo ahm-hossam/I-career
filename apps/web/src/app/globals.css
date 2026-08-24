@@ -43,6 +43,10 @@ textarea:focus-visible,
   animation: marquee-scroll linear infinite;
 }
 
+[dir='rtl'] .animate-marquee {
+  animation-direction: reverse;
+}
+
 @keyframes shimmer-sweep {
   from {
     background-position: 200% center;

@@ -3,9 +3,11 @@
 import { useState } from 'react';
 import { AnimatePresence, motion } from 'motion/react';
 import { Play, X } from 'lucide-react';
+import { useLocale } from '@/lib/i18n/locale-context';
 
 export function VideoModal({ videoUrl, triggerLabel }: { videoUrl: string; triggerLabel: string }) {
   const [open, setOpen] = useState(false);
+  const { t } = useLocale();
 
   return (
     <>
@@ -17,7 +19,7 @@ export function VideoModal({ videoUrl, triggerLabel }: { videoUrl: string; trigg
         className="group inline-flex items-center gap-3 rounded-full bg-white px-6 py-3 text-sm font-semibold text-ink shadow-md transition-shadow hover:shadow-lg"
       >
         <span className="flex h-8 w-8 items-center justify-center rounded-full bg-brand-500 text-white transition-transform group-hover:scale-105">
-          <Play size={14} fill="currentColor" className="ml-0.5" />
+          <Play size={14} fill="currentColor" className="ms-0.5" />
         </span>
         {triggerLabel}
       </motion.button>
@@ -44,8 +46,8 @@ export function VideoModal({ videoUrl, triggerLabel }: { videoUrl: string; trigg
               <button
                 type="button"
                 onClick={() => setOpen(false)}
-                aria-label="Close video"
-                className="absolute right-3 top-3 z-10 flex h-9 w-9 items-center justify-center rounded-full bg-black/50 text-white transition-colors hover:bg-black/70"
+                aria-label={t('videoModal.closeVideo')}
+                className="absolute end-3 top-3 z-10 flex h-9 w-9 items-center justify-center rounded-full bg-black/50 text-white transition-colors hover:bg-black/70"
               >
                 <X size={18} />
               </button>

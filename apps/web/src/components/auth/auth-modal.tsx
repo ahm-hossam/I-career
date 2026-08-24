@@ -3,19 +3,20 @@
 import { AnimatePresence, motion } from 'motion/react';
 import { X } from 'lucide-react';
 import { useAuthModal } from '@/lib/auth/auth-modal-context';
+import { useLocale } from '@/lib/i18n/locale-context';
 import { LoginForm } from './login-form';
 import { SignupForm } from './signup-form';
 import { ForgotPasswordForm } from './forgot-password-form';
 
-const TITLES: Record<string, string> = {
-  login: 'Log In',
-  signup: 'Registration',
-  forgot: 'Forgot Password',
-};
-
 export function AuthModal() {
   const { view, close } = useAuthModal();
+  const { t } = useLocale();
   const open = view !== 'closed';
+  const titles: Record<string, string> = {
+    login: t('auth.modalTitleLogin'),
+    signup: t('auth.modalTitleSignup'),
+    forgot: t('auth.modalTitleForgot'),
+  };
 
   return (
     <AnimatePresence>
@@ -40,13 +41,13 @@ export function AuthModal() {
             <button
               type="button"
               onClick={close}
-              aria-label="Close"
-              className="absolute right-5 top-6 z-10 flex h-9 w-9 items-center justify-center rounded-full text-ink-faint transition-colors hover:bg-ink/[0.05] hover:text-ink"
+              aria-label={t('auth.close')}
+              className="absolute end-5 top-6 z-10 flex h-9 w-9 items-center justify-center rounded-full text-ink-faint transition-colors hover:bg-ink/[0.05] hover:text-ink"
             >
               <X size={20} />
             </button>
 
-            <h2 className="text-2xl font-extrabold text-ink">{TITLES[view] ?? ''}</h2>
+            <h2 className="text-2xl font-extrabold text-ink">{titles[view] ?? ''}</h2>
 
             <div className="mt-6">
               {view === 'login' && <LoginForm />}

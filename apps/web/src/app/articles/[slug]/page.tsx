@@ -1,16 +1,21 @@
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { fetchArticleBySlug } from '@/lib/api';
+import { getServerLocale } from '@/lib/i18n/server';
+import { translate } from '@/lib/i18n/translate';
 
 export default async function ArticleDetailPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
-  const data = await fetchArticleBySlug(slug);
+  const [data, locale] = await Promise.all([fetchArticleBySlug(slug), getServerLocale()]);
   if (!data) notFound();
 
   const { article, relatedArticles } = data;
-  const formattedDate = new Intl.DateTimeFormat('en-US', { month: 'long', day: 'numeric', year: 'numeric' }).format(
-    new Date(article.publishedAt),
-  );
+  const t = (path: string, vars?: Record<string, string | number>) => translate(locale, path, vars);
+  const formattedDate = new Intl.DateTimeFormat(locale === 'ar' ? 'ar-EG' : 'en-US', {
+    month: 'long',
+    day: 'numeric',
+    year: 'numeric',
+  }).format(new Date(article.publishedAt));
 
   return (
     <article className="relative -mt-[80px] mx-auto max-w-2xl px-4 pb-12 pt-[124px] sm:px-6 sm:pb-16 sm:pt-[140px] lg:px-8">
@@ -22,9 +27,9 @@ export default async function ArticleDetailPage({ params }: { params: Promise<{ 
       {relatedArticles.length > 0 && (
         <section className="mt-14 border-t border-ink/[0.06] pt-8">
           <div className="flex items-center justify-between">
-            <h2 className="font-bold text-ink">Must Reads</h2>
+            <h2 className="font-bold text-ink">{t('articlesPage.mustReads')}</h2>
             <Link href="/articles" className="text-sm font-semibold text-brand-600 hover:underline">
-              See all articles
+              {t('articlesPage.seeAllArticles')}
             </Link>
           </div>
           <ul className="mt-4 flex flex-col gap-2">

@@ -14,14 +14,17 @@ import { ReferralTracker } from '@/components/referral-tracker';
 import { fetchMyApplication, fetchProgramBySlug } from '@/lib/api';
 import { getSessionToken } from '@/lib/auth/session';
 import { aspectRatioClass } from '@/lib/rich-text';
+import { getServerLocale } from '@/lib/i18n/server';
+import { translate } from '@/lib/i18n/translate';
 
 export default async function ProgramDetailPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
-  const [data, token] = await Promise.all([fetchProgramBySlug(slug), getSessionToken()]);
+  const [data, token, locale] = await Promise.all([fetchProgramBySlug(slug), getSessionToken(), getServerLocale()]);
   if (!data) notFound();
 
   const { program, otherPrograms } = data;
   const myApplication = token ? await fetchMyApplication(slug, token) : null;
+  const t = (path: string, vars?: Record<string, string | number>) => translate(locale, path, vars);
 
   const banner = (
     <div
@@ -97,7 +100,7 @@ export default async function ProgramDetailPage({ params }: { params: Promise<{ 
 
         {program.sponsors.length > 0 && (
           <section className="mt-10">
-            <h2 className="text-xl font-bold text-ink">Sponsors</h2>
+            <h2 className="text-xl font-bold text-ink">{t('programPage.sponsors')}</h2>
             <div className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2">
               {program.sponsors.map((sponsor, i) => (
                 <div
@@ -129,8 +132,8 @@ export default async function ProgramDetailPage({ params }: { params: Promise<{ 
 
         {otherPrograms.length > 0 && (
           <section className="mt-14">
-            <h2 className="text-xl font-bold text-ink">Other Programs</h2>
-            <p className="mt-1 text-sm text-ink-faint">Programs recommended for you</p>
+            <h2 className="text-xl font-bold text-ink">{t('programPage.otherPrograms')}</h2>
+            <p className="mt-1 text-sm text-ink-faint">{t('programPage.programsRecommended')}</p>
             <div className="mt-4 grid grid-cols-1 gap-6 sm:grid-cols-2">
               {otherPrograms.map((other, i) => (
                 <ProgramCard key={other.id} program={other} index={i} />

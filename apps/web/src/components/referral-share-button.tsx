@@ -5,10 +5,12 @@ import { AnimatePresence, motion } from 'motion/react';
 import { Check, Copy, Share2 } from 'lucide-react';
 import { useAuth } from '@/lib/auth/auth-context';
 import { useAuthModal } from '@/lib/auth/auth-modal-context';
+import { useLocale } from '@/lib/i18n/locale-context';
 
 export function ReferralShareButton({ slug }: { slug: string }) {
   const { user } = useAuth();
   const { open: openAuthModal } = useAuthModal();
+  const { t } = useLocale();
   const [link, setLink] = useState<string | null>(null);
   const [popoverOpen, setPopoverOpen] = useState(false);
   const [copied, setCopied] = useState(false);
@@ -62,7 +64,7 @@ export function ReferralShareButton({ slug }: { slug: string }) {
         className="inline-flex items-center gap-2 rounded-full border border-ink/10 px-5 py-3 text-sm font-bold text-ink-soft transition-colors hover:bg-ink/[0.04]"
       >
         <Share2 size={16} />
-        Refer a friend
+        {t('referralShare.referAFriend')}
       </button>
 
       <AnimatePresence>
@@ -76,8 +78,8 @@ export function ReferralShareButton({ slug }: { slug: string }) {
           >
             {link ? (
               <>
-                <p className="text-xs font-semibold text-ink">Your referral link</p>
-                <p className="mt-0.5 text-[11px] text-ink-faint">Invite a friend — tracked on your account.</p>
+                <p className="text-xs font-semibold text-ink">{t('referralShare.yourReferralLink')}</p>
+                <p className="mt-0.5 text-[11px] text-ink-faint">{t('referralShare.inviteFriendHint')}</p>
                 <div className="mt-2.5 flex items-center gap-2">
                   <input
                     readOnly
@@ -91,12 +93,12 @@ export function ReferralShareButton({ slug }: { slug: string }) {
                     className="flex shrink-0 items-center gap-1.5 rounded-full border border-ink/10 px-3.5 py-1.5 text-xs font-semibold text-ink-soft transition-colors hover:bg-ink/[0.04]"
                   >
                     {copied ? <Check size={13} /> : <Copy size={13} />}
-                    {copied ? 'Copied' : 'Copy'}
+                    {copied ? t('referralShare.copied') : t('referralShare.copy')}
                   </button>
                 </div>
               </>
             ) : (
-              <p className="text-xs text-ink-faint">Generating your referral link…</p>
+              <p className="text-xs text-ink-faint">{t('referralShare.generatingLink')}</p>
             )}
           </motion.div>
         )}

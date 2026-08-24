@@ -7,9 +7,11 @@ import { useEffect, useRef, useState } from 'react';
 import { AnimatePresence, motion, useAnimation } from 'motion/react';
 import { ChevronDown, LogOut, Menu, X } from 'lucide-react';
 import { cn } from '@i-career/utils';
-import { NAV_ITEMS } from '@/data/site';
+import { getSiteContent } from '@/data/site';
 import { useAuth } from '@/lib/auth/auth-context';
 import { useAuthModal } from '@/lib/auth/auth-modal-context';
+import { useLocale } from '@/lib/i18n/locale-context';
+import { LanguageSwitcher } from '@/components/language-switcher';
 
 const TRIGGER_Y = 90;
 
@@ -24,6 +26,8 @@ export function SiteHeader() {
   const controls = useAnimation();
   const { user, logout } = useAuth();
   const { open: openAuthModal } = useAuthModal();
+  const { t, locale } = useLocale();
+  const navItems = getSiteContent(locale).navItems;
   const profileRef = useRef<HTMLDivElement>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
@@ -111,7 +115,7 @@ export function SiteHeader() {
         transition={{ layout: { type: 'spring', stiffness: 320, damping: 32 } }}
         className={cn(
           'mx-auto flex items-center justify-between transition-[max-width,border-radius,background-color,border-color,box-shadow,backdrop-filter] duration-300 ease-out',
-          atTop ? 'max-w-7xl px-4 py-4 sm:px-6 lg:px-8' : 'max-w-5xl px-5 py-2.5 sm:px-6',
+          atTop ? 'max-w-7xl px-4 py-4 sm:px-6 lg:px-8' : 'max-w-5xl px-5 py-2.5 sm:px-6 rtl:max-w-6xl',
           atTop && 'rounded-none border border-transparent bg-transparent shadow-none',
           showDarkPill &&
             'rounded-[2rem] border border-white/10 bg-ink/90 shadow-[0_10px_40px_-8px_rgba(0,0,0,0.55)] backdrop-blur-md',
@@ -119,7 +123,7 @@ export function SiteHeader() {
             'rounded-[2rem] border border-black/[0.06] bg-white/95 shadow-[0_10px_40px_-8px_rgba(21,26,30,0.18)] backdrop-blur-md',
         )}
       >
-        <Link href="/" className="flex shrink-0 items-center" aria-label="iCareer home">
+        <Link href="/" className="flex shrink-0 items-center" aria-label={t('header.homeAriaLabel')}>
           <Image
             src="/brand/logo-nav.png"
             alt="iCareer"
@@ -130,15 +134,15 @@ export function SiteHeader() {
           />
         </Link>
 
-        <nav className="hidden items-center gap-1 lg:flex" aria-label="Primary">
-          {NAV_ITEMS.map((item) =>
+        <nav className="hidden items-center gap-1 lg:flex" aria-label={t('header.primaryNavAriaLabel')}>
+          {navItems.map((item) =>
             item.children ? (
               <div key={item.label} ref={dropdownRef} className="relative">
                 <button
                   type="button"
                   onClick={() => setOpenDropdown((v) => (v === item.label ? null : item.label))}
                   className={cn(
-                    'relative flex items-center gap-1 rounded-full px-4 py-2 text-[15px] font-medium transition-colors',
+                    'relative flex items-center gap-1 whitespace-nowrap rounded-full px-4 py-2 text-[15px] font-medium transition-colors',
                     useWhiteText
                       ? 'text-white/75 hover:bg-white/10 hover:text-white'
                       : 'text-ink/80 hover:bg-ink/[0.04] hover:text-ink',
@@ -183,7 +187,7 @@ export function SiteHeader() {
                 key={item.label}
                 href={item.href}
                 className={cn(
-                  'relative rounded-full px-4 py-2 text-[15px] font-medium transition-colors',
+                  'relative whitespace-nowrap rounded-full px-4 py-2 text-[15px] font-medium transition-colors',
                   useWhiteText
                     ? 'text-white/75 hover:bg-white/10 hover:text-white'
                     : 'text-ink/80 hover:bg-ink/[0.04] hover:text-ink',
@@ -213,7 +217,7 @@ export function SiteHeader() {
                 type="button"
                 onClick={() => setProfileOpen((v) => !v)}
                 className={cn(
-                  'hidden items-center gap-2 whitespace-nowrap rounded-full py-1 pl-1 pr-3 text-[15px] font-semibold transition-colors sm:inline-flex',
+                  'hidden items-center gap-2 whitespace-nowrap rounded-full py-1 ps-1 pe-3 text-[15px] font-semibold transition-colors sm:inline-flex',
                   useWhiteText ? 'text-white hover:bg-white/10' : 'text-ink hover:bg-ink/[0.05]',
                 )}
               >
@@ -230,7 +234,7 @@ export function SiteHeader() {
                     animate={{ opacity: 1, y: 0, scale: 1 }}
                     exit={{ opacity: 0, y: 8, scale: 0.97 }}
                     transition={{ duration: 0.15 }}
-                    className="absolute right-0 top-[calc(100%+8px)] w-48 overflow-hidden rounded-2xl border border-ink/[0.06] bg-white shadow-xl"
+                    className="absolute end-0 top-[calc(100%+8px)] w-48 overflow-hidden rounded-2xl border border-ink/[0.06] bg-white shadow-xl"
                   >
                     <button
                       type="button"
@@ -241,7 +245,7 @@ export function SiteHeader() {
                       className="flex w-full items-center gap-2.5 px-4 py-3 text-sm font-medium text-status-coral transition-colors hover:bg-status-coral/[0.08]"
                     >
                       <LogOut size={16} />
-                      Log out
+                      {t('header.logOut')}
                     </button>
                   </motion.div>
                 )}
@@ -257,17 +261,20 @@ export function SiteHeader() {
                   useWhiteText ? 'text-white hover:bg-white/10' : 'text-ink hover:bg-ink/[0.05]',
                 )}
               >
-                Login
+                {t('header.login')}
               </button>
               <button
                 type="button"
                 onClick={() => openAuthModal('signup')}
                 className="hidden whitespace-nowrap rounded-full bg-accent-300 px-5 py-2.5 text-[15px] font-semibold text-ink shadow-sm transition-all hover:-translate-y-0.5 hover:shadow-md active:translate-y-0 sm:inline-flex"
               >
-                Sign Up
+                {t('header.signUp')}
               </button>
             </>
           )}
+          <div className="hidden sm:block">
+            <LanguageSwitcher inverted={useWhiteText} />
+          </div>
           <button
             type="button"
             onClick={() => setOpen((v) => !v)}
@@ -275,7 +282,7 @@ export function SiteHeader() {
               'inline-flex h-10 w-10 items-center justify-center rounded-full transition-colors lg:hidden',
               useWhiteText ? 'text-white hover:bg-white/10' : 'text-ink hover:bg-ink/[0.06]',
             )}
-            aria-label={open ? 'Close menu' : 'Open menu'}
+            aria-label={open ? t('header.closeMenu') : t('header.openMenu')}
             aria-expanded={open}
           >
             {open ? <X size={22} /> : <Menu size={22} />}
@@ -304,10 +311,13 @@ export function SiteHeader() {
             exit={{ height: 0, opacity: 0, y: -8 }}
             transition={{ duration: 0.25, ease: [0.16, 1, 0.3, 1] }}
             className="relative z-50 mx-auto mt-2 max-w-4xl overflow-hidden rounded-[2rem] border border-black/[0.06] bg-white/95 shadow-[0_10px_40px_-8px_rgba(21,26,30,0.18)] backdrop-blur-md lg:hidden"
-            aria-label="Mobile"
+            aria-label={t('header.mobileNavAriaLabel')}
           >
             <div className="flex flex-col gap-1 p-4">
-              {NAV_ITEMS.map((item) =>
+              <div className="mb-1 flex justify-center sm:hidden">
+                <LanguageSwitcher />
+              </div>
+              {navItems.map((item) =>
                 item.children ? (
                   <div key={item.label}>
                     <button
@@ -377,7 +387,7 @@ export function SiteHeader() {
                   className="mt-2 flex items-center justify-center gap-2 rounded-full border border-status-coral/20 px-5 py-3 text-center text-base font-semibold text-status-coral"
                 >
                   <LogOut size={18} />
-                  Log out ({user.firstName})
+                  {t('header.logOutWithName', { name: user.firstName })}
                 </button>
               ) : (
                 <div className="mt-2 flex flex-col gap-2">
@@ -389,7 +399,7 @@ export function SiteHeader() {
                     }}
                     className="rounded-full border border-ink/10 px-5 py-3 text-center text-base font-semibold text-ink"
                   >
-                    Login
+                    {t('header.login')}
                   </button>
                   <button
                     type="button"
@@ -399,7 +409,7 @@ export function SiteHeader() {
                     }}
                     className="rounded-full bg-accent-300 px-5 py-3 text-center text-base font-semibold text-ink shadow-sm"
                   >
-                    Sign Up
+                    {t('header.signUp')}
                   </button>
                 </div>
               )}

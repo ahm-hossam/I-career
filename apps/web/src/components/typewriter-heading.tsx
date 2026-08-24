@@ -1,6 +1,7 @@
 'use client';
 
 import { motion } from 'motion/react';
+import { useLocale } from '@/lib/i18n/locale-context';
 
 export interface TypewriterSegment {
   text: string;
@@ -33,6 +34,34 @@ export function TypewriterHeading({
   className,
   cursorClassName,
 }: TypewriterHeadingProps) {
+  const { dir } = useLocale();
+
+  if (dir === 'rtl') {
+    // Arabic letters need to sit adjacent to their neighbors to get the correct
+    // connected glyph shapes — splitting them into per-character inline-block
+    // spans (as the LTR typewriter effect below does) breaks that shaping and
+    // the RTL reordering. RTL gets a per-line fade-in instead, text left intact.
+    return (
+      <span className={className}>
+        {lines.map((segments, lineIndex) => (
+          <motion.span
+            key={lineIndex}
+            className="block"
+            initial={{ opacity: 0, y: 8 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.4, delay: startDelay + lineIndex * 0.12 }}
+          >
+            {segments.map((segment, segIndex) => (
+              <span key={segIndex} className={segment.className}>
+                {segment.text}
+              </span>
+            ))}
+          </motion.span>
+        ))}
+      </span>
+    );
+  }
+
   const flat: FlatChar[] = lines.flatMap((segments, lineIndex) =>
     segments.flatMap((segment, segIndex) =>
       segment.text.split('').map((char) => ({ char, lineIndex, segIndex })),

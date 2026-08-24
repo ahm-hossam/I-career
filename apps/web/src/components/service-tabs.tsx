@@ -4,19 +4,22 @@ import { useState } from 'react';
 import { AnimatePresence, motion } from 'motion/react';
 import { ArrowRight, Building2, Check, HeartHandshake, Users } from 'lucide-react';
 import { cn } from '@i-career/utils';
-import { SERVICE_TABS, SERVICES_HEADING, SERVICES_SUBHEAD } from '@/data/home';
+import { getHomeContent } from '@/data/home';
+import { useLocale } from '@/lib/i18n/locale-context';
 
 const TAB_ICONS = [Users, Building2, HeartHandshake];
 
 export function ServiceTabs() {
   const [active, setActive] = useState(0);
-  const activeTab = SERVICE_TABS[active];
+  const { t, locale } = useLocale();
+  const { serviceTabs, servicesHeading, servicesSubhead } = getHomeContent(locale);
+  const activeTab = serviceTabs[active];
   const ActiveIcon = TAB_ICONS[active];
 
   return (
     <section id="services" data-nav-theme="dark" className="relative overflow-hidden bg-ink py-16 sm:py-24">
-      <div className="pointer-events-none absolute -top-32 left-[12%] h-72 w-72 rounded-full bg-brand-500/15 blur-3xl" />
-      <div className="pointer-events-none absolute -bottom-24 right-[8%] h-80 w-80 rounded-full bg-accent-300/10 blur-3xl" />
+      <div className="pointer-events-none absolute -top-32 start-[12%] h-72 w-72 rounded-full bg-brand-500/15 blur-3xl" />
+      <div className="pointer-events-none absolute -bottom-24 end-[8%] h-80 w-80 rounded-full bg-accent-300/10 blur-3xl" />
 
       <div className="relative mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
         <motion.div
@@ -26,8 +29,8 @@ export function ServiceTabs() {
           transition={{ duration: 0.5 }}
           className="text-center"
         >
-          <h2 className="text-3xl font-extrabold text-white sm:text-[32px]">{SERVICES_HEADING}</h2>
-          <p className="mx-auto mt-3 max-w-xl text-balance text-white/60">{SERVICES_SUBHEAD}</p>
+          <h2 className="text-3xl font-extrabold text-white sm:text-[32px]">{servicesHeading}</h2>
+          <p className="mx-auto mt-3 max-w-xl text-balance text-white/60">{servicesSubhead}</p>
         </motion.div>
 
         <motion.div
@@ -38,7 +41,7 @@ export function ServiceTabs() {
           className="relative mt-12 rounded-3xl border border-white/10 bg-white/[0.04] p-2 shadow-2xl shadow-black/40 backdrop-blur-xl sm:p-3"
         >
           <div className="relative flex flex-col gap-1.5 rounded-2xl bg-black/20 p-1.5 sm:flex-row">
-            {SERVICE_TABS.map((tab, i) => {
+            {serviceTabs.map((tab, i) => {
               const Icon = TAB_ICONS[i];
               return (
                 <button
@@ -111,7 +114,7 @@ export function ServiceTabs() {
                 </span>
                 <span className="text-lg font-bold">{activeTab.tabLabel}</span>
                 <span className="rounded-full bg-white/15 px-4 py-1 text-xs font-semibold backdrop-blur-sm">
-                  {activeTab.items.length} Services
+                  {t('serviceTabs.servicesCount', { count: activeTab.items.length })}
                 </span>
               </div>
             </div>

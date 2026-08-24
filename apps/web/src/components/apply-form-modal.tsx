@@ -5,6 +5,7 @@ import { AnimatePresence, motion } from 'motion/react';
 import { Loader2, X } from 'lucide-react';
 import type { ProgramFormField } from '@i-career/types';
 import { FileUploadField } from '@/components/employer/file-upload-field';
+import { useLocale } from '@/lib/i18n/locale-context';
 
 const inputClass =
   'rounded-xl border border-ink/10 px-4 py-2.5 font-normal text-ink outline-none transition-colors focus:border-brand-500';
@@ -20,6 +21,7 @@ function renderField(
   value: string | string[] | undefined,
   onChange: (v: string | string[]) => void,
   onBlur: () => void,
+  t: (path: string, vars?: Record<string, string | number>) => string,
 ) {
   switch (field.type) {
     case 'LONG_TEXT':
@@ -81,7 +83,7 @@ function renderField(
           className={`${inputClass} bg-white`}
         >
           <option value="" disabled>
-            Choose
+            {t('applyForm.choose')}
           </option>
           {field.options.map((o) => (
             <option key={o} value={o}>
@@ -115,19 +117,22 @@ function renderField(
     case 'YES_NO':
       return (
         <div className="flex gap-2">
-          {['Yes', 'No'].map((o) => (
+          {[
+            { code: 'Yes', label: t('applyForm.yes') },
+            { code: 'No', label: t('applyForm.no') },
+          ].map((o) => (
             <button
-              key={o}
+              key={o.code}
               type="button"
               onClick={() => {
                 onBlur();
-                onChange(o);
+                onChange(o.code);
               }}
               className={`rounded-full px-4 py-2 text-sm font-semibold transition-colors ${
-                value === o ? 'bg-brand-500 text-white' : 'bg-ink/[0.04] text-ink-soft hover:bg-ink/[0.08]'
+                value === o.code ? 'bg-brand-500 text-white' : 'bg-ink/[0.04] text-ink-soft hover:bg-ink/[0.08]'
               }`}
             >
-              {o}
+              {o.label}
             </button>
           ))}
         </div>
@@ -170,6 +175,7 @@ export function ApplyFormModal({
   onClose: () => void;
   onSubmit: (answers: Answers) => void;
 }) {
+  const { t } = useLocale();
   const [answers, setAnswers] = useState<Answers>({});
   const [touched, setTouched] = useState<Record<string, boolean>>({});
 
@@ -211,14 +217,14 @@ export function ApplyFormModal({
           <button
             type="button"
             onClick={onClose}
-            aria-label="Close"
-            className="absolute right-5 top-6 z-10 flex h-9 w-9 items-center justify-center rounded-full text-ink-faint transition-colors hover:bg-ink/[0.05] hover:text-ink"
+            aria-label={t('applyForm.close')}
+            className="absolute end-5 top-6 z-10 flex h-9 w-9 items-center justify-center rounded-full text-ink-faint transition-colors hover:bg-ink/[0.05] hover:text-ink"
           >
             <X size={20} />
           </button>
 
-          <h2 className="text-2xl font-extrabold text-ink">Register</h2>
-          <p className="mt-1 text-sm text-ink-soft">Fill in the details below to apply.</p>
+          <h2 className="text-2xl font-extrabold text-ink">{t('applyForm.title')}</h2>
+          <p className="mt-1 text-sm text-ink-soft">{t('applyForm.subtitle')}</p>
 
           <form onSubmit={handleSubmit} className="mt-6 flex flex-col gap-4">
             {fields.map((field) => (
@@ -229,9 +235,9 @@ export function ApplyFormModal({
                     {field.required && <span className="text-status-coral"> *</span>}
                   </label>
                 )}
-                {renderField(field, answers[field.id], (v) => set(field.id, v), () => markTouched(field.id))}
+                {renderField(field, answers[field.id], (v) => set(field.id, v), () => markTouched(field.id), t)}
                 {field.required && touched[field.id] && isEmpty(answers[field.id]) && (
-                  <span className="text-xs font-medium text-status-coral">Required</span>
+                  <span className="text-xs font-medium text-status-coral">{t('applyForm.required')}</span>
                 )}
               </div>
             ))}
@@ -244,7 +250,7 @@ export function ApplyFormModal({
               className="mt-2 flex items-center justify-center gap-2 rounded-full bg-brand-500 px-5 py-3 text-sm font-bold text-white shadow-sm transition-all hover:-translate-y-0.5 hover:bg-brand-600 hover:shadow-md disabled:cursor-not-allowed disabled:opacity-60"
             >
               {submitting && <Loader2 size={16} className="animate-spin" />}
-              {submitting ? 'Submitting…' : 'Submit application'}
+              {submitting ? t('applyForm.submitting') : t('applyForm.submit')}
             </button>
           </form>
         </motion.div>

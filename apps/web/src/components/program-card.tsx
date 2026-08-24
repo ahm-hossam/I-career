@@ -5,8 +5,10 @@ import Link from 'next/link';
 import { motion } from 'motion/react';
 import type { PublicProgram } from '@i-career/types';
 import { aspectRatioClass, stripHtml } from '@/lib/rich-text';
+import { useLocale } from '@/lib/i18n/locale-context';
 
 export function ProgramCard({ program, index = 0 }: { program: PublicProgram; index?: number }) {
+  const { t } = useLocale();
   return (
     <motion.div
       initial={{ opacity: 0, y: 16 }}
@@ -39,7 +41,7 @@ export function ProgramCard({ program, index = 0 }: { program: PublicProgram; in
             href={`/programs/${program.slug}`}
             className="shrink-0 rounded-full bg-brand-500 px-4 py-1.5 text-xs font-bold text-white transition-colors hover:bg-brand-600"
           >
-            Register
+            {t('programsPage.register')}
           </Link>
         </div>
         <p className="line-clamp-1 text-sm font-semibold text-ink">{program.subtitleEn}</p>

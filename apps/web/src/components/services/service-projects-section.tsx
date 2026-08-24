@@ -1,13 +1,17 @@
+'use client';
+
 import Image from 'next/image';
 import type { PublicServiceProject } from '@i-career/types';
+import { useLocale } from '@/lib/i18n/locale-context';
 
 export function ServiceProjectsSection({ projects }: { projects: PublicServiceProject[] }) {
+  const { t } = useLocale();
   if (projects.length === 0) return null;
 
   return (
     <section className="mt-14">
-      <h2 className="text-lg font-bold text-ink">Previous Projects</h2>
-      <p className="mt-1 text-sm text-ink-faint">Proven Success Records in Our Projects</p>
+      <h2 className="text-lg font-bold text-ink">{t('serviceProjects.previousProjects')}</h2>
+      <p className="mt-1 text-sm text-ink-faint">{t('serviceProjects.provenSuccessRecords')}</p>
 
       <div className="mt-5 flex gap-4 overflow-x-auto pb-2">
         {projects.map((project) => {

@@ -2,14 +2,17 @@
 
 import { motion } from 'motion/react';
 import { ArrowRight, Calendar, MapPin } from 'lucide-react';
-import { EVENTS_TEASER } from '@/data/home';
+import { getHomeContent } from '@/data/home';
+import { useLocale } from '@/lib/i18n/locale-context';
 
 export function EventsTeaser() {
-  const { featured } = EVENTS_TEASER;
+  const { locale } = useLocale();
+  const eventsTeaser = getHomeContent(locale).eventsTeaser;
+  const { featured } = eventsTeaser;
 
   return (
     <section data-nav-theme="dark" className="relative overflow-hidden bg-ink py-16 sm:py-24">
-      <span className="pointer-events-none absolute -bottom-10 right-[-4%] select-none font-sans text-[16rem] font-extrabold leading-none text-white/[0.04]">
+      <span className="pointer-events-none absolute -bottom-10 end-[-4%] select-none font-sans text-[16rem] font-extrabold leading-none text-white/[0.04]">
         car
       </span>
 
@@ -22,14 +25,14 @@ export function EventsTeaser() {
           className="flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-end"
         >
           <div>
-            <h2 className="text-3xl font-extrabold text-white sm:text-[32px]">{EVENTS_TEASER.heading}</h2>
-            <p className="mt-2 max-w-md text-white/70">{EVENTS_TEASER.subhead}</p>
+            <h2 className="text-3xl font-extrabold text-white sm:text-[32px]">{eventsTeaser.heading}</h2>
+            <p className="mt-2 max-w-md text-white/70">{eventsTeaser.subhead}</p>
           </div>
           <a
             href="/events"
             className="group inline-flex shrink-0 items-center gap-1.5 rounded-full border border-white/20 px-5 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-white/10"
           >
-            {EVENTS_TEASER.cta}
+            {eventsTeaser.cta}
             <ArrowRight size={16} className="transition-transform group-hover:translate-x-1" />
           </a>
         </motion.div>

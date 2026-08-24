@@ -1,12 +1,15 @@
 'use client';
 
+'use client';
+
 import { motion } from 'motion/react';
 import { Sparkles, Target } from 'lucide-react';
 import { NetworkField } from '@/components/network-field';
 import { StatCounter } from '@/components/stat-counter';
 import { VideoModal } from '@/components/video-modal';
-import { STATS } from '@/data/home';
-import { MISSION, NUMBERS_HEADING, TEAM, VALUES, VISION, WHO_ARE_WE } from '@/data/about';
+import { getHomeContent } from '@/data/home';
+import { getAboutContent } from '@/data/about';
+import { useLocale } from '@/lib/i18n/locale-context';
 
 function initialsOf(name: string) {
   return name
@@ -18,6 +21,11 @@ function initialsOf(name: string) {
 }
 
 export default function AboutPage() {
+  const { locale } = useLocale();
+  const { stats: STATS } = getHomeContent(locale);
+  const { vision: VISION, mission: MISSION, whoAreWe: WHO_ARE_WE, values: VALUES, numbersHeading: NUMBERS_HEADING, team: TEAM } =
+    getAboutContent(locale);
+
   return (
     <div>
       <section
@@ -34,7 +42,7 @@ export default function AboutPage() {
             y: { duration: 4, repeat: Infinity, ease: 'easeInOut', delay: 0.4 },
             rotate: { duration: 4, repeat: Infinity, ease: 'easeInOut', delay: 0.4 },
           }}
-          className="pointer-events-none absolute left-[7%] top-20 hidden items-center gap-1.5 rounded-full border border-white/25 bg-white/10 px-3.5 py-1.5 text-xs font-bold text-white backdrop-blur-sm lg:flex"
+          className="pointer-events-none absolute start-[7%] top-20 hidden items-center gap-1.5 rounded-full border border-white/25 bg-white/10 px-3.5 py-1.5 text-xs font-bold text-white backdrop-blur-sm lg:flex"
         >
           <Target size={13} />
           {STATS[0].value} {STATS[0].label}
@@ -98,7 +106,7 @@ export default function AboutPage() {
           <div className="mt-8 grid gap-4 sm:grid-cols-3 lg:grid-cols-5">
             {VALUES.items.map((value, i) => (
               <motion.div
-                key={value}
+                key={i}
                 initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true, margin: '-60px' }}
@@ -155,7 +163,7 @@ export default function AboutPage() {
           <div className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
             {TEAM.members.map((member, i) => (
               <motion.div
-                key={member.name}
+                key={i}
                 initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true, margin: '-60px' }}

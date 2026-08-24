@@ -2,13 +2,14 @@
 
 import { useRef, useState } from 'react';
 import { Loader2, Paperclip, X } from 'lucide-react';
+import { useLocale } from '@/lib/i18n/locale-context';
 
-async function uploadFile(file: File): Promise<string> {
+async function uploadFile(file: File, uploadFailedMessage: string): Promise<string> {
   const formData = new FormData();
   formData.append('file', file);
   const res = await fetch('/api/uploads', { method: 'POST', body: formData });
   const data = await res.json();
-  if (!res.ok) throw new Error(data.message ?? 'Upload failed');
+  if (!res.ok) throw new Error(data.message ?? uploadFailedMessage);
   return data.url as string;
 }
 
@@ -23,6 +24,7 @@ export function FileUploadField({
   urls: string[];
   onChange: (urls: string[]) => void;
 }) {
+  const { t } = useLocale();
   const inputRef = useRef<HTMLInputElement>(null);
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -32,10 +34,12 @@ export function FileUploadField({
     setError(null);
     setUploading(true);
     try {
-      const uploaded = await Promise.all(Array.from(fileList).map(uploadFile));
+      const uploaded = await Promise.all(
+        Array.from(fileList).map((file) => uploadFile(file, t('fileUpload.uploadFailed'))),
+      );
       onChange(multiple ? [...urls, ...uploaded] : uploaded);
     } catch {
-      setError('Upload failed. PDF, JPG, JPEG, PNG only, max 10 MB.');
+      setError(t('fileUpload.uploadFailedDetailed'));
     } finally {
       setUploading(false);
       if (inputRef.current) inputRef.current.value = '';
@@ -52,8 +56,8 @@ export function FileUploadField({
         className="flex flex-col items-center justify-center gap-1.5 rounded-xl border border-dashed border-ink/15 px-4 py-6 text-center transition-colors hover:border-brand-500 disabled:cursor-not-allowed"
       >
         {uploading ? <Loader2 size={20} className="animate-spin text-brand-500" /> : <Paperclip size={20} className="text-ink-faint" />}
-        <span className="text-sm font-medium text-ink-soft">Click to upload or drag files here</span>
-        <span className="text-xs font-normal text-ink-faint">PDF, jpg, png, jpeg (max 10 MB).</span>
+        <span className="text-sm font-medium text-ink-soft">{t('fileUpload.clickToUpload')}</span>
+        <span className="text-xs font-normal text-ink-faint">{t('fileUpload.fileTypesHint')}</span>
       </button>
       <input
         ref={inputRef}
@@ -72,7 +76,7 @@ export function FileUploadField({
               <button
                 type="button"
                 onClick={() => onChange(urls.filter((_, idx) => idx !== i))}
-                aria-label="Remove file"
+                aria-label={t('fileUpload.removeFile')}
                 className="text-ink-faint hover:text-status-coral"
               >
                 <X size={14} />

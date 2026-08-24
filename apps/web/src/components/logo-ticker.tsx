@@ -3,14 +3,18 @@
 import Image from 'next/image';
 import { motion } from 'motion/react';
 import type { PartnerLogoCategory, PublicPartnerLogo } from '@i-career/types';
-import { WHO_WE_WORKED_WITH_HEADING } from '@/data/home';
+import { getHomeContent } from '@/data/home';
+import { useLocale } from '@/lib/i18n/locale-context';
 
-const CATEGORY_ORDER: { key: PartnerLogoCategory; label: string }[] = [
-  { key: 'GOVERNMENTAL', label: 'Governmental Partners' },
-  { key: 'ORGANIZATIONS', label: 'International & Local Organizations' },
-  { key: 'EMPLOYERS', label: 'Employers' },
-  { key: 'UNIVERSITIES', label: 'Universities' },
-];
+function useCategoryOrder(): { key: PartnerLogoCategory; label: string }[] {
+  const { t } = useLocale();
+  return [
+    { key: 'GOVERNMENTAL', label: t('logoTicker.governmental') },
+    { key: 'ORGANIZATIONS', label: t('logoTicker.organizations') },
+    { key: 'EMPLOYERS', label: t('logoTicker.employers') },
+    { key: 'UNIVERSITIES', label: t('logoTicker.universities') },
+  ];
+}
 
 function MarqueeRow({ logos }: { logos: PublicPartnerLogo[] }) {
   const duration = 22 + logos.length * 1.6;
@@ -31,6 +35,7 @@ function MarqueeRow({ logos }: { logos: PublicPartnerLogo[] }) {
               alt={logo.name}
               width={logo.width}
               height={logo.height}
+              loading="eager"
               className="h-9 w-auto object-contain sm:h-10"
             />
           </div>
@@ -41,7 +46,11 @@ function MarqueeRow({ logos }: { logos: PublicPartnerLogo[] }) {
 }
 
 export function LogoTicker({ logos }: { logos: PublicPartnerLogo[] }) {
-  const groups = CATEGORY_ORDER.map(({ key, label }) => ({
+  const { locale } = useLocale();
+  const categoryOrder = useCategoryOrder();
+  const whoWeWorkedWithHeading = getHomeContent(locale).whoWeWorkedWithHeading;
+  const groups = categoryOrder.map(({ key, label }) => ({
+    key,
     label,
     logos: logos.filter((l) => l.category === key).sort((a, b) => a.order - b.order),
   })).filter((group) => group.logos.length > 0);
@@ -58,19 +67,19 @@ export function LogoTicker({ logos }: { logos: PublicPartnerLogo[] }) {
           transition={{ duration: 0.5 }}
           className="text-center text-3xl font-extrabold text-ink sm:text-[32px]"
         >
-          {WHO_WE_WORKED_WITH_HEADING}
+          {whoWeWorkedWithHeading}
         </motion.h2>
 
         <div className="mt-12 flex flex-col gap-10">
           {groups.map((group, i) => (
             <motion.div
-              key={group.label}
+              key={group.key}
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, margin: '-60px' }}
               transition={{ duration: 0.5, delay: i * 0.06 }}
             >
-              <p className="mb-4 text-center text-xs font-bold uppercase tracking-wide text-ink-soft sm:text-left">
+              <p className="mb-4 text-center text-xs font-bold uppercase tracking-wide text-ink-soft sm:text-start">
                 {group.label}
               </p>
               <MarqueeRow logos={group.logos} />

@@ -16,6 +16,7 @@ import type { PublicServiceProject } from '@i-career/types';
 import { NetworkField } from '@/components/network-field';
 import { TypewriterHeading } from '@/components/typewriter-heading';
 import type { ServiceIconName, ServicePageData } from '@/data/services';
+import { useLocale } from '@/lib/i18n/locale-context';
 import { BoldedText } from './bolded-text';
 import { ServiceProjectsSection } from './service-projects-section';
 
@@ -31,6 +32,7 @@ const ICONS: Record<ServiceIconName, typeof Sparkles> = {
 };
 
 export function ServicePage({ data, projects }: { data: ServicePageData; projects: PublicServiceProject[] }) {
+  const { t } = useLocale();
   const highlightIndex = data.headlineText.indexOf(data.headlineHighlight);
   const before = highlightIndex >= 0 ? data.headlineText.slice(0, highlightIndex) : data.headlineText;
   const after = highlightIndex >= 0 ? data.headlineText.slice(highlightIndex + data.headlineHighlight.length) : '';
@@ -51,7 +53,7 @@ export function ServicePage({ data, projects }: { data: ServicePageData; project
             y: { duration: 4, repeat: Infinity, ease: 'easeInOut', delay: 0.5 },
             rotate: { duration: 4, repeat: Infinity, ease: 'easeInOut', delay: 0.5 },
           }}
-          className="pointer-events-none absolute left-[6%] top-40 hidden items-center gap-1.5 rounded-full border border-brand-500/20 bg-white/90 px-3.5 py-1.5 text-xs font-bold text-brand-700 shadow-lg backdrop-blur-sm lg:flex"
+          className="pointer-events-none absolute start-[6%] top-40 hidden items-center gap-1.5 rounded-full border border-brand-500/20 bg-white/90 px-3.5 py-1.5 text-xs font-bold text-brand-700 shadow-lg backdrop-blur-sm lg:flex"
         >
           <Sparkles size={13} />
           {data.keywords[0]}
@@ -64,7 +66,7 @@ export function ServicePage({ data, projects }: { data: ServicePageData; project
             y: { duration: 4.5, repeat: Infinity, ease: 'easeInOut', delay: 0.65 },
             rotate: { duration: 4.5, repeat: Infinity, ease: 'easeInOut', delay: 0.65 },
           }}
-          className="pointer-events-none absolute right-[7%] top-56 hidden items-center gap-1.5 rounded-full border border-accent-500/25 bg-white/90 px-3.5 py-1.5 text-xs font-bold text-accent-500 shadow-lg backdrop-blur-sm lg:flex"
+          className="pointer-events-none absolute end-[7%] top-56 hidden items-center gap-1.5 rounded-full border border-accent-500/25 bg-white/90 px-3.5 py-1.5 text-xs font-bold text-accent-500 shadow-lg backdrop-blur-sm lg:flex"
         >
           <ApproachIcon size={13} />
           {data.keywords[1]}
@@ -77,7 +79,7 @@ export function ServicePage({ data, projects }: { data: ServicePageData; project
             transition={{ duration: 0.5 }}
             className="inline-flex items-center gap-2 rounded-full border border-brand-500/20 bg-white/80 px-4 py-1.5 text-xs font-bold uppercase tracking-wide text-brand-700 shadow-sm backdrop-blur-sm"
           >
-            Services / {data.breadcrumbLabel}
+            {t('servicesBreadcrumb.prefix')} / {data.breadcrumbLabel}
           </motion.span>
 
           <h1 className="mt-6 text-balance font-sans text-3xl font-bold uppercase leading-[1.15] tracking-tight text-ink sm:text-4xl md:text-5xl">
@@ -117,7 +119,7 @@ export function ServicePage({ data, projects }: { data: ServicePageData; project
             <div className="mt-5 flex flex-wrap gap-2.5">
               {data.approach.bullets.map((bullet, i) => (
                 <motion.span
-                  key={bullet}
+                  key={i}
                   initial={{ opacity: 0, y: 8 }}
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
@@ -149,7 +151,7 @@ export function ServicePage({ data, projects }: { data: ServicePageData; project
             const SectionIcon = ICONS[section.icon];
             return (
               <motion.section
-                key={section.heading}
+                key={i}
                 initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true, margin: '-60px' }}
@@ -181,7 +183,7 @@ export function ServicePage({ data, projects }: { data: ServicePageData; project
             {[...ghostWords, ...ghostWords].map((word, i) => (
               <span
                 key={i}
-                className="text-[5rem] font-extrabold uppercase leading-none tracking-tight text-white/[0.07] sm:text-[7rem]"
+                className="text-[5rem] font-extrabold uppercase leading-none tracking-tight text-white/[0.07] rtl:leading-[1.3] sm:text-[7rem]"
               >
                 {word}
               </span>
