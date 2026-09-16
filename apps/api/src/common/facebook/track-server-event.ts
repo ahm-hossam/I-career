@@ -13,6 +13,11 @@ export interface FacebookEventUserData {
  * Best-effort server-side call to the Facebook Conversions API. No-ops when
  * FB_PIXEL_ID / FB_CONVERSIONS_ACCESS_TOKEN aren't configured, and never
  * throws — a Facebook outage must not affect registration/application flows.
+ *
+ * When FB_TEST_EVENT_CODE is set (Events Manager → Test Events tab), it's
+ * attached to every call so these events land in the Test Events feed
+ * instead of mixing into real production analytics — meant for local/staging
+ * only; leave it unset in production.
  */
 export async function trackServerEvent(
   eventName: string,
@@ -21,6 +26,7 @@ export async function trackServerEvent(
 ): Promise<void> {
   const pixelId = process.env.FB_PIXEL_ID;
   const accessToken = process.env.FB_CONVERSIONS_ACCESS_TOKEN;
+  const testEventCode = process.env.FB_TEST_EVENT_CODE;
   if (!pixelId || !accessToken) return;
 
   const hashedUserData: Record<string, string[]> = {};
@@ -45,6 +51,7 @@ export async function trackServerEvent(
             ...(customData ? { custom_data: customData } : {}),
           },
         ],
+        ...(testEventCode ? { test_event_code: testEventCode } : {}),
       }),
     });
   } catch {
