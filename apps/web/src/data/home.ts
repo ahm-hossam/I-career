@@ -13,7 +13,15 @@ interface HomeContent {
     heading: string;
     subhead: string;
     cta: string;
-    featured: { title: string; mode: 'Offline'; date: string; location: string; tag: string; cta: string };
+    featured: {
+      slug: string;
+      title: string;
+      mode: 'Offline';
+      date: string;
+      location: string;
+      tag: string;
+      cta: string;
+    };
   };
   testimonialsHeading: string;
   testimonialsSubhead: string;
@@ -68,7 +76,6 @@ const HOME_CONTENT: Record<Locale, HomeContent> = {
         heading: 'Drive Positive Change',
         items: [
           'Employment Programs',
-          'Virtual Career Center',
           'Career Fair Summits',
           'Refugees Employment',
           'Private Sector Engagement',
@@ -86,11 +93,12 @@ const HOME_CONTENT: Record<Locale, HomeContent> = {
       subhead: 'Get face-to-face with employers, boost your skills through rich content, and apply for jobs!',
       cta: 'View More',
       featured: {
-        title: 'Jobzella Career Fair',
+        slug: 'next-summit',
+        title: 'NEXT Summit',
         mode: 'Offline',
-        date: '21 Dec 2024',
+        date: '12 Sep 2026',
         location: 'Cairo',
-        tag: 'Career Fair',
+        tag: 'Career Summit',
         cta: 'View Event',
       },
     },
@@ -209,7 +217,6 @@ const HOME_CONTENT: Record<Locale, HomeContent> = {
         heading: 'قد التغيير الإيجابي',
         items: [
           'برامج التوظيف',
-          'المركز الوظيفي الافتراضي',
           'قمم معارض التوظيف',
           'توظيف اللاجئين',
           'التعاون مع القطاع الخاص',
@@ -227,11 +234,12 @@ const HOME_CONTENT: Record<Locale, HomeContent> = {
       subhead: 'التق وجهًا لوجه بأصحاب العمل، وطوّر مهاراتك من خلال محتوى غني، وتقدّم للوظائف!',
       cta: 'عرض المزيد',
       featured: {
-        title: 'معرض جوبزيلا الوظيفي',
+        slug: 'next-summit',
+        title: 'قمة NEXT',
         mode: 'Offline',
-        date: '21 ديسمبر 2024',
+        date: '12 سبتمبر 2026',
         location: 'القاهرة',
-        tag: 'معرض وظيفي',
+        tag: 'قمة مهنية',
         cta: 'عرض الفعالية',
       },
     },

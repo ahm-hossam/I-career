@@ -23,20 +23,10 @@ const SITE_CONTENT: Record<Locale, SiteContent> = {
       },
       { label: 'Programs', href: '/programs' },
       { label: 'Events', href: '/events' },
-      { label: 'Articles', href: '/articles' },
-      { label: 'About us', href: '/about' },
       { label: 'Contact us', href: '/contact' },
     ],
     footerTagline: 'Be Career Ready!',
     footerColumns: [
-      {
-        heading: 'Company',
-        links: [
-          { label: 'About', href: '/about' },
-          { label: 'Careers', href: '/careers' },
-          { label: 'Team', href: '/about#team' },
-        ],
-      },
       {
         heading: 'Support',
         links: [
@@ -62,20 +52,10 @@ const SITE_CONTENT: Record<Locale, SiteContent> = {
       },
       { label: 'البرامج', href: '/programs' },
       { label: 'الفعاليات', href: '/events' },
-      { label: 'المقالات', href: '/articles' },
-      { label: 'من نحن', href: '/about' },
       { label: 'اتصل بنا', href: '/contact' },
     ],
     footerTagline: 'كن جاهزًا لمهنتك!',
     footerColumns: [
-      {
-        heading: 'الشركة',
-        links: [
-          { label: 'من نحن', href: '/about' },
-          { label: 'الوظائف', href: '/careers' },
-          { label: 'الفريق', href: '/about#team' },
-        ],
-      },
       {
         heading: 'الدعم',
         links: [

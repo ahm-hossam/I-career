@@ -1,5 +1,6 @@
 'use client';
 
+import Link from 'next/link';
 import { motion } from 'motion/react';
 import { ArrowRight, Calendar, MapPin } from 'lucide-react';
 import { getHomeContent } from '@/data/home';
@@ -43,32 +44,34 @@ export function EventsTeaser() {
           viewport={{ once: true, margin: '-60px' }}
           transition={{ duration: 0.5, delay: 0.1 }}
           whileHover={{ y: -4 }}
-          className="mt-10 max-w-md rounded-2xl border border-white/10 bg-white/[0.06] p-6 shadow-xl backdrop-blur"
+          className="mt-10 max-w-md"
         >
-          <span className="inline-block rounded-full bg-status-coral/15 px-3 py-1 text-xs font-semibold text-status-coral">
-            {featured.mode}
-          </span>
-          <h3 className="mt-3 text-xl font-bold text-white">{featured.title}</h3>
-          <div className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-1.5 text-sm text-white/70">
-            <span className="flex items-center gap-1.5">
-              <Calendar size={14} />
-              {featured.date}
-            </span>
-            <span className="flex items-center gap-1.5">
-              <MapPin size={14} />
-              {featured.location}
-            </span>
-            <span className="rounded-full bg-white/10 px-2.5 py-0.5 text-xs font-medium text-white/80">
-              {featured.tag}
-            </span>
-          </div>
-          <a
-            href="/events"
-            className="group mt-5 inline-flex items-center gap-1.5 text-sm font-semibold text-accent-300"
+          <Link
+            href={`/events/${featured.slug}`}
+            className="group block rounded-2xl border border-white/10 bg-white/[0.06] p-6 shadow-xl backdrop-blur transition-colors hover:bg-white/[0.09]"
           >
-            {featured.cta}
-            <ArrowRight size={16} className="transition-transform group-hover:translate-x-1" />
-          </a>
+            <span className="inline-block rounded-full bg-status-coral/15 px-3 py-1 text-xs font-semibold text-status-coral">
+              {featured.mode}
+            </span>
+            <h3 className="mt-3 text-xl font-bold text-white">{featured.title}</h3>
+            <div className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-1.5 text-sm text-white/70">
+              <span className="flex items-center gap-1.5">
+                <Calendar size={14} />
+                {featured.date}
+              </span>
+              <span className="flex items-center gap-1.5">
+                <MapPin size={14} />
+                {featured.location}
+              </span>
+              <span className="rounded-full bg-white/10 px-2.5 py-0.5 text-xs font-medium text-white/80">
+                {featured.tag}
+              </span>
+            </div>
+            <span className="mt-5 inline-flex items-center gap-1.5 text-sm font-semibold text-accent-300">
+              {featured.cta}
+              <ArrowRight size={16} className="transition-transform group-hover:translate-x-1" />
+            </span>
+          </Link>
         </motion.div>
       </div>
     </section>

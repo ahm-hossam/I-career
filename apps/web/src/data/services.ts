@@ -109,7 +109,7 @@ const SERVICES_CONTENT: Record<Locale, ServicesContent> = {
       breadcrumbLabel: 'NGOs',
       headlineText: 'SYNERGIZING FORCES FOR TRANSFORMATIVE CHANGE',
       headlineHighlight: 'SYNERGIZING',
-      keywords: ['Virtual Career Center', 'Career Fair Summits'],
+      keywords: ['Career Fair Summits'],
       approach: {
         heading: 'Employment Programs',
         body: 'We provide **Employment Programs** for NGOs, designed to create a dynamic matchmaking environment that aligns the needs of employers with the skills of job seekers, fostering collaborative opportunities for economic development and workforce growth.',
@@ -117,11 +117,6 @@ const SERVICES_CONTENT: Record<Locale, ServicesContent> = {
         icon: 'rocket',
       },
       sections: [
-        {
-          heading: 'Virtual Career Center (VCC)',
-          body: 'The **Virtual Career Center (VCC)** is a one-stop platform that seamlessly integrates all stakeholders into a single, powerful server. This innovative solution empowers NGOs to efficiently track and support their beneficiaries, fostering a meaningful technological transformation.',
-          icon: 'globe',
-        },
         {
           heading: 'Employment Programs for Refugees',
           body: 'We offer Employment Programs specialized for refugees. These programs include personalized career guidance, skill development workshops, and job placement services tailored to the unique needs of refugees to empower their economic independence and social integration.',
@@ -207,7 +202,7 @@ const SERVICES_CONTENT: Record<Locale, ServicesContent> = {
       breadcrumbLabel: 'المنظمات غير الحكومية',
       headlineText: 'توحيد الجهود من أجل تغيير جذري',
       headlineHighlight: 'توحيد الجهود',
-      keywords: ['المركز الوظيفي الافتراضي', 'قمم معارض التوظيف'],
+      keywords: ['قمم معارض التوظيف'],
       approach: {
         heading: 'برامج التوظيف',
         body: 'نقدم **برامج توظيف** للمنظمات غير الحكومية، مصممة لخلق بيئة مطابقة ديناميكية تُوائم بين احتياجات أصحاب العمل ومهارات الباحثين عن عمل، مما يعزز فرص التعاون من أجل التنمية الاقتصادية ونمو القوى العاملة.',
@@ -215,11 +210,6 @@ const SERVICES_CONTENT: Record<Locale, ServicesContent> = {
         icon: 'rocket',
       },
       sections: [
-        {
-          heading: 'المركز الوظيفي الافتراضي (VCC)',
-          body: 'يُعد **المركز الوظيفي الافتراضي (VCC)** منصة شاملة تدمج جميع الأطراف المعنية بسلاسة في خادم واحد قوي. يمكّن هذا الحل المبتكر المنظمات غير الحكومية من تتبع ودعم المستفيدين لديها بكفاءة، مما يعزز تحولًا تقنيًا هادفًا.',
-          icon: 'globe',
-        },
         {
           heading: 'برامج التوظيف للاجئين',
           body: 'نقدم برامج توظيف متخصصة للاجئين. تشمل هذه البرامج إرشادًا مهنيًا شخصيًا، وورش عمل لتطوير المهارات، وخدمات تنسيب وظيفي مصممة خصيصًا لتلبية الاحتياجات الفريدة للاجئين لتعزيز استقلالهم الاقتصادي واندماجهم الاجتماعي.',
